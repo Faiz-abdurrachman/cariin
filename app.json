@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Cari.In",
+    "slug": "cariin",
+    "scheme": "cariin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#18181B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "id.cariin.app"
+    },
+    "android": {
+      "package": "id.cariin.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#18181B"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-image-picker",
+      "expo-notifications",
+      "@react-native-google-signin/google-signin"
+    ]
+  }
+}
