@@ -1,7 +1,7 @@
 # CONTEXT.md — Cari.In (Campus Lost & Found App)
 > **Sumber kebenaran tunggal project ini.**
 > Baca file ini + `UI_AUDIT.md` sebelum menulis satu baris kode pun.
-> Last updated: Mei 2026 | Versi: 5.0
+> Last updated: Mei 2026 | Versi: 5.1 (migrasi total Firebase → Supabase)
 
 ---
 
@@ -115,12 +115,12 @@ src/
 │   └── ConfirmModal.tsx
 │
 ├── services/
-│   ├── firebase.ts              ← inisialisasi Firebase
-│   ├── auth.service.ts          ← Firebase Auth operations
-│   ├── report.service.ts        ← Firestore CRUD laporan
-│   ├── chat.service.ts          ← Firestore real-time chat
-│   ├── notification.service.ts  ← FCM push notification
-│   └── upload.service.ts        ← Firebase Storage foto
+│   ├── supabase.ts              ← inisialisasi Supabase client
+│   ├── auth.service.ts          ← Supabase Auth operations
+│   ├── report.service.ts        ← Supabase Postgres CRUD laporan
+│   ├── chat.service.ts          ← Supabase Realtime chat (postgres_changes)
+│   ├── notification.service.ts  ← Expo Notifications (lokal + remote via Expo Push)
+│   └── upload.service.ts        ← Supabase Storage foto
 │
 ├── context/
 │   ├── AuthContext.tsx           ← global auth state
@@ -153,10 +153,10 @@ Ini adalah requirement dari PDF dosen yang HARUS ada di project:
 | **Navigation** | Tab Navigator | MainNavigator (Bottom Tab) ✅ |
 | **Navigation** | Drawer Navigator | AdminNavigator ✅ |
 | **State** | Context API / Zustand / Redux | AuthContext + Zustand ✅ |
-| **Networking** | REST APIs via Axios atau Fetch | Axios + Firebase REST ✅ |
-| **Auth** | JWT Authentication | Firebase Auth token ✅ |
-| **Auth** | Google Authentication | Firebase Google Sign-In ✅ |
-| **Database** | Realtime Database CRUD | Firestore real-time ✅ |
+| **Networking** | REST APIs via Axios atau Fetch | Axios + Supabase REST (PostgREST) ✅ |
+| **Auth** | JWT Authentication | Supabase Auth (JWT-based) ✅ |
+| **Auth** | Google Authentication | Supabase OAuth (Google provider via web flow) ✅ |
+| **Database** | Realtime Database CRUD | Supabase Postgres + Realtime subscription ✅ |
 | **Storage** | AsyncStorage (offline persistence) | Cache laporan ✅ |
 | **Storage** | SecureStorage (JWT/token) | expo-secure-store ✅ |
 | **Build** | Expo EAS Build → APK | Untuk submission ✅ |
@@ -221,7 +221,7 @@ Ini adalah requirement dari PDF dosen yang HARUS ada di project:
 - **Detail:** foto, badge status+kategori, lokasi, deskripsi, badge "Via Admin"
 - **Laporan Lost:** foto wajib, nama, kategori, lokasi terakhir, deskripsi → pending
 - **Laporan Found:** foto wajib, nama, kategori, lokasi temuan, titik penitipan wajib, deskripsi → pending
-- **Chat:** inbox, in-app chat real-time (Firestore), notifikasi
+- **Chat:** inbox, in-app chat real-time (Supabase Realtime), notifikasi
 - **Akun:** laporanku, edit laporan, profil, pengaturan, bantuan
 
 ### Admin
@@ -261,23 +261,24 @@ Zustand        → feedStore (laporan, filter, search)
                → chatStore (percakapan, pesan aktif)
 ```
 
-### Backend — Firebase (sesuai dosen: Google Auth + Realtime Database)
+### Backend — Supabase (sesuai dosen: Google Auth + Realtime Database)
 ```
-firebase (JS SDK ^10.0.0)
-├── Firebase Authentication
+@supabase/supabase-js (^2.x) + react-native-url-polyfill
+├── Supabase Auth
 │   ├── Email/Password login
-│   └── Google Sign-In ← WAJIB DOSEN
-├── Firestore           ← Realtime Database CRUD ← WAJIB DOSEN
-│   ├── Real-time listener untuk chat
-│   └── CRUD untuk laporan, notifikasi
-├── Firebase Storage    ← foto barang
-└── FCM                 ← push notification
+│   └── OAuth Google provider ← WAJIB DOSEN (web flow via expo-web-browser)
+├── Supabase Postgres + Realtime  ← Realtime Database CRUD ← WAJIB DOSEN
+│   ├── Subscription via postgres_changes untuk chat real-time
+│   ├── CRUD lewat PostgREST (auto-generated REST API per tabel)
+│   └── Row Level Security (RLS) sebagai access control
+├── Supabase Storage    ← foto barang (bucket: report-photos, chat-media, avatars)
+└── expo-notifications  ← push notification (lokal + remote via Expo Push token)
 ```
 
 ### Networking — WAJIB DOSEN
 ```
 axios              ← REST API calls ← WAJIB DOSEN
-                   → dipakai untuk Firestore REST endpoint
+                   → dipakai untuk Supabase PostgREST endpoint (auto-generated REST per tabel)
                    → atau external API jika ada
 ```
 
@@ -320,80 +321,103 @@ export const EMAIL_DOMAIN_ERROR =
   'Email harus menggunakan alamat resmi kampus (contoh: nama@student.unu-jogja.ac.id)'
 ```
 
-> Validasi dilakukan client-side sebelum request ke Firebase.
-> Cukup untuk project kuliah — tidak perlu Cloud Functions.
+> Validasi dilakukan client-side sebelum request ke Supabase.
+> Cukup untuk project kuliah — backend enforcement bisa lewat trigger Postgres atau RLS policy.
 
 ---
 
-## 9. FIRESTORE STRUCTURE
+## 9. POSTGRES SCHEMA (SUPABASE)
 
-### Collection: users
-```
-users/{userId}
-  name:             string
-  nim:              string
-  email:            string
-  role:             'mahasiswa' | 'admin'
-  faculty:          string
-  department:       string
-  avatarUrl:        string | null
-  isVerified:       boolean
-  fcmToken:         string | null
-  createdAt:        Timestamp
-  updatedAt:        Timestamp
-```
+> Schema lengkap + RLS policies ada di file `supabase-schema.sql` (root project). Run di Supabase Dashboard → SQL Editor sebelum mulai integrasi.
 
-### Collection: reports
+### Tabel: profiles
+> Extends `auth.users` (Supabase built-in). 1-1 dengan `auth.users.id`.
 ```
-reports/{reportId}
-  userId:           string | null
-  type:             'lost' | 'found'
-  title:            string
-  description:      string
-  category:         'elektronik' | 'dokumen' | 'dompet_tas' | 'kunci' |
-                    'aksesoris' | 'pakaian' | 'buku_atk' | 'lainnya'
-  location:         string
-  custodyPoint:     string | null    ← wajib jika found
-  photoUrl:         string | null
-  status:           'pending' | 'approved' | 'rejected' | 'resolved'
-  adminNote:        string | null
-  createdByAdmin:   boolean
-  reporterName:     string | null    ← jika createdByAdmin = true
-  reporterNim:      string | null
-  reporterFaculty:  string | null
-  resolvedAt:       Timestamp | null
-  createdAt:        Timestamp
-  updatedAt:        Timestamp
+profiles
+  id                UUID PK, FK → auth.users(id) ON DELETE CASCADE
+  name              TEXT NOT NULL
+  nim               TEXT
+  email             TEXT NOT NULL
+  role              TEXT CHECK (role IN ('mahasiswa', 'admin')) DEFAULT 'mahasiswa'
+  faculty           TEXT
+  department        TEXT
+  avatar_url        TEXT
+  is_verified       BOOLEAN DEFAULT false
+  expo_push_token   TEXT             -- ganti fcmToken (pakai Expo Push)
+  created_at        TIMESTAMPTZ DEFAULT now()
+  updated_at        TIMESTAMPTZ DEFAULT now()
 ```
 
-### Collection: conversations
+### Tabel: reports
 ```
-conversations/{convId}
-  reportId:         string
-  userAId:          string
-  userBId:          string
-  lastMessage:      string
-  lastAt:           Timestamp
-  createdAt:        Timestamp
+reports
+  id                UUID PK DEFAULT gen_random_uuid()
+  user_id           UUID FK → profiles(id) ON DELETE SET NULL
+  type              TEXT CHECK (type IN ('lost', 'found'))
+  title             TEXT NOT NULL
+  description       TEXT
+  category          TEXT CHECK (category IN (
+                      'elektronik','dokumen','dompet_tas','kunci',
+                      'aksesoris','pakaian','buku_atk','lainnya'))
+  location          TEXT NOT NULL
+  custody_point     TEXT             -- wajib jika type='found' (enforced di RLS/trigger)
+  photo_url         TEXT
+  status            TEXT CHECK (status IN ('pending','approved','rejected','resolved'))
+                       DEFAULT 'pending'
+  admin_note        TEXT
+  created_by_admin  BOOLEAN DEFAULT false
+  reporter_name     TEXT             -- jika created_by_admin = true
+  reporter_nim      TEXT
+  reporter_faculty  TEXT
+  resolved_at       TIMESTAMPTZ
+  created_at        TIMESTAMPTZ DEFAULT now()
+  updated_at        TIMESTAMPTZ DEFAULT now()
+```
 
-  subcollection: messages/{msgId}
-    senderId:       string
-    content:        string
-    isRead:         boolean
-    createdAt:      Timestamp
+### Tabel: conversations
+```
+conversations
+  id                UUID PK DEFAULT gen_random_uuid()
+  report_id         UUID FK → reports(id) ON DELETE CASCADE
+  user_a_id         UUID FK → profiles(id) ON DELETE CASCADE
+  user_b_id         UUID FK → profiles(id) ON DELETE CASCADE
+  last_message      TEXT
+  last_at           TIMESTAMPTZ
+  created_at        TIMESTAMPTZ DEFAULT now()
+  UNIQUE (report_id, user_a_id, user_b_id)
 ```
 
-### Collection: notifications
+### Tabel: messages
 ```
-notifications/{notifId}
-  userId:           string
-  type:             'report_approved' | 'report_rejected' | 'new_message'
-  title:            string
-  body:             string
-  isRead:           boolean
-  refId:            string
-  createdAt:        Timestamp
+messages
+  id                UUID PK DEFAULT gen_random_uuid()
+  conversation_id   UUID FK → conversations(id) ON DELETE CASCADE
+  sender_id         UUID FK → profiles(id)
+  content           TEXT NOT NULL
+  is_read           BOOLEAN DEFAULT false
+  created_at        TIMESTAMPTZ DEFAULT now()
 ```
+
+### Tabel: notifications
+```
+notifications
+  id                UUID PK DEFAULT gen_random_uuid()
+  user_id           UUID FK → profiles(id) ON DELETE CASCADE
+  type              TEXT CHECK (type IN ('report_approved','report_rejected','new_message'))
+  title             TEXT NOT NULL
+  body              TEXT NOT NULL
+  is_read           BOOLEAN DEFAULT false
+  ref_id            UUID
+  created_at        TIMESTAMPTZ DEFAULT now()
+```
+
+### RLS (Row Level Security) — ringkasan
+
+- **profiles**: user bisa SELECT semua, UPDATE hanya row sendiri. Admin bisa UPDATE semua.
+- **reports**: SELECT publik untuk status='approved' atau 'resolved'. Owner bisa SELECT/UPDATE/DELETE row sendiri (dengan batasan status). Admin bisa SELECT/UPDATE/DELETE semua.
+- **conversations**: SELECT/INSERT/UPDATE hanya jika user adalah `user_a_id` atau `user_b_id`.
+- **messages**: SELECT/INSERT hanya jika user adalah peserta `conversation`.
+- **notifications**: SELECT/UPDATE hanya untuk `user_id = auth.uid()`. INSERT lewat trigger atau service.
 
 ---
 
@@ -514,10 +538,10 @@ Font:           System default / Inter via expo-font
 ## 12. BUSINESS RULES
 
 ### Auth
-1. Email register WAJIB domain kampus — validasi `isValidCampusEmail()` sebelum kirim ke Firebase
-2. Dukung login via Email/Password DAN Google Sign-In (requirement dosen)
-3. Token disimpan di `expo-secure-store`
-4. Admin tidak bisa daftar via form — di-seed langsung di Firestore
+1. Email register WAJIB domain kampus — validasi `isValidCampusEmail()` sebelum kirim ke Supabase
+2. Dukung login via Email/Password DAN Google Sign-In (requirement dosen — Supabase OAuth web flow)
+3. Token sesi otomatis disimpan Supabase di AsyncStorage; PII sensitif (jika ada) di `expo-secure-store`
+4. Admin tidak bisa daftar via form — di-seed manual via SQL: insert ke `profiles` dengan `role='admin'`
 
 ### Laporan Mahasiswa
 5. Laporan mahasiswa WAJIB masuk status `pending` — tidak ada auto-publish
@@ -548,7 +572,7 @@ Font:           System default / Inter via expo-font
 |--------|-----------|--------|
 | 1–2 | Setup environment + prototype HTML (sudah selesai) | ✅ |
 | 3–5 | Core features: CRUD, Navigation Stack+Tab+Drawer, State | 🔜 |
-| 6–7 | Integrasi Firebase: Auth + Google Sign-In + Firestore + FCM | 🔜 |
+| 6–7 | Integrasi Supabase: Auth + OAuth Google + Postgres + Realtime + Storage | 🔜 |
 | 8 | Unit tests, bug fixing, UI refinement, animasi | 🔜 |
 | 9 | Expo EAS Build APK, README, video demo 3–5 menit | 🔜 |
 
@@ -578,8 +602,9 @@ Font:           System default / Inter via expo-font
 
     "zustand": "^4.5.0",
 
-    "firebase": "^10.0.0",
-    "@react-native-google-signin/google-signin": "^11.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "react-native-url-polyfill": "^3.0.0",
+    "expo-web-browser": "~14.0.0",
 
     "axios": "^1.6.0",
 
@@ -606,15 +631,8 @@ Font:           System default / Inter via expo-font
 ```env
 # .env — jangan di-commit ke GitHub
 
-EXPO_PUBLIC_FIREBASE_API_KEY=
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-EXPO_PUBLIC_FIREBASE_APP_ID=
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
-
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
 
 EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN=student.unu-jogja.ac.id
 EXPO_PUBLIC_APP_NAME=Cari.In
@@ -635,17 +653,17 @@ Kita kerja di folder cariin-mobile/
 ### Prioritas Pengerjaan
 1. Setup Expo + install dependencies + struktur folder
 2. Setup NativeWind + TypeScript + ESLint
-3. Setup Firebase + constants + validators
+3. Setup Supabase + constants + validators
 4. AuthContext + Root Navigator
 5. AuthNavigator: Splash → RoleSelection → Login (+ Google) → Register → Forgot
 6. MainNavigator: Bottom Tab + FAB modal
 7. AdminNavigator: Drawer indigo
-8. HomeScreen: fetch Firestore + ReportCard
-9. Create screens: form + upload foto Storage
-10. Admin moderation: approve/reject + notifikasi Firestore
+8. HomeScreen: fetch dari Supabase (table `reports`) + ReportCard
+9. Create screens: form + upload foto ke Supabase Storage
+10. Admin moderation: approve/reject + insert row ke `notifications`
 11. Admin CRUD: create manual + edit + delete
-12. In-App Chat: Firestore real-time listener
-13. Push Notification: FCM via Expo Notifications
+12. In-App Chat: Supabase Realtime subscription (`postgres_changes` di tabel `messages`)
+13. Push Notification: Expo Notifications (lokal saat foreground, remote via Expo Push token disimpan di `profiles.expo_push_token`)
 14. Polish: animasi Reanimated, empty states, skeleton loader
 15. Expo EAS Build → APK
 
@@ -671,7 +689,10 @@ https://cariin-lf.vercel.app/create.html
 
 ---
 
-*Versi: 5.0 | Mei 2026 | App: Cari.In*
-*Changelog v5.0: Stack final sesuai requirement dosen — Firebase Auth +*
-*Google Sign-In + Firestore Realtime + Axios + AsyncStorage + SecureStorage.*
-*Tambah tabel requirement dosen di section 3, Google Sign-In di dependencies.*
+*Versi: 5.1 | Mei 2026 | App: Cari.In*
+*Changelog v5.1: Migrasi total Firebase → Supabase. Alasan: Google Cloud Console*
+*paksa enable billing untuk Firestore di project baru. Stack baru: Supabase Auth +*
+*OAuth Google (web flow) + Postgres + Realtime + Storage + Axios + AsyncStorage*
+*+ SecureStorage. Section 7 (Backend), 9 (Schema), 14 (Deps), 15 (Env) di-rewrite.*
+*Plugin native @react-native-google-signin/google-signin di-drop — pakai*
+*expo-web-browser flow yang jalan di Expo Go tanpa dev build.*

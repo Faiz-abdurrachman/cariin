@@ -297,12 +297,12 @@
 - `admin-create-found.html` → `POST /api/admin/reports` dengan `type: "found"`, `created_by_admin: true`, `custody_point` wajib → status langsung: `approved`
 
 **Chat**
-- Socket.IO untuk real-time
+- Supabase Realtime (`postgres_changes` subscription pada tabel `messages`) untuk real-time
 - `report_id` harus ada di state/URL untuk context item di atas chat
 
 **Notifikasi**
 - 3 tipe: `report_approved`, `report_rejected`, `new_message`
-- Push via FCM ke device
+- Push via Expo Notifications (lokal saat foreground; remote via Expo Push token disimpan di `profiles.expo_push_token`)
 
 **Admin Dashboard Stats**
 - `GET /api/admin/stats` → return: `{ pending, approved, rejected, resolved, total }`

@@ -15,7 +15,7 @@ export const isValidCampusEmail = (email: string): boolean => {
 
 export const EMAIL_DOMAIN_ERROR = `Email harus menggunakan alamat resmi kampus (contoh: nama@${ALLOWED_DOMAIN})`;
 
-// Validator dasar password — minimal 6 karakter sesuai default Firebase Auth.
+// Validator dasar password — minimal 6 karakter sesuai default Supabase Auth.
 export const isValidPassword = (password: string): boolean => {
   return password.length >= 6;
 };

@@ -2,7 +2,7 @@
 
 > Ringkasan kondisi project saat sesi dijeda.
 > Baca file ini + `NEXT_STEPS.md` sebelum melanjutkan pengerjaan.
-> Last updated: 2026-05-05 | Branch: `develop` | Last commit: `06bd180`
+> Last updated: 2026-05-09 | Branch: `main` | Last commit: lihat `git log -1`
 
 ---
 
@@ -11,7 +11,7 @@
 | Fase | Status | Commit |
 |------|--------|--------|
 | FASE 0 — Plan & Konfirmasi | ✅ Selesai | (in-conversation) |
-| FASE 1 — Setup Project | ✅ Selesai | `06bd180` |
+| FASE 1 — Setup Project | ✅ Selesai | lihat `git log` |
 | FASE 2 — Fondasi Navigasi | 🔜 Belum mulai | — |
 | FASE 3 — Auth Screens | 🔜 Belum mulai | — |
 | FASE 4 — Core Mahasiswa | 🔜 Belum mulai | — |
@@ -24,7 +24,7 @@
 
 ### 1. Init Project
 - Expo project di-init via `create-expo-app` template `blank-typescript` di `/tmp/cariin-init`, lalu file dipindah ke `cariin-mobile/` (CONTEXT.md & UI_AUDIT.md tidak terhapus).
-- `app.json` diupdate: `name=Cari.In`, `slug=cariin`, `scheme=cariin`, `package=id.cariin.app`, `bundleIdentifier=id.cariin.app`, plugins `[expo-secure-store, expo-image-picker, expo-notifications, @react-native-google-signin/google-signin]`, splash `backgroundColor=#18181B`.
+- `app.json` diupdate: `name=Cari.In`, `slug=cariin`, `scheme=cariin`, `package=id.cariin.app`, `bundleIdentifier=id.cariin.app`, plugins `[expo-secure-store, expo-image-picker, expo-notifications]`, splash `backgroundColor=#18181B`.
 - `package.json`: `name=cariin-mobile`, scripts `lint`/`format` ditambah.
 
 ### 2. Branch Git
@@ -53,8 +53,8 @@ Versi aktual setelah `npx expo install` (auto-aligned ke SDK 54):
 | nativewind | ^4.2.3 |
 | tailwindcss | ^3.4.19 |
 | zustand | ^5.0.13 |
-| firebase | ^12.12.1 |
-| @react-native-google-signin/google-signin | ^16.1.2 |
+| @supabase/supabase-js | ^2.105.3 |
+| react-native-url-polyfill | ^3.0.0 |
 | axios | ^1.16.0 |
 | @react-native-async-storage/async-storage | 2.2.0 |
 | expo-secure-store | ~15.0.8 |
@@ -114,7 +114,7 @@ cariin-mobile/
     │   └── admin/           6 file .tsx
     ├── navigation/          5 file (4 stub + types.ts stub)
     ├── components/          8 file stub
-    ├── services/            6 file (firebase.ts BERISI KODE; 5 lain stub)
+    ├── services/            6 file (supabase.ts BERISI KODE; 5 lain stub)
     ├── context/             2 file stub
     ├── store/               2 file stub
     └── utils/               4 file (constants.ts + validators.ts BERISI KODE; 2 stub)
@@ -127,7 +127,7 @@ cariin-mobile/
 | `App.tsx` | Splash sederhana untuk verifikasi setup; import `./global.css` |
 | `src/utils/constants.ts` | `COLORS`, `CATEGORIES` (8), `FACULTIES` (8), `REPORT_STATUS_LABEL`, tipe `CategoryId`/`ReportStatus`/`ReportType`/`UserRole` |
 | `src/utils/validators.ts` | `ALLOWED_DOMAIN` (dari env, fallback `student.unu-jogja.ac.id`), `isValidCampusEmail()`, `isValidPassword()`, `isValidNim()`, error messages Indonesia |
-| `src/services/firebase.ts` | Init Firebase App + Auth (RN persistence via AsyncStorage) + Firestore + Storage dari env vars |
+| `src/services/supabase.ts` | Init Supabase client (createClient + AsyncStorage session storage + react-native-url-polyfill) dari env vars |
 | `tailwind.config.js` | Brand colors (lost/found/admin/status/etc) |
 | `app.json` | Cari.In identity + plugins |
 
@@ -155,10 +155,10 @@ Tidak bisa launch interactive dev server dari sesi ini. Yang harus dites manual:
 2. Scan QR di Expo Go (Android) atau iOS Simulator
 3. Pastikan splash "Setup FASE 1 berhasil ✓" muncul dengan styling NativeWind aktif (background hitam, badge hijau bulat)
 
-**Risiko jika gagal:** Metro bundler error (NativeWind config), atau Firebase init throw saat App.tsx pertama mount (karena `.env` belum diisi).
+**Risiko jika gagal:** Metro bundler error (NativeWind config). Supabase init tidak throw saat env kosong (hanya `console.warn`) — aman untuk FASE 1.
 
-### B. Firebase Belum Terkoneksi
-`.env` belum ada — `auth/db/storage` di `firebase.ts` akan throw saat dipanggil pertama kali. Aman selama belum ada screen yang panggil Firebase, tapi mulai FASE 3 wajib ada `.env`.
+### B. Supabase Belum Diuji End-to-End
+`.env` sudah berisi `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (publishable key). Tapi schema database (tabel `profiles`, `reports`, `conversations`, `messages`, `notifications`) belum dibuat di Supabase Dashboard, dan RLS policies belum di-set. Lihat `supabase-schema.sql` di root project — wajib di-run di Supabase SQL Editor sebelum FASE 3.
 
 ### C. Folder `cariin-web/` Nested di Dalam `cariin-mobile/`
 Per `CONTEXT.md` section 2, `cariin-web/` seharusnya **sibling** `cariin-mobile/`, bukan child. Saat ini posisinya di `cariin-mobile/cariin-web/` dan untracked. Belum disentuh — tunggu user putuskan: pindah keluar atau biarkan.
@@ -170,9 +170,9 @@ Per `CONTEXT.md` section 2, `cariin-web/` seharusnya **sibling** `cariin-mobile/
 | # | Keputusan | Alasan |
 |---|-----------|--------|
 | 1 | Pakai Expo SDK **54** (bukan 51 di CONTEXT.md) | SDK 51 + RN 0.83 yang disebut CONTEXT.md tidak compatible (SDK 51 = RN 0.74, RN 0.83 belum ada). SDK 54 adalah versi stabil terbaru per Mei 2026. Dosen tidak cek minor version. |
-| 2 | `npx expo install` untuk semua package, BUKAN versi hardcode dari CONTEXT.md section 14 | Versi di section 14 (`firebase ^10`, `react-navigation ^6`, dll) sudah usang. `expo install` auto-pick versi yang kompatibel dengan SDK 54. |
+| 2 | `npx expo install` untuk semua package, BUKAN versi hardcode dari CONTEXT.md section 14 lama | Versi di section 14 lama (`firebase ^10`, `react-navigation ^6`, dll) sudah usang. Pasca migrasi ke Supabase, dependency Firebase di-replace dengan `@supabase/supabase-js` + `react-native-url-polyfill`. |
 | 3 | React Navigation v7 (bukan v6) | Versi v7 yang dipasang `expo install` untuk SDK 54. API mirip v6, sedikit breaking di Stack vs Tab. |
-| 4 | Firebase JS SDK v12 (bukan v10) | v12 versi terkini. RN persistence via `getReactNativePersistence(AsyncStorage)` masih sama API-nya, tapi tidak terdeklarasi di types publik — perlu `// @ts-ignore` di `firebase.ts`. |
+| 4 | Migrasi total Firebase → Supabase (sebelumnya Firebase JS SDK v12) | Google Cloud Console paksa enable billing untuk Firestore di project baru. Project pindah ke Supabase yang free tier-nya tanpa kartu kredit. Schema NoSQL (Firestore) di-translate ke Postgres + RLS. `@react-native-google-signin/google-signin` ikut di-drop — Google login pakai Supabase OAuth web flow (jalan di Expo Go tanpa dev build). |
 | 5 | NativeWind v4 (bukan v2) | v4 lebih cepat, support lebih banyak Tailwind features. Setup standar 5-file (tailwind config, babel, metro, global.css, env types). |
 | 6 | React Compiler + Suspense **TIDAK** di-enable | Masih experimental di RN. Prioritas stabilitas. Skip — bukan blocker untuk requirement dosen. |
 | 7 | Path alias `@/*` → `src/*` | Lebih readable daripada relative import dalam panjang (`../../../components/...`). |
@@ -180,7 +180,7 @@ Per `CONTEXT.md` section 2, `cariin-web/` seharusnya **sibling** `cariin-mobile/
 | 9 | FACULTIES pakai placeholder dari CONTEXT.md | User akan update setelah cek website UNU Yogyakarta. |
 | 10 | 26 screen placeholder berisi component renderable (bukan murni `export {}`) | Saat navigator di-wire di FASE 2, semua route bisa dibuka tanpa crash. |
 | 11 | Brand colors dimasukkan ke `tailwind.config.js` extend | Bisa dipakai sebagai class langsung (`bg-lost`, `text-admin-text`, dll) selain via `COLORS` const. |
-| 12 | `expo install` plugin Google Sign-In auto-tambahkan ke `app.json` plugins | Dibiarkan karena memang dibutuhkan untuk native module Google Sign-In. |
+| 12 | Plugin `@react-native-google-signin/google-signin` DIHAPUS dari `app.json` plugins | Pasca migrasi ke Supabase, Google login pakai OAuth web flow lewat `expo-web-browser` — tidak butuh native module, jalan di Expo Go tanpa dev build. |
 | 13 | Commit FASE 1 hanya stage file di `cariin-mobile/` (kecuali `cariin-web/`) — tidak sentuh deletions di parent | Pre-existing deletions itu state user sebelum sesi. Bukan tanggung jawab FASE 1. |
 
 ---

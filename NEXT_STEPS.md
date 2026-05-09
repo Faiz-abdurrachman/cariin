@@ -20,9 +20,10 @@ Membangun fondasi navigasi & state otentikasi sehingga setelah ini selesai:
 
 ### 2.0 — Pre-flight Check (sebelum mulai coding)
 1. Pastikan user sudah:
-   - Buat Firebase project (atau setidaknya `.env` punya placeholder valid agar `firebase.ts` tidak crash saat di-import oleh AuthContext).
+   - Buat Supabase project (sudah dilakukan saat migrasi — `.env` sudah berisi `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY`).
+   - Run `supabase-schema.sql` di Supabase Dashboard → SQL Editor untuk bikin tabel + RLS policies.
    - Test FASE 1 di Expo Go — splash render dengan styling NativeWind aktif.
-2. Tanya user: "Apakah `.env` sudah diisi?" — kalau belum, minta isi MINIMAL `EXPO_PUBLIC_FIREBASE_*` agar `initializeApp` tidak throw. Untuk FASE 2 doang sebenarnya cukup placeholder valid (dummy string non-empty).
+2. Verifikasi `.env` sudah ada `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (non-empty). `supabase.ts` cuma `console.warn` (bukan throw) kalau env kosong, jadi App tidak crash — tapi semua call ke Supabase bakal gagal.
 
 ### 2.1 — TypeScript Route Param Types (DULU, biar autocomplete jalan)
 **File:** `src/navigation/types.ts`
@@ -67,24 +68,25 @@ declare global {
 **File:** `src/context/AuthContext.tsx`
 
 State yang di-expose:
-- `user: User | null` — Firebase user object
-- `userProfile: UserProfile | null` — data dari Firestore `users/{uid}` (role, name, nim, faculty, dll)
+- `user: User | null` — Supabase user object (dari `supabase.auth.getUser()` / `session.user`)
+- `userProfile: UserProfile | null` — data dari tabel Supabase `profiles` (row dengan `id = session.user.id`: role, name, nim, faculty, dll)
 - `role: 'mahasiswa' | 'admin' | null`
 - `isLoading: boolean` — true saat onAuthStateChanged belum fire pertama kali
 - `isAuthenticated: boolean`
 
 Fungsi yang di-expose:
-- `loginWithEmail(email, password)` — validasi domain dulu via `isValidCampusEmail`, lalu `signInWithEmailAndPassword`
-- `loginWithGoogle()` — pakai `@react-native-google-signin/google-signin` → dapat idToken → `signInWithCredential(GoogleAuthProvider.credential(idToken))`
-- `register(data)` — validasi domain → `createUserWithEmailAndPassword` → tulis ke `users/{uid}` Firestore (role default `mahasiswa`)
-- `logout()` — `signOut(auth)` + Google sign out + clear state
-- `resetPassword(email)` — `sendPasswordResetEmail`
+- `loginWithEmail(email, password)` — validasi domain dulu via `isValidCampusEmail`, lalu `supabase.auth.signInWithPassword({ email, password })`
+- `loginWithGoogle()` — `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'cariin://auth-callback' } })` dibungkus `expo-web-browser.openAuthSessionAsync` (browser flow). Tidak butuh native module, jalan di Expo Go.
+- `register(data)` — validasi domain → `supabase.auth.signUp({ email, password })` → setelah sukses, insert ke tabel `profiles` (role default `mahasiswa`). Atau pakai database trigger (lihat `supabase-schema.sql`).
+- `logout()` — `supabase.auth.signOut()` + clear state
+- `resetPassword(email)` — `supabase.auth.resetPasswordForEmail(email, { redirectTo: 'cariin://reset-password' })`
 
 Logic di useEffect:
-- Subscribe `onAuthStateChanged(auth, ...)`
-- Saat user ada: fetch `users/{uid}` dari Firestore untuk dapat role
-- Saat user null: clear state
-- Set `isLoading = false` setelah callback pertama
+- Initial: `supabase.auth.getSession()` untuk dapat session yang sudah ada (dari AsyncStorage)
+- Subscribe `supabase.auth.onAuthStateChange((event, session) => ...)`
+- Saat session ada: fetch row `profiles` by `id = session.user.id` untuk dapat role
+- Saat session null: clear state
+- Set `isLoading = false` setelah getSession + first onAuthStateChange settle
 
 **Hook:** `export function useAuth(): AuthContextValue`
 
@@ -188,7 +190,7 @@ Pesan commit:
 ```
 FASE 2: Fondasi navigasi (Stack + Tab + Drawer) + AuthContext
 
-- AuthContext dengan onAuthStateChanged + Firebase Auth methods
+- AuthContext dengan supabase.auth.onAuthStateChange + Supabase Auth methods
 - Root navigator branching: isLoading / Auth / Main / Admin
 - AuthNavigator (Stack), MainNavigator (5-tab + FAB modal), AdminNavigator (Drawer indigo)
 - Type-safe route params di src/navigation/types.ts
@@ -216,12 +218,12 @@ FASE 2: Fondasi navigasi (Stack + Tab + Drawer) + AuthContext
 
 ## POTENSI MASALAH
 
-### M1 — Firebase init throw saat AuthContext mount
-**Penyebab:** `.env` belum diisi → `initializeApp({})` dengan apiKey undefined.
-**Solusi:** Sebelum FASE 2 jalan, `.env` harus minimal punya placeholder valid (string non-empty) untuk semua key Firebase. Atau wrap `firebase.ts` import dalam try/catch dan log warning. **Saran:** minta user buat Firebase project asli sebelum FASE 2 — sekalian test koneksi.
+### M1 — Supabase call gagal walau init sukses
+**Penyebab:** `.env` kosong (hanya `console.warn`, bukan throw), tapi `supabase.from(...)` bakal return error 401 / network. Atau schema belum dibuat.
+**Solusi:** Pastikan (a) `.env` sudah berisi URL + publishable key non-empty, (b) `supabase-schema.sql` sudah di-run di SQL Editor.
 
-### M2 — `getReactNativePersistence` tidak ada di types
-Sudah di-handle dengan `// @ts-ignore` di `firebase.ts`. Kalau TypeScript versi baru memperketat ts-ignore, ganti jadi `// @ts-expect-error`.
+### M2 — `URL is not defined` / `Headers is not defined`
+Sudah di-handle dengan `import 'react-native-url-polyfill/auto'` di baris paling atas `supabase.ts`. Kalau ada error tipe ini, pastikan import polyfill dieksekusi sebelum `createClient`.
 
 ### M3 — Reanimated babel plugin
 React Navigation Drawer butuh Reanimated. Pastikan `babel.config.js` punya plugin `react-native-reanimated/plugin` di **akhir array plugins**. Saat ini babel.config.js cuma punya preset, belum plugin. Kalau drawer crash dengan error "Reanimated babel plugin missing", tambah:
@@ -236,8 +238,8 @@ Pattern `listeners.tabPress: (e) => e.preventDefault()` perlu kombinasi dengan c
 ### M5 — Nested navigator typing di v7
 React Navigation v7 mengubah cara typing nested navigator. `RootParamList` augmentation di global namespace cara baru. Kalau autocomplete tidak jalan, cek dokumentasi v7 di `node_modules/@react-navigation/native/lib/typescript/`.
 
-### M6 — Google Sign-In native module di Expo Go
-`@react-native-google-signin/google-signin` adalah native module. **Tidak jalan di Expo Go default** — perlu development build (EAS Build atau `npx expo run:android`). Untuk FASE 2 ini cuma setup AuthContext dengan stub `loginWithGoogle` — implementasi penuh & test bisa di FASE 3 dengan dev build. **Saran:** beri throw "Google Sign-In butuh dev build" di Expo Go untuk sekarang.
+### M6 — Google OAuth flow di mobile
+Pakai `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'cariin://auth-callback' } })` + `expo-web-browser.openAuthSessionAsync` untuk capture redirect. Butuh setup di Supabase Dashboard → Authentication → Providers → Google (paste Client ID + Secret dari Google Cloud Console). Deep link `cariin://auth-callback` harus terdaftar di Supabase URL Allow List, dan `scheme: 'cariin'` di `app.json` sudah cocok. **Bonus:** jalan di Expo Go tanpa dev build.
 
 ### M7 — `cariin-web/` nested di dalam cariin-mobile
 Belum dipindah. Sebelum atau saat FASE 2, putuskan: pindah keluar atau biarkan. Kalau biarkan, tambah ke `.gitignore` cariin-mobile/cariin-web/ supaya nggak ikut bundle.
@@ -248,15 +250,13 @@ Belum dipindah. Sebelum atau saat FASE 2, putuskan: pindah keluar atau biarkan. 
 
 ### WAJIB (blocker)
 1. **Test FASE 1 dulu di Expo Go** — `cd cariin-mobile && npm start`, scan QR, pastikan splash render dengan styling NativeWind. Kalau gagal, fix dulu sebelum FASE 2.
-2. **Buat `.env`** dari `.env.example`. MINIMAL field Firebase harus diisi. Cara cepat dapat:
-   - Buka https://console.firebase.google.com → buat project baru
-   - Project Settings → Add app → Web app → copy config
-   - Authentication → Sign-in method → enable Email/Password + Google
-   - Firestore Database → Create database → mode test (rules longgar dulu)
-   - Storage → Get started
+2. **`.env` sudah ada** dengan Supabase URL + publishable key (sudah di-set saat migrasi). Yang masih perlu di-setup di Supabase Dashboard:
+   - SQL Editor → run `supabase-schema.sql` (di root project) untuk bikin tabel + RLS
+   - Authentication → Providers → enable Email + Google
+   - Storage → bikin bucket `report-photos` (public read), `chat-media` (authenticated read), `avatars` (public read)
 
 ### OPSIONAL (boleh saat FASE 3)
-3. **Google OAuth Web Client ID** — Cloud Console → Credentials → OAuth 2.0 → Web application. Copy ke `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`.
+3. **Google OAuth setup** — Cloud Console → Credentials → OAuth 2.0 → Web application. Copy Client ID + Secret ke Supabase Dashboard → Authentication → Providers → Google. Tambah callback URL Supabase ke "Authorized redirect URIs" Google: `https://<project-id>.supabase.co/auth/v1/callback`.
 4. **Domain email kampus aktual** — kalau bukan `student.unu-jogja.ac.id`, update `EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN` di `.env`.
 
 ---
@@ -273,7 +273,7 @@ Belum dipindah. Sebelum atau saat FASE 2, putuskan: pindah keluar atau biarkan. 
 - 2.8 Verifikasi + manual nav test: 15–20 menit
 - 2.9 Commit: 5 menit
 
-**Total:** ~2 jam fokus (asumsi tidak ada bug Firebase / Reanimated / Drawer surprise).
+**Total:** ~2 jam fokus (asumsi tidak ada bug Supabase / Reanimated / Drawer surprise).
 
 ---
 
