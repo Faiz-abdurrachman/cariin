@@ -177,12 +177,49 @@ create trigger trg_messages_update_conversation
 -- 4. HELPER FUNCTIONS (untuk RLS)
 -- ============================================================================
 
-create or replace function public.is_admin() returns boolean as $$
+-- security definer + explicit search_path: function dieksekusi sebagai owner
+-- (postgres) sehingga bisa baca profiles tanpa rekursif memicu RLS.
+-- search_path eksplisit mencegah search_path hijack saat dipanggil dari
+-- konteks role lain.
+create or replace function public.is_admin()
+  returns boolean
+  language sql
+  stable
+  security definer
+  set search_path = public
+as $$
   select exists (
     select 1 from public.profiles
     where id = auth.uid() and role = 'admin'
   );
-$$ language sql stable security definer;
+$$;
+
+-- ============================================================================
+-- 4a. GRANTS — wajib supaya role authenticated/anon bisa "menyentuh" tabel
+-- ============================================================================
+-- Tanpa GRANT ini, klien Supabase JS kena error
+-- "permission denied for table profiles" walaupun RLS policy sudah ada.
+-- Postgres butuh DUA layer izin: GRANT (boleh akses tabel?) + RLS (boleh
+-- akses baris tertentu?).
+
+grant usage on schema public to anon, authenticated;
+
+grant select on all tables in schema public to anon;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+
+grant usage, select on all sequences in schema public to authenticated;
+
+-- Default privilege untuk tabel/sequence yang dibuat di masa depan.
+alter default privileges in schema public
+  grant select on tables to anon;
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public
+  grant usage, select on sequences to authenticated;
+
+-- Function `is_admin` butuh EXECUTE permission supaya bisa dipanggil dari
+-- RLS policy oleh role authenticated/anon.
+grant execute on function public.is_admin() to anon, authenticated;
 
 -- ============================================================================
 -- 5. ROW LEVEL SECURITY
@@ -204,10 +241,20 @@ create policy profiles_update_self on public.profiles
   for update using (id = auth.uid())
   with check (id = auth.uid());
 
-drop policy if exists profiles_admin_all on public.profiles;
-create policy profiles_admin_all on public.profiles
-  for all using (public.is_admin())
-  with check (public.is_admin());
+-- profiles_admin_all dihapus untuk menghindari risiko rekursi RLS:
+-- policy `for all using (public.is_admin())` menyebabkan setiap operasi pada
+-- profiles men-trigger is_admin() yang sendirinya query tabel profiles. Walau
+-- security definer mestinya bypass RLS, dalam praktik kombinasi ini kadang
+-- menyebabkan "permission denied" yang sulit di-debug.
+--
+-- Alternatif: admin INSERT/UPDATE/DELETE pada profiles dilakukan dengan
+-- service_role key (server side) atau pakai dedicated RPC function dengan
+-- security definer. Dipasang nanti di FASE 5 saat admin moderation diperlukan.
+--
+-- drop policy if exists profiles_admin_all on public.profiles;
+-- create policy profiles_admin_all on public.profiles
+--   for all using (public.is_admin())
+--   with check (public.is_admin());
 
 -- ----- reports -----
 -- SELECT: publik bisa lihat status approved/resolved. Owner bisa lihat semua row sendiri. Admin bisa lihat semua.

@@ -16,12 +16,13 @@ export interface RegisterPayload {
   email: string;
   password: string;
   faculty?: string;
+  department?: string;
 }
 
 export async function loginWithEmail(email: string, password: string): Promise<Session> {
-  if (!isValidCampusEmail(email)) {
-    throw new Error(EMAIL_DOMAIN_ERROR);
-  }
+  // Domain kampus DIVALIDASI di register, BUKAN di login — admin login pakai
+  // email non-domain (admin@cariin.app). Supabase akan reject email/password
+  // yang tidak match dgn pesan error sendiri.
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim().toLowerCase(),
     password,
@@ -70,22 +71,38 @@ export async function register(payload: RegisterPayload): Promise<User> {
     email: payload.email.trim().toLowerCase(),
     password: payload.password,
     options: {
-      data: { name: payload.name, nim: payload.nim, faculty: payload.faculty },
+      data: {
+        name: payload.name,
+        nim: payload.nim,
+        faculty: payload.faculty,
+        department: payload.department,
+      },
     },
   });
   if (error) throw error;
   if (!data.user) throw new Error('Registrasi gagal: user tidak dibuat.');
 
-  // Idempotent: aman walau ada trigger DB yang sudah bikin row profiles.
-  const { error: profileErr } = await supabase.from('profiles').upsert({
-    id: data.user.id,
-    name: payload.name,
-    nim: payload.nim,
-    email: payload.email.trim().toLowerCase(),
-    faculty: payload.faculty,
-    role: 'mahasiswa',
-  });
-  if (profileErr) throw profileErr;
+  // Trigger DB `trg_on_auth_user_created` sudah bikin row profiles dengan
+  // (id, email, name, role) saat insert ke auth.users. Kita UPDATE row itu
+  // untuk mengisi nim/faculty/department. Kalau session null (email
+  // confirmation ON) maka skip — data tetap ada di raw_user_meta_data dan
+  // bisa di-sinkron nanti saat user benar-benar login pertama kali.
+  if (data.session) {
+    const { error: profileErr } = await supabase
+      .from('profiles')
+      .update({
+        name: payload.name,
+        nim: payload.nim,
+        faculty: payload.faculty,
+        department: payload.department,
+      })
+      .eq('id', data.user.id);
+    if (profileErr) {
+      // PostgrestError bukan Error instance — bungkus jadi Error agar
+      // pesannya kebaca di catch block UI.
+      throw new Error(profileErr.message);
+    }
+  }
 
   return data.user;
 }
@@ -96,9 +113,6 @@ export async function logout(): Promise<void> {
 }
 
 export async function resetPassword(email: string): Promise<void> {
-  if (!isValidCampusEmail(email)) {
-    throw new Error(EMAIL_DOMAIN_ERROR);
-  }
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
     redirectTo: RESET_REDIRECT,
   });
