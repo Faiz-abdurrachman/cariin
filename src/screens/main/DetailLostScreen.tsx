@@ -1,10 +1,3 @@
-// Placeholder DetailLostScreen — akan diimplementasi pada fase berikutnya.
-import { View, Text } from 'react-native';
-
-export default function DetailLostScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-zinc-100">
-      <Text className="text-zinc-500">DetailLostScreen</Text>
-    </View>
-  );
-}
+// DetailLost & DetailFound share the same component — bedanya cuma route name
+// (untuk type-safe nav) + label tombol di-derive dari report.type setelah fetch.
+export { default } from './DetailReportScreen';

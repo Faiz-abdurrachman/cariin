@@ -1,10 +1,2 @@
-// Placeholder CreateLostScreen — akan diimplementasi pada fase berikutnya.
-import { View, Text } from 'react-native';
-
-export default function CreateLostScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-zinc-100">
-      <Text className="text-zinc-500">CreateLostScreen</Text>
-    </View>
-  );
-}
+// CreateLost & CreateFound share the same component — type di-derive dari route name.
+export { default } from './CreateReportScreen';

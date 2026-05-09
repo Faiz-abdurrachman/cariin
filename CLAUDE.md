@@ -39,10 +39,10 @@
 
 ## Akun test (sudah seeded manual via Dashboard)
 
-| Role | Email | Password |
-|------|-------|----------|
-| admin | `admin@cariin.app` | `admin123` |
-| mahasiswa | `faiz@student.unu-jogja.ac.id` | `test123` |
+| Role | Email | Password | UUID (auth.users.id) |
+|------|-------|----------|----------------------|
+| admin | `admin@cariin.app` | `admin123` | `c80aa818-4803-42f0-9265-5bb52cc81e19` |
+| mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` | `14719036-99a4-4b8d-9bf0-8dce43cee0e0` |
 
 ## Quick commands
 

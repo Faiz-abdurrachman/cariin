@@ -275,13 +275,17 @@ create policy reports_insert_self on public.reports
   );
 
 -- UPDATE: owner bisa edit row sendiri kalau status belum 'resolved'. Admin bebas.
+-- Catatan: USING gate "row mana yang boleh di-update" (cek state SEKARANG belum
+-- resolved). WITH CHECK hanya validate NEW row tetap milik user — tidak boleh
+-- replicate `status <> 'resolved'` di sini, karena transisi ke 'resolved'
+-- (markAsResolved) butuh NEW row punya status='resolved'.
 drop policy if exists reports_update_self on public.reports;
 create policy reports_update_self on public.reports
   for update using (
     (user_id = auth.uid() and status <> 'resolved')
     or public.is_admin()
   ) with check (
-    (user_id = auth.uid() and status <> 'resolved')
+    user_id = auth.uid()
     or public.is_admin()
   );
 

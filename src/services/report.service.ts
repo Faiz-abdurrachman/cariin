@@ -1,2 +1,179 @@
-// Placeholder report service — akan diimplementasi pada fase berikutnya.
-export {};
+// Wrapper Supabase untuk operasi tabel `reports` — semua CRUD lewat sini agar
+// validasi & error handling terpusat. Pola sama dgn auth.service.ts:
+// PostgrestError bukan Error class instance, jadi di-rewrap pakai
+// `throw new Error(error.message)` supaya UI bisa kebaca.
+
+import { supabase } from './supabase';
+import type { CategoryId, ReportStatus, ReportType } from '@/utils/constants';
+
+// ----- TYPES -----
+
+export interface Reporter {
+  name: string;
+  nim: string | null;
+  faculty: string | null;
+  avatar_url: string | null;
+}
+
+export interface Report {
+  id: string;
+  user_id: string | null;
+  type: ReportType;
+  title: string;
+  description: string | null;
+  category: CategoryId;
+  location: string;
+  custody_point: string | null;
+  photo_url: string | null;
+  status: ReportStatus;
+  admin_note: string | null;
+  created_by_admin: boolean;
+  // Saat created_by_admin=true, kolom-kolom ini diisi oleh admin (laporan walk-in
+  // dari user yg gak punya akun). Saat false, biarkan null & ambil dari relasi
+  // `reporter` (foreign embed dari profiles).
+  reporter_name: string | null;
+  reporter_nim: string | null;
+  reporter_faculty: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  updated_at: string;
+  reporter?: Reporter | null;
+}
+
+export interface ReportInput {
+  type: ReportType;
+  title: string;
+  description?: string | null;
+  category: CategoryId;
+  location: string;
+  custody_point?: string | null;
+  photo_url?: string | null;
+}
+
+export interface ReportFilter {
+  type?: ReportType;
+  category?: CategoryId;
+  status?: ReportStatus;
+  search?: string;
+  userId?: string; // dipakai MyPosts: filter laporan milik user tertentu
+}
+
+// PostgREST foreign embed: `reporter:user_id (...)`. Pakai alias `reporter`
+// supaya jelas di UI; kolom-kolom yg dibutuhkan untuk display (nama+fakultas).
+const REPORT_SELECT =
+  '*, reporter:user_id ( name, nim, faculty, avatar_url )';
+
+// ----- HELPERS -----
+
+function escapeLike(s: string): string {
+  // Escape wildcard PostgREST ilike supaya user input "50%" gak ditafsir wildcard.
+  return s.replace(/[%_\\]/g, (m) => `\\${m}`);
+}
+
+// ----- API -----
+
+export async function listReports(filter: ReportFilter = {}): Promise<Report[]> {
+  let q = supabase.from('reports').select(REPORT_SELECT);
+
+  // Default: hanya tampilkan approved+resolved untuk feed publik (RLS juga
+  // memfilter, tapi explicit di query menghemat round trip & jelas intent).
+  // Untuk MyPosts (userId di-set), tampilkan semua status milik user.
+  if (filter.userId) {
+    q = q.eq('user_id', filter.userId);
+  } else if (filter.status) {
+    q = q.eq('status', filter.status);
+  } else {
+    q = q.in('status', ['approved', 'resolved']);
+  }
+
+  if (filter.type) q = q.eq('type', filter.type);
+  if (filter.category) q = q.eq('category', filter.category);
+  if (filter.search && filter.search.trim().length > 0) {
+    q = q.ilike('title', `%${escapeLike(filter.search.trim())}%`);
+  }
+
+  const { data, error } = await q.order('created_at', { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Report[];
+}
+
+export async function getReportById(id: string): Promise<Report> {
+  const { data, error } = await supabase
+    .from('reports')
+    .select(REPORT_SELECT)
+    .eq('id', id)
+    .single();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Laporan tidak ditemukan.');
+  return data as Report;
+}
+
+export async function createReport(input: ReportInput): Promise<Report> {
+  const { data: authData } = await supabase.auth.getUser();
+  const userId = authData.user?.id;
+  if (!userId) throw new Error('Sesi tidak valid. Silakan login ulang.');
+
+  const { data, error } = await supabase
+    .from('reports')
+    .insert({
+      user_id: userId,
+      type: input.type,
+      title: input.title,
+      description: input.description ?? null,
+      category: input.category,
+      location: input.location,
+      custody_point: input.custody_point ?? null,
+      photo_url: input.photo_url ?? null,
+      status: 'pending', // default schema, di-set eksplisit biar jelas
+    })
+    .select(REPORT_SELECT)
+    .single();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Gagal membuat laporan.');
+  return data as Report;
+}
+
+export async function updateReport(
+  id: string,
+  patch: Partial<ReportInput>,
+): Promise<Report> {
+  // RLS `reports_update_self` memblokir update kalau status='resolved' atau
+  // bukan owner — gak perlu cek di sini. Error dari Supabase akan ke-throw.
+  const { data, error } = await supabase
+    .from('reports')
+    .update({
+      ...(patch.type !== undefined && { type: patch.type }),
+      ...(patch.title !== undefined && { title: patch.title }),
+      ...(patch.description !== undefined && { description: patch.description }),
+      ...(patch.category !== undefined && { category: patch.category }),
+      ...(patch.location !== undefined && { location: patch.location }),
+      ...(patch.custody_point !== undefined && { custody_point: patch.custody_point }),
+      ...(patch.photo_url !== undefined && { photo_url: patch.photo_url }),
+    })
+    .eq('id', id)
+    .select(REPORT_SELECT)
+    .single();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Gagal memperbarui laporan.');
+  return data as Report;
+}
+
+export async function deleteReport(id: string): Promise<void> {
+  const { error } = await supabase.from('reports').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function markAsResolved(id: string): Promise<Report> {
+  // Set status='resolved' + resolved_at=now. RLS update_self mengizinkan owner
+  // update selama status saat ini bukan 'resolved' (sudah resolved tidak bisa
+  // di-set ulang). Setelah resolve, RLS memblokir edit/delete row tsb.
+  const { data, error } = await supabase
+    .from('reports')
+    .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+    .eq('id', id)
+    .select(REPORT_SELECT)
+    .single();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Gagal menandai laporan selesai.');
+  return data as Report;
+}
