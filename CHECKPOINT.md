@@ -1,134 +1,229 @@
 # CHECKPOINT — Cari.In Mobile
 
-> Snapshot kondisi project. Baca file ini + `NEXT_STEPS.md` saat resume.
-> Last updated: 2026-05-10 | Branch: `main`
+> Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
+>
+> **Last updated:** 2026-05-10 | **Branch:** `main` | **Local ahead origin:** 1 commit (FASE 4) — belum push
 
 ---
 
-## STATUS PROGRES
+## 1. STATUS PROGRES PER FASE
 
-| Fase | Status | Commit |
-|------|--------|--------|
-| FASE 1 — Setup Project | ✅ Selesai | `ea6cc33` |
-| FASE 2 — Fondasi Navigasi + AuthContext | ✅ Selesai | `682093d` |
-| FASE 3 — Auth Screens | ✅ Selesai | `c42101a` |
-| FASE 4 — Core Mahasiswa | ✅ Selesai | (lihat `git log -1 --format=%h`) |
-| **FASE 4.5 — Chat (Inbox + Realtime)** | 🔜 **Berikutnya (opsional)** | — |
-| FASE 5 — Admin Screens | 🔜 Belum mulai | — |
-| FASE 6 — Polish & Submission | 🔜 Belum mulai | — |
+| Fase | Scope | Status | Commit |
+|------|-------|--------|--------|
+| FASE 1 | Setup Project (Expo + NativeWind + TS strict, Firebase→Supabase) | ✅ Selesai | `ea6cc33` |
+| FASE 2 | Fondasi Navigasi (Stack+Tab+Drawer) + AuthContext | ✅ Selesai | `682093d` |
+| FASE 3 | Auth Screens (Splash, RoleSelection, Login, Register, ForgotPassword) | ✅ Selesai | `c42101a` |
+| FASE 4 | Core Mahasiswa (Home, Detail, Create, MyPosts, Profile) | ✅ Selesai | `9e511f6` |
+| **FASE 4.5** | **Chat & Notifikasi (opsional, mahasiswa flow lengkap)** | 🔜 **Belum mulai** | — |
+| **FASE 5** | **Admin Screens (moderate, dashboard, walk-in)** | 🔜 **Belum mulai** | — |
+| **FASE 6** | **Polish (Settings, Help, UserProfile, EAS build)** | 🔜 **Belum mulai** | — |
 
-`git log --oneline -5` untuk lihat hash commit terkini.
+`git log --oneline -10` untuk konfirmasi hash terkini.
 
 ---
 
-## QUICK FACTS — Yang harus diingat
+## 2. STACK & TOOLING
 
-### Stack
-- Expo SDK **54**, React Native 0.81.5, React 19.1.0
-- React Navigation **v7** (Stack + Tab + Drawer)
-- NativeWind **v4** (Tailwind for RN)
-- Supabase (Auth + Postgres + Storage) — bukan Firebase
-- TypeScript strict, alias `@/*` → `src/*`
-- Web preview enabled (react-native-web + react-dom + @expo/metro-runtime). Run `npx expo start --web` untuk preview di Chrome.
+- **Frontend:** Expo SDK 54, React Native 0.81.5, React 19.1.0, NativeWind v4 (Tailwind for RN), Zustand 5, React Navigation v7
+- **Backend:** Supabase (Auth + Postgres + Storage + Realtime)
+- **Bahasa:** TypeScript strict (`noImplicitAny`, `noUncheckedIndexedAccess`)
+- **Path alias:** `@/*` → `src/*`
+- **Lint:** ESLint v9 + legacy `.eslintrc.js` — perlu env `ESLINT_USE_FLAT_CONFIG=false`. TODO: migrate ke flat config (FASE 6).
+- **Web preview enabled** sejak FASE 4 (react-native-web + react-dom + @expo/metro-runtime). `npx expo start --web` → preview di Chrome laptop.
+- **iPhone Expo Go** = primary test device (user manual test).
 
-### Supabase
-- Project URL prefix: `kytsksnyoyffwbksotps`
-- `.env` ada (URL + ANON_KEY + ALLOWED_EMAIL_DOMAIN=`student.unu-jogja.ac.id`)
-- Schema run via `supabase-schema.sql` (5 tabel + RLS + triggers + GRANTs)
-- Email Auth: ✅ Enabled, **Confirm email: OFF** (untuk dev)
-- Storage buckets: ✅ `report-photos` (public, 6 policies), ✅ `avatars` (public, 6 policies). `chat-media` dibuat tapi belum di-policy (defer FASE 4.5)
-- 5 seed reports approved (lihat seed SQL di history) untuk feed publik testing
-- Google OAuth: ❌ Belum disetup (opsional, defer ke FASE 6)
-- Redirect URLs (`cariin://auth-callback`, `cariin://reset-password`): ❌ Belum dipasang di URL Configuration
+---
 
-### Akun Test (sudah di-seed manual via Dashboard)
+## 3. SUPABASE STATE
+
+- **Project URL prefix:** `kytsksnyoyffwbksotps`
+- **Dashboard:** https://supabase.com/dashboard/project/kytsksnyoyffwbksotps
+- **`.env`** lokal terisi (URL + ANON_KEY + ALLOWED_EMAIL_DOMAIN=`student.unu-jogja.ac.id` + APP_NAME + APP_ENV)
+- **Schema:** lihat `supabase-schema.sql` (idempotent, aman di-rerun). 5 tabel + RLS + triggers + GRANTs.
+- **Email Auth:** ✅ Enabled, **Confirm email: OFF** (dev convenience)
+- **Google OAuth:** ❌ Belum disetup (defer FASE 6)
+- **Redirect URLs deep link:** ❌ Belum dipasang di URL Configuration (defer FASE 6)
+
+### Storage Buckets
+
+| Bucket | Public | Policies | Status |
+|--------|--------|----------|--------|
+| `report-photos` | Yes | 3 (insert+update+delete by user folder prefix) | ✅ Active |
+| `avatars` | Yes | 3 (insert+update+delete by user folder prefix) | ✅ Active |
+| `chat-media` | No | 0 | ⏸ Defer FASE 4.5 |
+
+### Akun Seeded
+
 | Role | Email | Password | UUID (auth.users.id) |
 |------|-------|----------|----------------------|
 | admin | `admin@cariin.app` | `admin123` | `c80aa818-4803-42f0-9265-5bb52cc81e19` |
-| mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` (di-register via app FASE 3) | `14719036-99a4-4b8d-9bf0-8dce43cee0e0` |
+| mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` | `14719036-99a4-4b8d-9bf0-8dce43cee0e0` |
 
-UUID-nya stabil — tinggal copas kalau perlu SQL seed/query manual tanpa subselect.
+UUID stabil — copas kalau perlu SQL seed/query manual.
 
-### Issue & Workaround Terdokumentasi
-- **`profiles_admin_all` policy** di-comment-out di schema (rekursi RLS via `is_admin()` bikin "permission denied"). Defer ke FASE 5; admin moderasi pakai service_role atau RPC function.
-- **`reports_update_self` WITH CHECK** sebelumnya replikasi `status <> 'resolved'` yang nge-block transition markAsResolved. Sudah di-fix di schema FASE 4 — WITH CHECK cuma validate user_id, biar update status ke 'resolved' lolos.
-- **Pressable function-form style unreliable** di RN/Expo SDK 54 versi project ini. WAJIB pakai `<Pressable>{({pressed}) => <View>...</View>}</Pressable>` (children-as-function), bukan `style={({pressed}) => ...}` — yg sering bikin tombol invisible atau Image collapse. Lihat FASE 4 PrimaryButton/CreateReport/Success.
-- **Modal back button** harus pakai `nav.getParent<RootStackParamList>()?.goBack()` untuk dismiss, bukan `nav.goBack()` di stack lokal — first screen di nested modal stack gak punya history.
-- **Auto memory CC** disimpan di `~/.claude/projects/-home-faiz-Semester-4-Mobile-Programming-cariin-cariin-mobile/memory/` — context user/feedback/project.
-- **ESLint v9 + .eslintrc.js (legacy)** — perlu env var `ESLINT_USE_FLAT_CONFIG=false` untuk lint. TODO: migrasi ke flat config (`eslint.config.js`) di FASE 6.
+### 5 Reports Seeded (FASE 4 testing)
+Status semua `approved`, mix lost/found, satu `created_by_admin=true`. Lihat git history untuk full SQL.
 
 ---
 
-## ARSITEKTUR — Map cepat
+## 4. ISSUE & WORKAROUND TERDOKUMENTASI
+
+| Issue | Status | Workaround / Catatan |
+|-------|--------|---------------------|
+| `profiles_admin_all` policy bikin "permission denied" (rekursi RLS via is_admin()) | 🔧 Workaround active | Di-COMMENT-OUT di schema. Defer FASE 5: pakai service_role atau RPC security-definer. |
+| `reports_update_self` WITH CHECK block transition ke `status='resolved'` | ✅ Fixed FASE 4 | WITH CHECK cuma cek `user_id = auth.uid()`, bukan replikasi USING. Schema sudah update. |
+| Pressable `style={({pressed}) => ...}` (function-form) sering broken | ✅ Documented | Pakai children-as-function pattern — lihat CLAUDE.md section 4.1. |
+| Modal back button no-op di first screen modal | ✅ Fixed FASE 4 | Pakai `nav.getParent<RootStackParamList>()?.goBack()`. |
+| Header title `position: absolute` capture tap, tombol back gak jalan | ✅ Fixed FASE 4 | Tambah `pointerEvents="none"` pada Text title overlay. |
+| ESLint v9 + legacy config | ⏸ Defer FASE 6 | Pakai env `ESLINT_USE_FLAT_CONFIG=false` saat lint. |
+
+---
+
+## 5. ARSITEKTUR
 
 ```
 RootNavigator (src/navigation/index.tsx)
-  └── isLoading → LoadingScreen
-  └── !isAuthenticated → AuthNavigator
+  ├── isLoading → LoadingScreen
+  ├── !isAuthenticated → AuthNavigator
   │     └── Splash → RoleSelection → Login | Register | ForgotPassword
-  └── role==='admin' → AdminNavigator (Drawer indigo)
+  ├── role==='admin' → AdminNavigator (Drawer indigo) [FASE 5]
   │     └── Dashboard | Semua Laporan | Buat Laporan | (Logout custom)
-  └── else → MainNavigator (Bottom Tab + Modal)
-        ├── HomeTab → HomeStack (HomeFeed + Detail*)
-        ├── ChatTab → ChatStack (Inbox/ChatRoom — placeholder, FASE 4.5)
-        ├── CreateTab (FAB) → modal CreateModal (CreateLost/Found shared + Success)
-        ├── MyPostsTab → MyPostsStack (MyPosts + EditPost + Detail*)
-        └── ProfileTab → ProfileStack (Profile + Settings/Help/UserProfile placeholder)
+  └── role==='mahasiswa' → MainNavigator (Bottom Tab + Modal)
+        ├── HomeTab → HomeStack
+        │     ├── HomeFeed (4.5)
+        │     └── DetailLost / DetailFound (shared via DetailReportScreen)
+        ├── ChatTab → ChatStack [FASE 4.5]
+        │     └── Inbox | ChatRoom | UserProfile | Notifications
+        ├── CreateTab (FAB +) → CreateModal (root-level modal)
+        │     ├── CreateLost / CreateFound (shared via CreateReportScreen)
+        │     └── Success
+        ├── MyPostsTab → MyPostsStack
+        │     ├── MyPosts (4.8)
+        │     ├── EditPost (4.8)
+        │     └── DetailLost / DetailFound
+        └── ProfileTab → ProfileStack
+              ├── Profile (4.9 lengkap)
+              ├── Settings | Help | UserProfile [FASE 6 placeholder]
 ```
 
 State global:
-- `AuthContext` (src/context/AuthContext.tsx) — session, user, userProfile, role, isLoading, methods (loginWithEmail, loginWithGoogle, register, logout, resetPassword)
-- `feedStore` (Zustand) — reports cache + filter type/category/search untuk HomeFeed
-- `chatStore` masih stub (FASE 4.5)
+- `AuthContext` (`src/context/AuthContext.tsx`) — session, user, userProfile, role, methods
+- `feedStore` (`src/store/feedStore.ts`) — reports cache + filter (HomeFeed)
+- `chatStore` (`src/store/chatStore.ts`) — stub, FASE 4.5
 
 ---
 
-## FILE PENTING (referensi)
+## 6. FILE PENTING
 
-| File | Isinya |
+### Sumber kebenaran (JANGAN UBAH)
+| File | Isi |
+|------|-----|
+| `CONTEXT.md` | Spec lengkap project dari dosen |
+| `UI_AUDIT.md` | Inventory 26 screen + spec UI |
+| `../cariin-web/*.html` | 26 prototype HTML, sumber visual untuk implementasi screen |
+
+### Update tiap akhir fase
+| File | Tujuan |
 |------|--------|
-| `CONTEXT.md` | Spec lengkap project (jangan diubah; sumber kebenaran) |
-| `UI_AUDIT.md` | Inventory 26 screen + spec UI (jangan diubah) |
-| `NEXT_STEPS.md` | Plan fase berikutnya (sekarang: FASE 4.5 chat / FASE 5 admin) |
-| `supabase-schema.sql` | DDL Postgres + RLS + GRANT + triggers |
-| `../cariin-web/*.html` | Prototype HTML 26 screen — referensi visual saat implementasi screen RN |
-| `src/utils/constants.ts` | COLORS, CATEGORIES (8), FACULTIES (8), REPORT_STATUS_LABEL, type guards |
-| `src/utils/validators.ts` | isValidCampusEmail, isValidPassword, isValidNim + error msg ID |
+| `CLAUDE.md` | Pattern + gotcha untuk AI baru. Update kalau ketemu pattern penting baru. |
+| `CHECKPOINT.md` | Status snapshot (file ini). Update tiap commit fase baru. |
+| `NEXT_STEPS.md` | Plan fase berikutnya step-by-step. Update tiap fase berganti. |
+
+### Code reference
+| File | Isi |
+|------|-----|
+| `src/utils/constants.ts` | COLORS, CATEGORIES (8), FACULTIES, REPORT_STATUS_LABEL, type guards |
+| `src/utils/validators.ts` | isValidCampusEmail, isValidPassword, isValidNim |
 | `src/utils/formatters.ts` | formatRelativeTime, formatFullDate, categoryLabel/Emoji |
-| `src/services/auth.service.ts` | Wrapper Supabase Auth — sudah lengkap |
-| `src/services/report.service.ts` | CRUD reports + types Report/ReportInput/ReportFilter (FASE 4) |
-| `src/services/upload.service.ts` | Image picker + upload ke Storage (report-photos, avatars) (FASE 4) |
-| `src/services/{chat,notification}.service.ts` | **Stub** — diisi di FASE 4.5 |
+| `src/services/auth.service.ts` | Wrapper Supabase Auth (FASE 3) |
+| `src/services/report.service.ts` | CRUD reports + types Report/ReportInput/Filter (FASE 4) |
+| `src/services/upload.service.ts` | Image picker + Storage upload (base64→Uint8Array) (FASE 4) |
+| `src/services/{chat,notification}.service.ts` | **STUB** — diisi FASE 4.5 |
+| `src/components/PrimaryButton.tsx` | Reference pattern Pressable children-as-function |
+| `supabase-schema.sql` | DDL Postgres + RLS + GRANT + triggers (idempotent) |
 
 ---
 
-## FILE PLACEHOLDER YANG MASIH HARUS DIISI
+## 7. REMAINING WORK (placeholder yang masih `export {};` atau stub)
 
 ### FASE 4.5 — Chat & Notifikasi
-- `src/screens/chat/InboxScreen.tsx` — list percakapan
-- `src/screens/chat/ChatRoomScreen.tsx` — UI chat realtime via Supabase Realtime
-- `src/screens/chat/NotificationsScreen.tsx` — list notif (laporan disetujui/ditolak, pesan baru)
-- `src/components/ChatBubble.tsx` — bubble pesan kiri/kanan
-- `src/services/chat.service.ts`, `notification.service.ts`
-- `src/store/chatStore.ts`
-- Storage `chat-media` policies (kalau dukung lampiran chat)
+**Screens:**
+- `src/screens/chat/InboxScreen.tsx` — list percakapan terurut by `last_at`
+- `src/screens/chat/ChatRoomScreen.tsx` — UI chat realtime via Supabase Realtime channel
+- `src/screens/chat/NotificationsScreen.tsx` — list notif + tap → ke Detail/Chat
 
-### FASE 5 — Admin
-- `AdminDashboardScreen`, `AdminReviewScreen`, `AdminReportsScreen`, `AdminCreateLostScreen`, `AdminCreateFoundScreen`
-- Pasang ulang `profiles_admin_all` via service_role atau RPC function security definer
+**Components:**
+- `src/components/ChatBubble.tsx` — bubble pesan kiri/kanan dgn timestamp
 
-### FASE 6 — Polish (defer)
-- `SettingsScreen.tsx` (edit profil, ganti password, toggle push notif)
-- `HelpScreen.tsx` (FAQ static)
-- `UserProfileScreen.tsx` (profil publik dipake dari Detail/Chat)
-- `helpers.ts`, `ConfirmModal`
+**Services & Stores:**
+- `src/services/chat.service.ts` — listConversations, getMessages, sendMessage, subscribe
+- `src/services/notification.service.ts` — list, markAsRead
+- `src/store/chatStore.ts` — messages state + active channel
+
+**Backend:**
+- Storage `chat-media` policies (kalau lampiran di-support)
+- Trigger DB tambahan untuk insert ke `notifications` saat report di-approve/reject (atau di-handle FASE 5)
+
+**Update existing:**
+- `DetailReportScreen.tsx` tombol chat: handle tap → upsert conversation, navigate ke ChatRoom (sekarang masih show Alert "Segera hadir")
+
+### FASE 5 — Admin Screens
+**Screens:**
+- `src/screens/admin/AdminDashboardScreen.tsx` — stats (pending count, today approved, dst) + quick actions
+- `src/screens/admin/AdminReportsScreen.tsx` — list semua laporan dgn filter status (lihat semua data)
+- `src/screens/admin/AdminReviewScreen.tsx` — detail per laporan + tombol Approve/Reject + form admin_note
+- `src/screens/admin/AdminCreateLostScreen.tsx` — laporan walk-in (set `created_by_admin=true`)
+- `src/screens/admin/AdminCreateFoundScreen.tsx` — sama, untuk found
+
+**Backend:**
+- **Restore `profiles_admin_all`** via security-definer RPC function (e.g. `set_user_role`, `update_profile_admin`) — bypass rekursi RLS
+- Update `report.service.ts`: tambah `listAllReports` (admin), `approveReport`, `rejectReport`, `addAdminNote`
+- Trigger DB: insert ke `notifications` saat report status berubah ke `approved` / `rejected` (notif ke owner)
+
+### FASE 6 — Polish
+**Screens:**
+- `src/screens/profile/SettingsScreen.tsx` — edit nama, ganti password, toggle push notif
+- `src/screens/profile/HelpScreen.tsx` — FAQ static
+- `src/screens/profile/UserProfileScreen.tsx` — profil publik (dipake dari Detail/Chat)
+
+**Other:**
+- Avatar upload integration di Profile (uploadAvatar service udah siap di upload.service.ts)
+- Animasi transition, splash final, app icon
+- Google OAuth setup (Cloud Console + Supabase provider + redirect URLs)
 - ESLint flat config migration
+- expo-doctor pass + EAS build standalone untuk submission ke dosen
 
 ---
 
-## CARA MELANJUTKAN
+## 8. CARA RESUME
 
-Cukup ketik:
+Saat sesi baru, ketik salah satu:
+
 ```
-Baca CHECKPOINT.md dan NEXT_STEPS.md, lanjut FASE 4.5 (chat) atau FASE 5 (admin).
+Baca CHECKPOINT.md dan NEXT_STEPS.md, lanjut FASE 4.5
 ```
+
+```
+Baca CHECKPOINT.md dan NEXT_STEPS.md, lanjut FASE 5
+```
+
+```
+Baca CHECKPOINT.md dan NEXT_STEPS.md, lanjut FASE 6
+```
+
+AI baru bakal otomatis baca CLAUDE.md (auto-load), CHECKPOINT.md, dan NEXT_STEPS.md, lalu kasih rekap plan + tanya scope sebelum eksekusi.
+
+---
+
+## 9. CATATAN UNTUK AI BARU (penting!)
+
+- ⚠️ **Pressable pattern children-as-function WAJIB.** Lihat CLAUDE.md section 4.1. Banyak bug FASE 4 disebabkan ini.
+- ⚠️ **Image dimension:** parent View harus punya height eksplisit (number, bukan `'100%'` di nested context).
+- ⚠️ **Modal back:** pakai `getParent()?.goBack()`, bukan `nav.goBack()` di screen pertama modal.
+- ⚠️ **Title overlay header:** `pointerEvents="none"` di Text yg `position: absolute`.
+- ⚠️ **PostgrestError bukan Error:** wrap `throw new Error(error.message)` di service.
+- ⚠️ **JANGAN push** ke origin tanpa user eksplisit minta.
+- ⚠️ **JANGAN ubah `CONTEXT.md` & `UI_AUDIT.md`** — sumber kebenaran dosen.
+- ⚠️ **Setelah edit code, langsung `npx tsc --noEmit`** verify clean sebelum klaim sukses.
+- ⚠️ **Sebelum commit, WAJIB update CHECKPOINT.md + NEXT_STEPS.md** reflect state baru.
+- ⚠️ **Komunikasi:** Indonesia casual lo/gw, step-by-step pelan-pelan, opsi A/B/C dengan trade-off via `AskUserQuestion`.
