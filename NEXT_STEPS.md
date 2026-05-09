@@ -1,291 +1,195 @@
-# NEXT_STEPS — Rencana FASE 2
+# NEXT_STEPS — Rencana FASE 4 (Core Mahasiswa)
 
-> Rencana detail langkah-langkah FASE 2 (Fondasi Navigasi).
-> Baca `CHECKPOINT.md` dulu untuk konteks status saat ini.
-
----
-
-## TUJUAN FASE 2
-
-Membangun fondasi navigasi & state otentikasi sehingga setelah ini selesai:
-- App bisa branching antar 3 navigator besar (Auth / Main / Admin) berdasarkan status login + role user.
-- Semua 26 screen placeholder bisa dibuka via navigation (tidak crash).
-- AuthContext jadi single source of truth untuk user, role, isLoading, isAuthenticated.
-
-**FASE 2 belum implementasi screen — itu di FASE 3 ke atas.** Yang dibangun di sini hanya kerangka navigasi + state global.
+> Plan langkah-langkah FASE 4. Baca `CHECKPOINT.md` dulu untuk konteks.
+> FASE 1, 2, 3 ✅ selesai (auth flow lengkap, navigator wired, akun seeded).
 
 ---
 
-## URUTAN TASK (WAJIB IKUTI)
+## TUJUAN FASE 4
 
-### 2.0 — Pre-flight Check (sebelum mulai coding)
-1. Pastikan user sudah:
-   - Buat Supabase project (sudah dilakukan saat migrasi — `.env` sudah berisi `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY`).
-   - Run `supabase-schema.sql` di Supabase Dashboard → SQL Editor untuk bikin tabel + RLS policies.
-   - Test FASE 1 di Expo Go — splash render dengan styling NativeWind aktif.
-2. Verifikasi `.env` sudah ada `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_ANON_KEY` (non-empty). `supabase.ts` cuma `console.warn` (bukan throw) kalau env kosong, jadi App tidak crash — tapi semua call ke Supabase bakal gagal.
+Implementasi screen utama untuk role mahasiswa:
+- Home feed laporan dengan filter & search
+- Detail laporan (Lost/Found) + tombol chat
+- Form buat laporan (foto wajib)
+- Laporanku (laporan saya + edit)
+- Profil lengkap (replace tombol Logout sementara)
+- (Opsional dipisah: Inbox + Chat di FASE 4.5)
 
-### 2.1 — TypeScript Route Param Types (DULU, biar autocomplete jalan)
-**File:** `src/navigation/types.ts`
-
-Definisikan param list untuk setiap navigator:
-```typescript
-export type AuthStackParamList = {
-  Splash: undefined;
-  RoleSelection: undefined;
-  Login: { isAdmin?: boolean } | undefined;
-  Register: undefined;
-  ForgotPassword: undefined;
-};
-
-export type HomeStackParamList = {
-  HomeFeed: undefined;
-  DetailLost: { reportId: string };
-  DetailFound: { reportId: string };
-  ChatRoom: { conversationId: string; reportId: string };
-  UserProfile: { userId: string };
-};
-
-export type ChatStackParamList = { ... };
-export type CreateModalParamList = { ... };
-export type MyPostsStackParamList = { ... };
-export type ProfileStackParamList = { ... };
-export type MainTabParamList = { ... };
-export type AdminDrawerParamList = { ... };
-export type RootParamList = AuthStackParamList & MainTabParamList & AdminDrawerParamList;
-```
-
-Lalu tambah module declaration untuk React Navigation v7 type safety:
-```typescript
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootParamList {}
-  }
-}
-```
-
-### 2.2 — AuthContext (state global user + role)
-**File:** `src/context/AuthContext.tsx`
-
-State yang di-expose:
-- `user: User | null` — Supabase user object (dari `supabase.auth.getUser()` / `session.user`)
-- `userProfile: UserProfile | null` — data dari tabel Supabase `profiles` (row dengan `id = session.user.id`: role, name, nim, faculty, dll)
-- `role: 'mahasiswa' | 'admin' | null`
-- `isLoading: boolean` — true saat onAuthStateChanged belum fire pertama kali
-- `isAuthenticated: boolean`
-
-Fungsi yang di-expose:
-- `loginWithEmail(email, password)` — validasi domain dulu via `isValidCampusEmail`, lalu `supabase.auth.signInWithPassword({ email, password })`
-- `loginWithGoogle()` — `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'cariin://auth-callback' } })` dibungkus `expo-web-browser.openAuthSessionAsync` (browser flow). Tidak butuh native module, jalan di Expo Go.
-- `register(data)` — validasi domain → `supabase.auth.signUp({ email, password })` → setelah sukses, insert ke tabel `profiles` (role default `mahasiswa`). Atau pakai database trigger (lihat `supabase-schema.sql`).
-- `logout()` — `supabase.auth.signOut()` + clear state
-- `resetPassword(email)` — `supabase.auth.resetPasswordForEmail(email, { redirectTo: 'cariin://reset-password' })`
-
-Logic di useEffect:
-- Initial: `supabase.auth.getSession()` untuk dapat session yang sudah ada (dari AsyncStorage)
-- Subscribe `supabase.auth.onAuthStateChange((event, session) => ...)`
-- Saat session ada: fetch row `profiles` by `id = session.user.id` untuk dapat role
-- Saat session null: clear state
-- Set `isLoading = false` setelah getSession + first onAuthStateChange settle
-
-**Hook:** `export function useAuth(): AuthContextValue`
-
-### 2.3 — Root Navigator (branching)
-**File:** `src/navigation/index.tsx`
-
-Logika:
-```typescript
-const { isLoading, isAuthenticated, role } = useAuth();
-
-if (isLoading) return <LoadingScreen />;
-if (!isAuthenticated) return <AuthNavigator />;
-if (role === 'admin') return <AdminNavigator />;
-return <MainNavigator />;
-```
-
-Wrap dengan `<NavigationContainer>` (dari `@react-navigation/native`) di sini.
-
-**Catatan:** `LoadingScreen` belum ada di `src/screens/`. Buat inline atau tambah `src/screens/LoadingScreen.tsx` baru (1 file kecil).
-
-### 2.4 — AuthNavigator (Stack)
-**File:** `src/navigation/AuthNavigator.tsx`
-
-Pakai `createStackNavigator` dari `@react-navigation/stack`.
-Routes urut: `Splash` → `RoleSelection` → `Login` / `Register` / `ForgotPassword`.
-Initial route: `Splash`.
-Header: `headerShown: false` untuk semua route auth (full-screen design).
-
-### 2.5 — MainNavigator (Bottom Tab + nested Stacks + Modal)
-**File:** `src/navigation/MainNavigator.tsx`
-
-Pakai `createBottomTabNavigator` dari `@react-navigation/bottom-tabs`.
-
-5 tab:
-1. **Home** — wrap `HomeStack` (HomeScreen → DetailLost/DetailFound/ChatRoom/UserProfile)
-2. **Pesan** — wrap `ChatStack` (InboxScreen → ChatRoomScreen → UserProfileScreen)
-3. **FAB (+)** — bukan tab biasa. Pakai `tabBarButton` custom yang menonjol ke atas. Saat ditekan: navigate ke modal route `Create` (CreateLost ↔ CreateFound → Success). Modal bisa pakai `Stack.Screen` dengan `presentation: 'modal'`.
-4. **Laporanku** — wrap `MyPostsStack` (MyPostsScreen → EditPostScreen)
-5. **Profil** — wrap `ProfileStack` (ProfileScreen → SettingsScreen / HelpScreen / UserProfileScreen)
-
-**Catatan implementasi FAB:** Tab tengah perlu custom button. Pattern yang sudah teruji:
-```typescript
-<Tab.Screen
-  name="Create"
-  component={DummyComponent}
-  options={{
-    tabBarButton: (props) => <FabButton onPress={() => navigation.navigate('CreateModal')} />,
-  }}
-  listeners={{ tabPress: (e) => e.preventDefault() }}
-/>
-```
-Lalu daftarkan `CreateModal` sebagai route Stack di level lebih tinggi (atau pakai `RootStack` yang membungkus MainTab).
-
-**Icon:** pakai `@expo/vector-icons` (Ionicons atau Feather). Warna aktif `COLORS.primary`, inactive `COLORS.textMuted`.
-
-### 2.6 — AdminNavigator (Drawer)
-**File:** `src/navigation/AdminNavigator.tsx`
-
-Pakai `createDrawerNavigator` dari `@react-navigation/drawer`.
-
-4 item drawer:
-1. **Dashboard** — wrap stack `AdminDashboard` → `AdminReview`
-2. **Semua Laporan** — `AdminReportsScreen`
-3. **Buat Laporan** — wrap stack `AdminCreateLost` ↔ `AdminCreateFound`
-4. **Logout** — custom drawer item; on press → `logout()` dari useAuth
-
-**Aksen warna:** `COLORS.admin` (#4F46E5 indigo) untuk active item background, header tint, dll. Konfigurasi via `drawerActiveBackgroundColor`, `drawerActiveTintColor`.
-
-**Catatan:** Drawer butuh `react-native-gesture-handler` di-import paling atas di `index.ts` (Expo entry). Verifikasi sudah ada — kalau belum, tambahkan `import 'react-native-gesture-handler';` sebagai baris pertama `index.ts`.
-
-### 2.7 — Update App.tsx
-**File:** `App.tsx`
-
-Hapus splash sederhana FASE 1. Ganti jadi:
-```typescript
-import './global.css';
-import 'react-native-gesture-handler';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { AuthProvider } from '@/context/AuthContext';
-import RootNavigator from '@/navigation';
-
-export default function App() {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
-    </GestureHandlerRootView>
-  );
-}
-```
-
-### 2.8 — Verifikasi FASE 2
-1. `npx tsc --noEmit` — harus clean.
-2. `npm start` di Expo Go — harus muncul `SplashScreen` placeholder lalu bisa navigate ke RoleSelection (kalau auto-navigate dari Splash sudah di-wire) atau minimal AuthNavigator render tanpa crash.
-3. Cek manual: tap RoleSelection → Login → Register → ForgotPassword — semua harus bisa dibuka & back.
-4. Karena belum ada login flow, tidak bisa test branching ke MainNavigator/AdminNavigator. Cara test cepat: hardcode `isAuthenticated = true` + `role = 'mahasiswa'` di AuthContext sementara, pastikan MainNavigator render dengan 5 tab. Lalu balik ke `false` sebelum commit.
-
-### 2.9 — Commit FASE 2
-Pesan commit:
-```
-FASE 2: Fondasi navigasi (Stack + Tab + Drawer) + AuthContext
-
-- AuthContext dengan supabase.auth.onAuthStateChange + Supabase Auth methods
-- Root navigator branching: isLoading / Auth / Main / Admin
-- AuthNavigator (Stack), MainNavigator (5-tab + FAB modal), AdminNavigator (Drawer indigo)
-- Type-safe route params di src/navigation/types.ts
-```
+**FASE 4 fokus mahasiswa flow.** Admin moderation di FASE 5. Settings/Help/UserProfile boleh di-defer ke FASE 6 polish.
 
 ---
 
-## FILE YANG AKAN DIBUAT / DIEDIT
+## URUTAN TASK (URUT)
 
-| File | Aksi | Status setelah FASE 2 |
-|------|------|----------------------|
-| `src/navigation/types.ts` | Edit (dari stub) | Berisi semua ParamList |
-| `src/navigation/index.tsx` | Edit (dari stub) | Root navigator + branching |
-| `src/navigation/AuthNavigator.tsx` | Edit (dari stub) | Stack 5 route |
-| `src/navigation/MainNavigator.tsx` | Edit (dari stub) | Bottom Tab 5 + FAB modal + nested stacks |
-| `src/navigation/AdminNavigator.tsx` | Edit (dari stub) | Drawer indigo 4 item |
-| `src/context/AuthContext.tsx` | Edit (dari stub) | Provider + useAuth hook |
-| `src/services/auth.service.ts` | Edit (dari stub) | Wrapper functions: loginWithEmail, loginWithGoogle, register, logout, resetPassword |
-| `src/screens/LoadingScreen.tsx` | **Buat baru** | Spinner sederhana (tidak ada di CONTEXT struktur, tapi diperlukan) |
-| `src/components/FabButton.tsx` | **Buat baru** | Custom tab button untuk FAB di MainNavigator |
-| `App.tsx` | Edit | Bungkus dengan GestureHandlerRootView + AuthProvider + RootNavigator |
-| `index.ts` | Edit (jika perlu) | Pastikan `import 'react-native-gesture-handler'` ada di paling atas |
+### 4.0 — Pre-flight
+1. **Setup Supabase Storage buckets** (manual via Dashboard → Storage):
+   - `report-photos` — public read, authenticated write. Buat policy: "Authenticated can insert", "Anyone can select".
+   - `chat-media` — authenticated read+write (bukan public). Policy: only conversation participants can read/write.
+   - `avatars` — public read, authenticated write. Policy: user can upsert ke path `<auth.uid>/...` sendiri.
+2. **Verifikasi `.env` masih lengkap** & app jalan di Expo Go (sanity check setelah istirahat).
+
+### 4.1 — Service layer untuk reports
+**File:** `src/services/report.service.ts`
+
+Fungsi yg dibutuhkan:
+- `listReports({ type?, category?, status?, search? })` — feed listing dgn filter
+- `getReportById(id)` — detail
+- `createReport(payload)` — insert ke `reports`, status default `pending`
+- `updateReport(id, payload)` — update kalau owner & belum resolved
+- `deleteReport(id)` — soft via update status='deleted' atau hard delete
+- `markAsResolved(id)` — status → `resolved`
+
+Tipe TS: `Report`, `ReportInput`, dst.
+
+### 4.2 — Service layer untuk upload
+**File:** `src/services/upload.service.ts`
+
+Fungsi:
+- `pickImage()` — wrap `expo-image-picker.launchImageLibraryAsync` (cropping, kompresi)
+- `uploadReportPhoto(uri, userId)` — upload ke bucket `report-photos`, path `<userId>/<uuid>.jpg`, return public URL
+- `uploadAvatar(uri, userId)` — bucket `avatars`, path `<userId>/avatar.jpg`
+
+Pakai `expo-file-system` untuk read file → ArrayBuffer → upload via `supabase.storage.from(bucket).upload(...)`.
+
+### 4.3 — Komponen reusable
+- `src/components/ReportCard.tsx` — card di feed (foto thumbnail, title, badge type+status, lokasi, waktu)
+- `src/components/CategoryGrid.tsx` — grid 8 kategori dgn emoji (dipake di feed filter & form Create)
+- `src/components/StatusBadge.tsx` — badge status (pending/approved/rejected/resolved) dgn warna
+- `src/components/ViaAdminBadge.tsx` — badge "Dilaporkan via Admin" indigo
+- `src/components/EmptyState.tsx` — placeholder kalau feed kosong
+- `src/components/LoadingSkeleton.tsx` — skeleton list saat fetching
+
+### 4.4 — Zustand store
+**File:** `src/store/feedStore.ts`
+
+State: `reports`, `loading`, `filter` (type/category/status/search). Actions: `fetchReports()`, `setFilter()`, `clearFilter()`. Cache hasil di store biar gak fetch ulang.
+
+### 4.5 — HomeScreen
+**File:** `src/screens/main/HomeScreen.tsx` (referensi: `cariin-web/home.html`)
+
+Layout:
+- Sticky header: avatar + greeting + bell icon (notifikasi)
+- Search bar
+- Filter chip: All | Lost | Found
+- CategoryGrid horizontal scrollable
+- FlatList of ReportCard (pull-to-refresh, infinite scroll opsional)
+- Empty state
+
+Navigation: tap card → `DetailLost` atau `DetailFound` (sesuai type).
+
+### 4.6 — DetailLost & DetailFound
+**Files:** `DetailLostScreen.tsx`, `DetailFoundScreen.tsx` (referensi: `detail.html`, `detail-dompet.html`)
+
+- Header back + share button
+- Foto besar
+- Badge type + kategori + status
+- Title + description + lokasi + waktu + custodyPoint (Found)
+- Reporter info (nama + fakultas, **TANPA nomor HP** per business rule #10)
+- Tombol "Chat Penemu/Pelapor" (hanya kalau status=approved per BR #11)
+
+### 4.7 — CreateLost & CreateFound + Success
+**Files:** `CreateLostScreen.tsx`, `CreateFoundScreen.tsx`, `SuccessScreen.tsx` (referensi: `create.html`, `create-found.html`, `success.html`)
+
+Form: title, description, kategori, lokasi, custodyPoint (Found only), foto (wajib). Submit → `report.service.createReport()` → navigate ke Success → tap OK → balik ke Home.
+
+Ada tab toggle Lost↔Found di header.
+
+### 4.8 — MyPosts & EditPost
+**Files:** `MyPostsScreen.tsx`, `EditPostScreen.tsx` (referensi: `my-posts.html`, `edit-post.html`)
+
+MyPosts: list laporan saya (filter by `user_id = auth.uid()`). Action menu per item: Edit, Hapus, Tandai Selesai. EditPost: form pre-filled, hanya bisa kalau status≠resolved.
+
+### 4.9 — ProfileScreen lengkap
+**File:** `ProfileScreen.tsx` (replace yang sekarang cuma Logout)
+
+Sections: avatar + nama + NIM + fakultas, "Edit Profile" → Settings, "Pusat Bantuan" → Help, "Tentang App", "Logout" merah.
+
+### 4.10 — Settings, Help, UserProfile
+**Files:** `SettingsScreen.tsx`, `HelpScreen.tsx`, `UserProfileScreen.tsx`
+
+Settings: edit nama, ganti password, toggle notifikasi push.
+Help: FAQ static.
+UserProfile: profil publik user lain (dipake dari ChatRoom/DetailReport).
+
+### 4.11 — Verifikasi
+1. `npx tsc --noEmit` clean
+2. Tes E2E di Expo Go:
+   - HomeFeed render reports dari DB
+   - Filter category & search jalan
+   - Tap report → detail → tombol chat (kalau approved)
+   - Buat report (foto upload jalan) → success → muncul di MyPosts
+   - Edit report → tersimpan
+   - Profile lengkap render dgn data dari `userProfile`
+
+### 4.12 — Commit FASE 4
 
 ---
 
-## POTENSI MASALAH
+## YANG USER PERLU SIAPKAN SEBELUM FASE 4
 
-### M1 — Supabase call gagal walau init sukses
-**Penyebab:** `.env` kosong (hanya `console.warn`, bukan throw), tapi `supabase.from(...)` bakal return error 401 / network. Atau schema belum dibuat.
-**Solusi:** Pastikan (a) `.env` sudah berisi URL + publishable key non-empty, (b) `supabase-schema.sql` sudah di-run di SQL Editor.
+**WAJIB:**
+1. **Storage buckets** di Supabase Dashboard:
+   - `report-photos` (public read, auth write) — wajib untuk Create Report dgn foto
+   - `avatars` (public read, auth write) — wajib untuk ProfileScreen
+   - `chat-media` (private, defer kalau chat di FASE 4.5)
 
-### M2 — `URL is not defined` / `Headers is not defined`
-Sudah di-handle dengan `import 'react-native-url-polyfill/auto'` di baris paling atas `supabase.ts`. Kalau ada error tipe ini, pastikan import polyfill dieksekusi sebelum `createClient`.
+   Policy SQL contoh untuk `report-photos`:
+   ```sql
+   -- read: anyone
+   create policy "report photos public read"
+     on storage.objects for select
+     using (bucket_id = 'report-photos');
 
-### M3 — Reanimated babel plugin
-React Navigation Drawer butuh Reanimated. Pastikan `babel.config.js` punya plugin `react-native-reanimated/plugin` di **akhir array plugins**. Saat ini babel.config.js cuma punya preset, belum plugin. Kalau drawer crash dengan error "Reanimated babel plugin missing", tambah:
-```javascript
-plugins: ['react-native-reanimated/plugin']
-```
-Tapi sebelum nambah, verifikasi dulu — mungkin Expo SDK 54 sudah auto-include via `babel-preset-expo`.
+   -- write: authenticated user, file path harus prefix auth.uid()
+   create policy "report photos auth write"
+     on storage.objects for insert
+     to authenticated
+     with check (
+       bucket_id = 'report-photos'
+       and (storage.foldername(name))[1] = auth.uid()::text
+     );
+   ```
 
-### M4 — FAB tab button preventDefault
-Pattern `listeners.tabPress: (e) => e.preventDefault()` perlu kombinasi dengan custom `tabBarButton` agar tap memang bypass tab nav dan trigger modal. Hati-hati duplicate event handling.
+2. **Test data**: bikin minimal 5 row di `reports` (status=approved) via SQL biar HomeFeed gak kosong saat tes pertama. Atau bikin via app saat Create Report jalan.
 
-### M5 — Nested navigator typing di v7
-React Navigation v7 mengubah cara typing nested navigator. `RootParamList` augmentation di global namespace cara baru. Kalau autocomplete tidak jalan, cek dokumentasi v7 di `node_modules/@react-navigation/native/lib/typescript/`.
-
-### M6 — Google OAuth flow di mobile
-Pakai `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'cariin://auth-callback' } })` + `expo-web-browser.openAuthSessionAsync` untuk capture redirect. Butuh setup di Supabase Dashboard → Authentication → Providers → Google (paste Client ID + Secret dari Google Cloud Console). Deep link `cariin://auth-callback` harus terdaftar di Supabase URL Allow List, dan `scheme: 'cariin'` di `app.json` sudah cocok. **Bonus:** jalan di Expo Go tanpa dev build.
-
-### M7 — `cariin-web/` nested di dalam cariin-mobile
-Belum dipindah. Sebelum atau saat FASE 2, putuskan: pindah keluar atau biarkan. Kalau biarkan, tambah ke `.gitignore` cariin-mobile/cariin-web/ supaya nggak ikut bundle.
-
----
-
-## YANG USER PERLU SIAPKAN SEBELUM FASE 2
-
-### WAJIB (blocker)
-1. **Test FASE 1 dulu di Expo Go** — `cd cariin-mobile && npm start`, scan QR, pastikan splash render dengan styling NativeWind. Kalau gagal, fix dulu sebelum FASE 2.
-2. **`.env` sudah ada** dengan Supabase URL + publishable key (sudah di-set saat migrasi). Yang masih perlu di-setup di Supabase Dashboard:
-   - SQL Editor → run `supabase-schema.sql` (di root project) untuk bikin tabel + RLS
-   - Authentication → Providers → enable Email + Google
-   - Storage → bikin bucket `report-photos` (public read), `chat-media` (authenticated read), `avatars` (public read)
-
-### OPSIONAL (boleh saat FASE 3)
-3. **Google OAuth setup** — Cloud Console → Credentials → OAuth 2.0 → Web application. Copy Client ID + Secret ke Supabase Dashboard → Authentication → Providers → Google. Tambah callback URL Supabase ke "Authorized redirect URIs" Google: `https://<project-id>.supabase.co/auth/v1/callback`.
-4. **Domain email kampus aktual** — kalau bukan `student.unu-jogja.ac.id`, update `EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN` di `.env`.
+**OPSIONAL (boleh di FASE 6):**
+- Google OAuth setup (Cloud Console + Supabase provider)
+- Deep link callback URLs di Authentication → URL Configuration
 
 ---
 
-## DURASI ESTIMASI FASE 2
+## DURASI ESTIMASI FASE 4
 
-- 2.1 types.ts: 10 menit
-- 2.2 AuthContext + auth.service: 30–45 menit
-- 2.3 RootNavigator: 10 menit
-- 2.4 AuthNavigator: 10 menit
-- 2.5 MainNavigator (paling kompleks, FAB modal): 30–45 menit
-- 2.6 AdminNavigator: 15 menit
-- 2.7 App.tsx update: 5 menit
-- 2.8 Verifikasi + manual nav test: 15–20 menit
-- 2.9 Commit: 5 menit
+- 4.0 setup: 15 menit (user manual setup buckets)
+- 4.1-4.2 services: 45 menit
+- 4.3 components: 1 jam
+- 4.4 store: 15 menit
+- 4.5 HomeScreen: 1 jam
+- 4.6 Detail screens: 45 menit
+- 4.7 Create + Success: 1.5 jam (image picker + upload tricky)
+- 4.8 MyPosts + EditPost: 45 menit
+- 4.9 Profile lengkap: 30 menit
+- 4.10 Settings/Help/UserProfile: 45 menit
+- 4.11 Verifikasi + manual test: 30 menit
+- 4.12 Commit: 5 menit
 
-**Total:** ~2 jam fokus (asumsi tidak ada bug Supabase / Reanimated / Drawer surprise).
+**Total: ~7-8 jam fokus.** Bisa dibreak jadi 2-3 sesi.
 
 ---
 
-## DEFINISI "FASE 2 SELESAI"
+## DEFINISI "FASE 4 SELESAI"
 
-Checklist sebelum mark FASE 2 done:
-- [ ] `npx tsc --noEmit` clean
-- [ ] App.tsx render tanpa crash di Expo Go
-- [ ] Tap dari Splash → bisa sampai ke ForgotPassword via Login
-- [ ] Hardcode `isAuthenticated = true; role = 'mahasiswa'` → MainNavigator render 5 tab, semua tab bisa dibuka
-- [ ] Hardcode `role = 'admin'` → AdminNavigator drawer render, semua 4 item bisa dibuka
-- [ ] Hardcode dikembalikan ke null/false sebelum commit
-- [ ] FAB tap → modal Create muncul (CreateLost/CreateFound bisa toggle)
-- [ ] Logout dari AdminNavigator → kembali ke AuthNavigator
-- [ ] Commit FASE 2 di branch `develop`
+Checklist:
+- [ ] Storage buckets created with policies
+- [ ] All services (report, upload) implemented & typed
+- [ ] All 8 reusable components done
+- [ ] HomeScreen render feed dengan filter & search
+- [ ] Detail screens render full info
+- [ ] Create flow: form → upload foto → DB insert → Success → balik feed
+- [ ] MyPosts: list owned reports + edit + delete
+- [ ] ProfileScreen lengkap (replace temp logout)
+- [ ] Tab navigation antar Home/Pesan/FAB/Laporanku/Profil semua kebuka tanpa crash
+- [ ] tsc clean, expo-doctor pass
+- [ ] Commit FASE 4 di `main`
+
+Chat (Inbox + ChatRoom + Notifications) bisa **DEFER** ke FASE 4.5 atau FASE 5 — tergantung waktu.
