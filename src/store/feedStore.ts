@@ -30,6 +30,10 @@ const DEFAULT_FILTER: FeedFilter = {
   search: '',
 };
 
+// Debounce search supaya gak nge-bombardir Supabase tiap keystroke.
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+const SEARCH_DEBOUNCE_MS = 300;
+
 function toServiceFilter(f: FeedFilter): ReportFilter {
   return {
     ...(f.type !== 'all' && { type: f.type }),
@@ -73,11 +77,19 @@ export const useFeedStore = create<FeedState>((set, get) => ({
 
   setFilter(patch) {
     set((s) => ({ filter: { ...s.filter, ...patch } }));
-    void get().fetch();
+    // Search field: debounce fetch biar cuma trigger setelah user berhenti ngetik.
+    // Filter lain (type/category): langsung fetch tanpa delay.
+    if (patch.search !== undefined) {
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => void get().fetch(), SEARCH_DEBOUNCE_MS);
+    } else {
+      void get().fetch();
+    }
   },
 
   clearFilter() {
     set({ filter: DEFAULT_FILTER });
+    if (searchTimer) clearTimeout(searchTimer);
     void get().fetch();
   },
 }));
