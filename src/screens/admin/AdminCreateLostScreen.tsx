@@ -21,6 +21,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import type { AdminCreateStackParamList, AdminDrawerParamList } from '@/navigation/types';
 import { createAdminReport } from '@/services/report.service';
+import { supabase } from '@/services/supabase';
 import {
   pickImageFromLibrary,
   takePhoto,
@@ -96,7 +97,7 @@ export default function AdminCreateLostScreen() {
     try {
       let photoUrl: string | null = null;
       if (photo) {
-        const { data: authData } = await (await import('@/services/supabase')).supabase.auth.getUser();
+        const { data: authData } = await supabase.auth.getUser();
         const userId = authData.user?.id;
         if (userId) photoUrl = await uploadReportPhoto(photo, userId);
       }
