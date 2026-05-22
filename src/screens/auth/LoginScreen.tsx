@@ -79,16 +79,22 @@ export default function LoginScreen() {
             onPress={() => navigation.goBack()}
             accessibilityRole="button"
             accessibilityLabel="Kembali"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: COLORS.background,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
           >
-            <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+            {({ pressed }) => (
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: COLORS.background,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.7 : 1,
+                }}
+              >
+                <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+              </View>
+            )}
           </Pressable>
         </View>
 
@@ -179,9 +185,18 @@ export default function LoginScreen() {
                     onPress={() => navigation.navigate('ForgotPassword')}
                     hitSlop={8}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: COLORS.textMuted }}>
-                      Lupa sandi?
-                    </Text>
+                    {({ pressed }) => (
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: '600',
+                          color: COLORS.textMuted,
+                          opacity: pressed ? 0.7 : 1,
+                        }}
+                      >
+                        Lupa sandi?
+                      </Text>
+                    )}
                   </Pressable>
                 )
               }

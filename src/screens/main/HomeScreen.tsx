@@ -108,25 +108,30 @@ export default function HomeScreen() {
                 onPress={() => nav.getParent()?.navigate('ChatTab', { screen: 'Notifications' })}
                 accessibilityRole="button"
                 accessibilityLabel="Notifikasi"
-                style={({ pressed }) => ({
-                  width: 44,
-                  height: 44,
-                  borderRadius: 999,
-                  backgroundColor: COLORS.surface,
-                  borderWidth: 1,
-                  borderColor: COLORS.border,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: pressed ? 0.7 : 1,
-                })}
               >
-                {userProfile?.avatar_url ? (
-                  <Image
-                    source={{ uri: userProfile.avatar_url }}
-                    style={{ width: 44, height: 44, borderRadius: 999 }}
-                  />
-                ) : (
-                  <Feather name="bell" size={20} color={COLORS.primary} />
+                {({ pressed }) => (
+                  <View
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 999,
+                      backgroundColor: COLORS.surface,
+                      borderWidth: 1,
+                      borderColor: COLORS.border,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: pressed ? 0.7 : 1,
+                    }}
+                  >
+                    {userProfile?.avatar_url ? (
+                      <Image
+                        source={{ uri: userProfile.avatar_url }}
+                        style={{ width: 44, height: 44, borderRadius: 999 }}
+                      />
+                    ) : (
+                      <Feather name="bell" size={20} color={COLORS.primary} />
+                    )}
+                  </View>
                 )}
               </Pressable>
             </View>
@@ -161,8 +166,20 @@ export default function HomeScreen() {
                   returnKeyType="search"
                 />
                 {filter.search.length > 0 ? (
-                  <Pressable onPress={() => setFilter({ search: '' })}>
-                    <Feather name="x-circle" size={16} color={COLORS.textMuted} />
+                  <Pressable
+                    onPress={() => setFilter({ search: '' })}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Hapus pencarian"
+                  >
+                    {({ pressed }) => (
+                      <Feather
+                        name="x-circle"
+                        size={16}
+                        color={COLORS.textMuted}
+                        style={{ opacity: pressed ? 0.7 : 1 }}
+                      />
+                    )}
                   </Pressable>
                 ) : null}
               </View>

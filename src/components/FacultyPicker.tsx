@@ -109,27 +109,32 @@ export default function FacultyPicker({
                       onChange(item);
                       setOpen(false);
                     }}
-                    style={({ pressed }) => ({
-                      paddingHorizontal: 24,
-                      paddingVertical: 16,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      backgroundColor: pressed ? COLORS.background : 'transparent',
-                    })}
                   >
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: selected ? '700' : '500',
-                        color: selected ? COLORS.primary : COLORS.textMuted,
-                      }}
-                    >
-                      {item}
-                    </Text>
-                    {selected ? (
-                      <Ionicons name="checkmark" size={20} color={COLORS.primary} />
-                    ) : null}
+                    {({ pressed }) => (
+                      <View
+                        style={{
+                          paddingHorizontal: 24,
+                          paddingVertical: 16,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          backgroundColor: pressed ? COLORS.background : 'transparent',
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: selected ? '700' : '500',
+                            color: selected ? COLORS.primary : COLORS.textMuted,
+                          }}
+                        >
+                          {item}
+                        </Text>
+                        {selected ? (
+                          <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+                        ) : null}
+                      </View>
+                    )}
                   </Pressable>
                 );
               }}

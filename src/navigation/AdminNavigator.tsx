@@ -7,6 +7,7 @@
 //   - Logout         (custom item, panggil useAuth().logout())
 
 import { Ionicons } from '@expo/vector-icons';
+import { Alert } from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItem,
@@ -60,7 +61,23 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         labelStyle={{ color: COLORS.lost, fontWeight: '600' }}
         icon={({ size }) => <Ionicons name="log-out-outline" size={size} color={COLORS.lost} />}
         onPress={() => {
-          void logout();
+          Alert.alert('Keluar dari Cari.In?', 'Sesi admin akan diakhiri.', [
+            { text: 'Batal', style: 'cancel' },
+            {
+              text: 'Keluar',
+              style: 'destructive',
+              onPress: async () => {
+                try {
+                  await logout();
+                } catch (e) {
+                  Alert.alert(
+                    'Gagal logout',
+                    e instanceof Error ? e.message : 'Coba lagi sebentar.',
+                  );
+                }
+              },
+            },
+          ]);
         }}
       />
     </DrawerContentScrollView>

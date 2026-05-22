@@ -156,6 +156,7 @@ export default function EditPostScreen() {
             )}
           </Pressable>
           <Text
+            pointerEvents="none"
             style={{
               position: 'absolute',
               left: 0,

@@ -207,28 +207,35 @@ export default function CreateReportScreen() {
                 <Pressable
                   key={t}
                   onPress={() => switchType(t)}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 11,
-                    borderRadius: 12,
-                    backgroundColor: active ? COLORS.surface : 'transparent',
-                    alignItems: 'center',
-                    shadowColor: active ? '#000' : 'transparent',
-                    shadowOpacity: active ? 0.06 : 0,
-                    shadowRadius: 4,
-                    shadowOffset: { width: 0, height: 1 },
-                    elevation: active ? 1 : 0,
-                  }}
+                  accessibilityRole="button"
                 >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: '700',
-                      color: active ? COLORS.primary : COLORS.textMuted,
-                    }}
-                  >
-                    {label}
-                  </Text>
+                  {({ pressed }) => (
+                    <View
+                      style={{
+                        flex: 1,
+                        paddingVertical: 11,
+                        borderRadius: 12,
+                        backgroundColor: active ? COLORS.surface : 'transparent',
+                        alignItems: 'center',
+                        shadowColor: active ? '#000' : 'transparent',
+                        shadowOpacity: active ? 0.06 : 0,
+                        shadowRadius: 4,
+                        shadowOffset: { width: 0, height: 1 },
+                        elevation: active ? 1 : 0,
+                        opacity: pressed ? 0.85 : 1,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: '700',
+                          color: active ? COLORS.primary : COLORS.textMuted,
+                        }}
+                      >
+                        {label}
+                      </Text>
+                    </View>
+                  )}
                 </Pressable>
               );
             })}
@@ -335,30 +342,35 @@ export default function CreateReportScreen() {
                 <Pressable
                   key={c.id}
                   onPress={() => setCategory(c.id)}
-                  style={({ pressed }) => ({
-                    width: '23.5%', // 4 cols dgn gap 8
-                    aspectRatio: 1,
-                    borderRadius: 16,
-                    backgroundColor: active ? COLORS.primary : COLORS.surface,
-                    borderWidth: 1,
-                    borderColor: active ? COLORS.primary : COLORS.border,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 4,
-                    opacity: pressed ? 0.85 : 1,
-                  })}
                 >
-                  <Text style={{ fontSize: 22 }}>{c.emoji}</Text>
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      fontWeight: '700',
-                      color: active ? '#FFFFFF' : COLORS.primary,
-                      textAlign: 'center',
-                    }}
-                  >
-                    {c.label}
-                  </Text>
+                  {({ pressed }) => (
+                    <View
+                      style={{
+                        width: '23.5%', // 4 cols dgn gap 8
+                        aspectRatio: 1,
+                        borderRadius: 16,
+                        backgroundColor: active ? COLORS.primary : COLORS.surface,
+                        borderWidth: 1,
+                        borderColor: active ? COLORS.primary : COLORS.border,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        opacity: pressed ? 0.85 : 1,
+                      }}
+                    >
+                      <Text style={{ fontSize: 22 }}>{c.emoji}</Text>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          fontWeight: '700',
+                          color: active ? '#FFFFFF' : COLORS.primary,
+                          textAlign: 'center',
+                        }}
+                      >
+                        {c.label}
+                      </Text>
+                    </View>
+                  )}
                 </Pressable>
               );
             })}

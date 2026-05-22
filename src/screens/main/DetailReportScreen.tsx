@@ -93,15 +93,24 @@ export default function DetailReportScreen() {
           </Text>
           <Pressable
             onPress={() => nav.goBack()}
-            style={{
-              marginTop: 12,
-              paddingHorizontal: 18,
-              paddingVertical: 10,
-              backgroundColor: COLORS.primary,
-              borderRadius: 12,
-            }}
+            accessibilityRole="button"
+            accessibilityLabel="Kembali"
           >
-            <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>Kembali</Text>
+            {({ pressed }) => (
+              <View
+                style={{
+                  marginTop: 12,
+                  paddingHorizontal: 18,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  opacity: pressed ? 0.85 : 1,
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontWeight: '600' }}>Kembali</Text>
+              </View>
+            )}
           </Pressable>
         </View>
       </SafeAreaView>
@@ -321,66 +330,71 @@ export default function DetailReportScreen() {
               }
             }}
             disabled={report.created_by_admin || !report.user_id}
-            style={({ pressed }) => ({
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 14,
-              backgroundColor: COLORS.surface,
-              borderWidth: 1,
-              borderColor: COLORS.border,
-              borderRadius: 18,
-              gap: 12,
-              opacity: pressed ? 0.7 : 1,
-              marginBottom: 12,
-            })}
           >
+            {({ pressed }) => (
             <View
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 999,
-                backgroundColor: '#F4F4F5',
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
+                padding: 14,
+                backgroundColor: COLORS.surface,
+                borderWidth: 1,
+                borderColor: COLORS.border,
+                borderRadius: 18,
+                gap: 12,
+                opacity: pressed ? 0.7 : 1,
+                marginBottom: 12,
               }}
             >
-              {reporterAvatar ? (
-                <Image
-                  source={{ uri: reporterAvatar }}
-                  style={{ width: 48, height: 48 }}
-                />
-              ) : (
-                <Feather name="user" size={20} color={COLORS.textMuted} />
-              )}
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text
+              <View
                 style={{
-                  fontSize: 10,
-                  fontWeight: '800',
-                  color: COLORS.textMuted,
-                  letterSpacing: 0.8,
-                  marginBottom: 2,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  backgroundColor: '#F4F4F5',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
               >
-                DILAPORKAN OLEH
-              </Text>
-              <Text
-                style={{ fontSize: 14, fontWeight: '700', color: COLORS.primary }}
-                numberOfLines={1}
-              >
-                {reporterName}
-              </Text>
-              {reporterFaculty ? (
-                <Text style={{ fontSize: 12, color: COLORS.textMuted }} numberOfLines={1}>
-                  {reporterFaculty}
+                {reporterAvatar ? (
+                  <Image
+                    source={{ uri: reporterAvatar }}
+                    style={{ width: 48, height: 48 }}
+                  />
+                ) : (
+                  <Feather name="user" size={20} color={COLORS.textMuted} />
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '800',
+                    color: COLORS.textMuted,
+                    letterSpacing: 0.8,
+                    marginBottom: 2,
+                  }}
+                >
+                  DILAPORKAN OLEH
                 </Text>
+                <Text
+                  style={{ fontSize: 14, fontWeight: '700', color: COLORS.primary }}
+                  numberOfLines={1}
+                >
+                  {reporterName}
+                </Text>
+                {reporterFaculty ? (
+                  <Text style={{ fontSize: 12, color: COLORS.textMuted }} numberOfLines={1}>
+                    {reporterFaculty}
+                  </Text>
+                ) : null}
+              </View>
+              {!report.created_by_admin && report.user_id ? (
+                <Feather name="chevron-right" size={20} color={COLORS.border} />
               ) : null}
             </View>
-            {!report.created_by_admin && report.user_id ? (
-              <Feather name="chevron-right" size={20} color={COLORS.border} />
-            ) : null}
+            )}
           </Pressable>
         </View>
       </ScrollView>
@@ -422,26 +436,31 @@ export default function DetailReportScreen() {
                   'Fitur chat akan tersedia di update berikutnya. Untuk sementara, hubungi admin via kontak resmi.',
                 )
               }
-              style={({ pressed }) => ({
-                paddingVertical: 16,
-                backgroundColor: COLORS.primary,
-                borderRadius: 16,
-                alignItems: 'center',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                gap: 8,
-                opacity: pressed ? 0.85 : 1,
-                shadowColor: COLORS.primary,
-                shadowOpacity: 0.2,
-                shadowRadius: 8,
-                shadowOffset: { width: 0, height: 4 },
-                elevation: 4,
-              })}
             >
-              <Feather name="message-circle" size={18} color="#FFFFFF" />
-              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
-                {ctaLabel}
-              </Text>
+              {({ pressed }) => (
+                <View
+                  style={{
+                    paddingVertical: 16,
+                    backgroundColor: COLORS.primary,
+                    borderRadius: 16,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    gap: 8,
+                    opacity: pressed ? 0.85 : 1,
+                    shadowColor: COLORS.primary,
+                    shadowOpacity: 0.2,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 4,
+                  }}
+                >
+                  <Feather name="message-circle" size={18} color="#FFFFFF" />
+                  <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
+                    {ctaLabel}
+                  </Text>
+                </View>
+              )}
             </Pressable>
           ) : (
             <View
@@ -478,17 +497,22 @@ function RoundIconButton({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={({ pressed }) => ({
-        width: 40,
-        height: 40,
-        borderRadius: 999,
-        backgroundColor: 'rgba(0,0,0,0.35)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: pressed ? 0.7 : 1,
-      })}
     >
-      <Feather name={icon} size={18} color="#FFFFFF" />
+      {({ pressed }) => (
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 999,
+            backgroundColor: 'rgba(0,0,0,0.35)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.7 : 1,
+          }}
+        >
+          <Feather name={icon} size={18} color="#FFFFFF" />
+        </View>
+      )}
     </Pressable>
   );
 }
