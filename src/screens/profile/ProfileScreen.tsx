@@ -3,14 +3,18 @@
 // fallback ke icon. Referensi visual: cariin-web/profile.html.
 
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
+import type { ProfileStackParamList } from '@/navigation/types';
 import { COLORS } from '@/utils/constants';
 
 export default function ProfileScreen() {
   const { logout, userProfile } = useAuth();
+  const nav = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
 
   const onLogout = () => {
     Alert.alert('Keluar dari Cari.In?', 'Sesi akan diakhiri.', [
@@ -134,21 +138,14 @@ export default function ProfileScreen() {
               icon="settings"
               title="Pengaturan Akun"
               subtitle="Edit profil dan kata sandi"
-              onPress={() =>
-                Alert.alert('Segera hadir', 'Pengaturan akan tersedia di update berikutnya.')
-              }
+              onPress={() => nav.navigate('Settings')}
             />
             <Divider />
             <MenuItem
               icon="help-circle"
               title="Pusat Bantuan"
               subtitle="FAQ & Kontak Dukungan"
-              onPress={() =>
-                Alert.alert(
-                  'Pusat Bantuan',
-                  'Untuk bantuan, hubungi admin Cari.In via email admin@cariin.app.',
-                )
-              }
+              onPress={() => nav.navigate('Help')}
             />
             <Divider />
             <MenuItem

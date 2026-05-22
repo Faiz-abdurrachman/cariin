@@ -104,6 +104,7 @@ export default function AdminNavigator() {
         component={DashboardStackNavigator}
         options={{
           title: 'Dashboard',
+          headerShown: false,
           drawerIcon: ({ color, size }) => (
             <Ionicons name="speedometer-outline" color={color} size={size} />
           ),
@@ -114,6 +115,7 @@ export default function AdminNavigator() {
         component={AdminReportsScreen}
         options={{
           title: 'Semua Laporan',
+          headerShown: false,
           drawerIcon: ({ color, size }) => (
             <Ionicons name="list-outline" color={color} size={size} />
           ),
@@ -124,6 +126,7 @@ export default function AdminNavigator() {
         component={AdminCreateStackNavigator}
         options={{
           title: 'Buat Laporan',
+          headerShown: false,
           drawerIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" color={color} size={size} />
           ),

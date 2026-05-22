@@ -177,3 +177,95 @@ export async function markAsResolved(id: string): Promise<Report> {
   if (!data) throw new Error('Gagal menandai laporan selesai.');
   return data as Report;
 }
+
+// ----- ADMIN FUNCTIONS -----
+// Memakai RPC security-definer functions dari supabase-schema.sql.
+// RPC `update_report_status` dan `create_admin_report` sudah di-grant ke authenticated.
+
+export async function approveReport(id: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc('update_report_status', {
+    p_report_id: id,
+    p_new_status: 'approved',
+    p_admin_note: note ?? null,
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function rejectReport(id: string, note: string): Promise<void> {
+  const { error } = await supabase.rpc('update_report_status', {
+    p_report_id: id,
+    p_new_status: 'rejected',
+    p_admin_note: note,
+  });
+  if (error) throw new Error(error.message);
+}
+
+export interface AdminReportInput {
+  type: ReportType;
+  title: string;
+  description?: string | null;
+  category: CategoryId;
+  location: string;
+  custody_point?: string | null;
+  photo_url?: string | null;
+  reporter_name?: string | null;
+  reporter_nim?: string | null;
+  reporter_faculty?: string | null;
+}
+
+export async function createAdminReport(input: AdminReportInput): Promise<string> {
+  const { data, error } = await supabase.rpc('create_admin_report', {
+    p_type: input.type,
+    p_title: input.title,
+    p_description: input.description ?? null,
+    p_category: input.category,
+    p_location: input.location,
+    p_custody_point: input.custody_point ?? null,
+    p_photo_url: input.photo_url ?? null,
+    p_reporter_name: input.reporter_name ?? null,
+    p_reporter_nim: input.reporter_nim ?? null,
+    p_reporter_faculty: input.reporter_faculty ?? null,
+  });
+  if (error) throw new Error(error.message);
+  return data as string;
+}
+
+export async function getAdminStats(): Promise<{
+  pending: number;
+  approved: number;
+  rejected: number;
+  resolved: number;
+  total: number;
+  todayApproved: number;
+}> {
+  const { data, error } = await supabase
+    .from('reports')
+    .select('status, created_at, updated_at');
+  if (error) throw new Error(error.message);
+
+  const rows = data ?? [];
+  const today = new Date().toISOString().slice(0, 10);
+
+  let pending = 0;
+  let approved = 0;
+  let rejected = 0;
+  let resolved = 0;
+  let todayApproved = 0;
+
+  for (const r of rows) {
+    if (r.status === 'pending') pending++;
+    else if (r.status === 'approved') approved++;
+    else if (r.status === 'rejected') rejected++;
+    else if (r.status === 'resolved') resolved++;
+
+    if (
+      (r.status === 'approved' || r.status === 'resolved') &&
+      r.updated_at &&
+      r.updated_at.slice(0, 10) === today
+    ) {
+      todayApproved++;
+    }
+  }
+
+  return { pending, approved, rejected, resolved, total: rows.length, todayApproved };
+}

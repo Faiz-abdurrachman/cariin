@@ -399,5 +399,123 @@ alter publication supabase_realtime add table public.notifications;
 -- Lalu setup policy storage di tab "Policies" per bucket.
 
 -- ============================================================================
+-- 8. FASE 5 — ADMIN RPC FUNCTIONS + NOTIFICATION TRIGGER
+-- ============================================================================
+
+-- RPC: Admin approve/reject report. Security definer bypass RLS recursion.
+-- Dipanggil dari client biasa (anon key). Caller harus admin.
+create or replace function public.update_report_status(
+  p_report_id  uuid,
+  p_new_status text,
+  p_admin_note text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+begin
+  -- Gate: hanya admin yang boleh panggil
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh mengubah status laporan.';
+  end if;
+
+  -- Validasi status
+  if p_new_status not in ('approved','rejected','resolved') then
+    raise exception 'Status tidak valid: %', p_new_status;
+  end if;
+
+  -- Update report
+  update public.reports
+  set status     = p_new_status,
+      admin_note = p_admin_note
+  where id = p_report_id
+  returning user_id into v_user_id;
+
+  if not found then
+    raise exception 'Laporan tidak ditemukan.';
+  end if;
+
+  -- Insert notification ke owner laporan (kalau ada user_id)
+  if v_user_id is not null then
+    if p_new_status = 'approved' then
+      insert into public.notifications (user_id, type, title, body, ref_id)
+      values (
+        v_user_id,
+        'report_approved',
+        'Laporan Disetujui',
+        'Laporan "' || (select title from public.reports where id = p_report_id) || '" telah disetujui.',
+        p_report_id
+      );
+    elsif p_new_status = 'rejected' then
+      insert into public.notifications (user_id, type, title, body, ref_id)
+      values (
+        v_user_id,
+        'report_rejected',
+        'Laporan Ditolak',
+        case
+          when p_admin_note is not null
+          then 'Laporan "' || (select title from public.reports where id = p_report_id) || '" ditolak. Alasan: ' || p_admin_note
+          else 'Laporan "' || (select title from public.reports where id = p_report_id) || '" ditolak.'
+        end,
+        p_report_id
+      );
+    end if;
+  end if;
+end;
+$$;
+
+-- RPC: Admin membuat laporan walk-in (created_by_admin=true).
+-- Field reporter_name/nim/faculty diisi manual karena pelapor bukan user sistem.
+create or replace function public.create_admin_report(
+  p_type            text,
+  p_title           text,
+  p_description     text default null,
+  p_category        text,
+  p_location        text,
+  p_custody_point   text default null,
+  p_photo_url       text default null,
+  p_reporter_name   text default null,
+  p_reporter_nim    text default null,
+  p_reporter_faculty text default null
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+begin
+  -- Gate: hanya admin
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh membuat laporan walk-in.';
+  end if;
+
+  insert into public.reports (
+    user_id, type, title, description, category,
+    location, custody_point, photo_url,
+    status, created_by_admin,
+    reporter_name, reporter_nim, reporter_faculty
+  ) values (
+    auth.uid(),             -- admin jadi user_id owner (untuk RLS update)
+    p_type, p_title, p_description, p_category,
+    p_location, p_custody_point, p_photo_url,
+    'approved',             -- langsung approved
+    true,
+    p_reporter_name, p_reporter_nim, p_reporter_faculty
+  ) returning id into v_id;
+
+  return v_id;
+end;
+$$;
+
+-- GRANT execute untuk RPC functions
+grant execute on function public.update_report_status(uuid, text, text) to authenticated;
+grant execute on function public.create_admin_report(text, text, text, text, text, text, text, text, text, text) to authenticated;
+
+-- ============================================================================
 -- DONE
 -- ============================================================================

@@ -2,7 +2,7 @@
 
 > Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
 >
-> **Last updated:** 2026-05-10 | **Branch:** `main` | **Local ahead origin:** 1 commit (FASE 4) — belum push
+> **Last updated:** 2026-05-23 | **Branch:** `main` | **Local ahead origin:** 2 commits (FASE 4 + FASE 5) — belum push
 
 ---
 
@@ -15,7 +15,7 @@
 | FASE 3 | Auth Screens (Splash, RoleSelection, Login, Register, ForgotPassword) | ✅ Selesai | `c42101a` |
 | FASE 4 | Core Mahasiswa (Home, Detail, Create, MyPosts, Profile) | ✅ Selesai | `9e511f6` |
 | **FASE 4.5** | **Chat & Notifikasi (opsional, mahasiswa flow lengkap)** | 🔜 **Belum mulai** | — |
-| **FASE 5** | **Admin Screens (moderate, dashboard, walk-in)** | 🔜 **Belum mulai** | — |
+| **FASE 5** | **Admin Screens (moderate, dashboard, walk-in)** | ✅ **Selesai** | *(commit incoming)* |
 | **FASE 6** | **Polish (Settings, Help, UserProfile, EAS build)** | 🔜 **Belum mulai** | — |
 
 `git log --oneline -10` untuk konfirmasi hash terkini.
@@ -70,7 +70,7 @@ Status semua `approved`, mix lost/found, satu `created_by_admin=true`. Lihat git
 
 | Issue | Status | Workaround / Catatan |
 |-------|--------|---------------------|
-| `profiles_admin_all` policy bikin "permission denied" (rekursi RLS via is_admin()) | 🔧 Workaround active | Di-COMMENT-OUT di schema. Defer FASE 5: pakai service_role atau RPC security-definer. |
+| `profiles_admin_all` policy bikin "permission denied" (rekursi RLS via is_admin()) | ✅ Resolved FASE 5 | Di-COMMENT-OUT di schema. Admin moderation pakai RPC security-definer (`update_report_status`, `create_admin_report`). |
 | `reports_update_self` WITH CHECK block transition ke `status='resolved'` | ✅ Fixed FASE 4 | WITH CHECK cuma cek `user_id = auth.uid()`, bukan replikasi USING. Schema sudah update. |
 | Pressable `style={({pressed}) => ...}` (function-form) sering broken | ✅ Documented | Pakai children-as-function pattern — lihat CLAUDE.md section 4.1. |
 | Modal back button no-op di first screen modal | ✅ Fixed FASE 4 | Pakai `nav.getParent<RootStackParamList>()?.goBack()`. |
@@ -86,8 +86,8 @@ RootNavigator (src/navigation/index.tsx)
   ├── isLoading → LoadingScreen
   ├── !isAuthenticated → AuthNavigator
   │     └── Splash → RoleSelection → Login | Register | ForgotPassword
-  ├── role==='admin' → AdminNavigator (Drawer indigo) [FASE 5]
-  │     └── Dashboard | Semua Laporan | Buat Laporan | (Logout custom)
+  ├── role==='admin' → AdminNavigator (Drawer indigo) [FASE 5 ✅]
+  │     └── Dashboard (stats+pending list) | Semua Laporan (filter+search) | Buat Laporan (walk-in) | (Logout custom)
   └── role==='mahasiswa' → MainNavigator (Bottom Tab + Modal)
         ├── HomeTab → HomeStack
         │     ├── HomeFeed (4.5)
@@ -102,7 +102,7 @@ RootNavigator (src/navigation/index.tsx)
         │     ├── EditPost (4.8)
         │     └── DetailLost / DetailFound
         └── ProfileTab → ProfileStack
-              ├── Profile (4.9 lengkap)
+              ├── Profile (lengkap, navigate ke Settings/Help)
               ├── Settings | Help | UserProfile [FASE 6 placeholder]
 ```
 
@@ -136,7 +136,7 @@ State global:
 | `src/utils/validators.ts` | isValidCampusEmail, isValidPassword, isValidNim |
 | `src/utils/formatters.ts` | formatRelativeTime, formatFullDate, categoryLabel/Emoji |
 | `src/services/auth.service.ts` | Wrapper Supabase Auth (FASE 3) |
-| `src/services/report.service.ts` | CRUD reports + types Report/ReportInput/Filter (FASE 4) |
+| `src/services/report.service.ts` | CRUD reports + admin functions (approve/reject/createAdmin/stats) (FASE 4+5) |
 | `src/services/upload.service.ts` | Image picker + Storage upload (base64→Uint8Array) (FASE 4) |
 | `src/services/{chat,notification}.service.ts` | **STUB** — diisi FASE 4.5 |
 | `src/components/PrimaryButton.tsx` | Reference pattern Pressable children-as-function |
@@ -167,18 +167,8 @@ State global:
 **Update existing:**
 - `DetailReportScreen.tsx` tombol chat: handle tap → upsert conversation, navigate ke ChatRoom (sekarang masih show Alert "Segera hadir")
 
-### FASE 5 — Admin Screens
-**Screens:**
-- `src/screens/admin/AdminDashboardScreen.tsx` — stats (pending count, today approved, dst) + quick actions
-- `src/screens/admin/AdminReportsScreen.tsx` — list semua laporan dgn filter status (lihat semua data)
-- `src/screens/admin/AdminReviewScreen.tsx` — detail per laporan + tombol Approve/Reject + form admin_note
-- `src/screens/admin/AdminCreateLostScreen.tsx` — laporan walk-in (set `created_by_admin=true`)
-- `src/screens/admin/AdminCreateFoundScreen.tsx` — sama, untuk found
-
-**Backend:**
-- **Restore `profiles_admin_all`** via security-definer RPC function (e.g. `set_user_role`, `update_profile_admin`) — bypass rekursi RLS
-- Update `report.service.ts`: tambah `listAllReports` (admin), `approveReport`, `rejectReport`, `addAdminNote`
-- Trigger DB: insert ke `notifications` saat report status berubah ke `approved` / `rejected` (notif ke owner)
+### FASE 5 — Admin Screens ✅ SELESAI
+Semua admin screens sudah diimplementasi. RPC functions (`update_report_status`, `create_admin_report`) sudah di-supabase-schema.sql. Admin moderation pakai security-definer RPC, bukan direct RLS `profiles_admin_all`.
 
 ### FASE 6 — Polish
 **Screens:**
