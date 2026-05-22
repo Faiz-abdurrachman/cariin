@@ -16,7 +16,7 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   // Lempar warning saat import — biar ketahuan cepat kalau .env belum di-set.
-  // eslint-disable-next-line no-console
+   
   console.warn(
     '[supabase] EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY belum di-set di .env',
   );

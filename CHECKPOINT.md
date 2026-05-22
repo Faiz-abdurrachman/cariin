@@ -2,7 +2,7 @@
 
 > Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
 >
-> **Last updated:** 2026-05-23 | **Branch:** `main` | **Local ahead origin:** 2 commits (FASE 4 + FASE 5) — belum push
+> **Last updated:** 2026-05-23 | **Branch:** `main` | **Local ahead origin:** 2 commits (FASE 4 + FASE 5) — belum push. Quick-fix commit pending.
 
 ---
 
@@ -28,8 +28,8 @@
 - **Backend:** Supabase (Auth + Postgres + Storage + Realtime)
 - **Bahasa:** TypeScript strict (`noImplicitAny`, `noUncheckedIndexedAccess`)
 - **Path alias:** `@/*` → `src/*`
-- **Lint:** ESLint v9 + legacy `.eslintrc.js` — perlu env `ESLINT_USE_FLAT_CONFIG=false`. TODO: migrate ke flat config (FASE 6).
-- **Web preview enabled** sejak FASE 4 (react-native-web + react-dom + @expo/metro-runtime). `npx expo start --web` → preview di Chrome laptop.
+- **Lint:** ESLint v9 + flat config (`eslint.config.js`) ✅ migrated from legacy `.eslintrc.js`. `npm run lint` clean, 0 errors/warnings.
+- **Web preview:** `@expo/metro-runtime` masih installed (kalau butuh `npx expo start --web`). `react-native-web` + `react-dom` removed (unused in src).
 - **iPhone Expo Go** = primary test device (user manual test).
 
 ---
@@ -75,7 +75,7 @@ Status semua `approved`, mix lost/found, satu `created_by_admin=true`. Lihat git
 | Pressable `style={({pressed}) => ...}` (function-form) sering broken | ✅ Documented | Pakai children-as-function pattern — lihat CLAUDE.md section 4.1. |
 | Modal back button no-op di first screen modal | ✅ Fixed FASE 4 | Pakai `nav.getParent<RootStackParamList>()?.goBack()`. |
 | Header title `position: absolute` capture tap, tombol back gak jalan | ✅ Fixed FASE 4 | Tambah `pointerEvents="none"` pada Text title overlay. |
-| ESLint v9 + legacy config | ⏸ Defer FASE 6 | Pakai env `ESLINT_USE_FLAT_CONFIG=false` saat lint. |
+| ESLint v9 + legacy config | ✅ Fixed | Migrated ke flat config `eslint.config.js`. `npm run lint` jalan clean tanpa env var. |
 
 ---
 
@@ -180,7 +180,7 @@ Semua admin screens sudah diimplementasi. RPC functions (`update_report_status`,
 - Avatar upload integration di Profile (uploadAvatar service udah siap di upload.service.ts)
 - Animasi transition, splash final, app icon
 - Google OAuth setup (Cloud Console + Supabase provider + redirect URLs)
-- ESLint flat config migration
+- ESLint flat config migration ✅ DONE (quick-fix)
 - expo-doctor pass + EAS build standalone untuk submission ke dosen
 
 ---

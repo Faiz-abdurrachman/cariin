@@ -96,7 +96,7 @@ export type AdminDrawerParamList = {
 // Augmentasi global untuk type-safe useNavigation di RootStack scope (mahasiswa flow).
 // Untuk Auth/Admin scope, screen pakai tipe spesifik: useNavigation<...<AuthStackParamList>>().
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
+   
   namespace ReactNavigation {
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface RootParamList extends RootStackParamList {}

@@ -217,7 +217,7 @@ Referensi visual: `cariin-web/admin-*.html`.
 - [ ] Reset password flow lengkap (deep link `cariin://reset-password`)
 
 ### 6.5 — Tooling
-- [ ] Migrate ESLint v9 ke flat config (`eslint.config.js`)
+- [x] ~~Migrate ESLint v9 ke flat config (`eslint.config.js`)~~ ✅ DONE (quick-fix)
 - [ ] expo-doctor 100% pass tanpa warning
 - [ ] Optional: prettier-plugin-tailwindcss untuk auto-sort className
 

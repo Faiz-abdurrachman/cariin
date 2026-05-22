@@ -46,7 +46,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
   if (error) {
     // Bukan fatal — bisa terjadi kalau row profiles belum di-insert (misal Google
     // login pertama kali) atau RLS belum dikonfigurasi. Caller boleh decide UX.
-    // eslint-disable-next-line no-console
+     
     console.warn('[AuthContext] gagal fetch profile:', error.message);
     return null;
   }

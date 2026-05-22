@@ -181,8 +181,9 @@ npx expo start --web      # buka di Chrome laptop
 # typecheck
 npx tsc --noEmit
 
-# lint (legacy config — TODO migrate ke flat config FASE 6)
-ESLINT_USE_FLAT_CONFIG=false npx eslint "src/**/*.{ts,tsx}"
+# lint (flat config — migrated from legacy .eslintrc.js)
+npm run lint
+# atau: npx eslint "src/**/*.{ts,tsx}"
 
 # expo health check
 npx expo-doctor
