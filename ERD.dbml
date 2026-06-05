@@ -1,0 +1,185 @@
+// ============================================================================
+// Cari.In — Entity Relationship Diagram (DBML)
+// ============================================================================
+// Cara pakai:
+//   1. Buka https://dbdiagram.io
+//   2. Hapus kode default, paste seluruh isi file ini
+//   3. ERD auto-render — atur posisi tabel (drag) sesuai preferensi
+//   4. Export → PNG (resolusi tinggi untuk laporan)
+//
+// Sumber: supabase-schema.sql (schema terkini & terimplementasi)
+// Versi: 1.0 | Mei 2026
+// ============================================================================
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+Enum role_type {
+  mahasiswa
+  admin
+}
+
+Enum report_type {
+  lost
+  found
+}
+
+Enum report_status {
+  pending
+  approved
+  rejected
+  resolved
+}
+
+Enum category_type {
+  elektronik
+  dokumen
+  dompet_tas
+  kunci
+  aksesoris
+  pakaian
+  buku_atk
+  lainnya
+}
+
+Enum notification_type {
+  report_approved
+  report_rejected
+  new_message
+}
+
+// ============================================================================
+// TABLE GROUPS
+// ============================================================================
+
+TableGroup auth_area {
+  profiles
+}
+
+TableGroup laporan_area {
+  reports
+}
+
+TableGroup chat_area {
+  conversations
+  messages
+}
+
+TableGroup notifikasi_area {
+  notifications
+}
+
+// ============================================================================
+// TABLES
+// ============================================================================
+
+Table profiles {
+  id uuid [PK, note: 'FK dari auth.users(id). ON DELETE CASCADE.']
+  name text [NOT NULL, note: 'Nama lengkap sesuai KTM']
+  nim text [UNIQUE, note: 'Nomor Induk Mahasiswa']
+  email text [UNIQUE, NOT NULL, note: 'Email kampus (@student.unu-jogja.ac.id)']
+  role role_type [NOT NULL, default: 'mahasiswa', note: 'mahasiswa atau admin']
+  faculty text [note: 'Fakultas (cth: Teknik, Ekonomi)']
+  department text [note: 'Jurusan (cth: Informatika)']
+  avatar_url text [note: 'URL foto profil di Supabase Storage']
+  is_verified boolean [NOT NULL, default: false, note: 'Email sudah diverifikasi?']
+  expo_push_token text [note: 'Token Expo Push Notification']
+  created_at timestamptz [NOT NULL, default: 'now()']
+  updated_at timestamptz [NOT NULL, default: 'now()']
+
+  Note: 'Data user (mahasiswa & admin). 1-1 dengan auth.users Supabase. Admin tidak bisa daftar via form, harus di-seed di database.'
+}
+
+Table reports {
+  id uuid [PK, default: 'gen_random_uuid()']
+  user_id uuid [note: 'FK → profiles.id. Nullable jika laporan walk-in (created_by_admin=true). ON DELETE SET NULL.']
+  type report_type [NOT NULL, note: 'lost = kehilangan, found = penemuan']
+  title text [NOT NULL, note: 'Nama barang (cth: Dompet hitam berisi KTP)']
+  description text [note: 'Deskripsi detail, ciri-ciri khusus']
+  category category_type [NOT NULL, note: '8 kategori standar']
+  location text [NOT NULL, note: 'Lokasi kehilangan/penemuan']
+  custody_point text [note: 'Titik penitipan. Wajib jika type=found.']
+  photo_url text [note: 'URL foto di Supabase Storage. Wajib untuk mahasiswa, opsional untuk admin.']
+  status report_status [NOT NULL, default: 'pending', note: 'Mahasiswa: selalu pending. Admin: langsung approved.']
+  admin_note text [note: 'Catatan admin saat reject (wajib isi alasan).']
+  created_by_admin boolean [NOT NULL, default: false, note: 'TRUE = laporan walk-in diinput admin atas nama mahasiswa.']
+  reporter_name text [note: 'Nama pelapor manual (hanya jika created_by_admin=true)']
+  reporter_nim text [note: 'NIM pelapor manual (hanya jika created_by_admin=true)']
+  reporter_faculty text [note: 'Fakultas pelapor manual (hanya jika created_by_admin=true)']
+  resolved_at timestamptz [note: 'Waktu laporan ditandai selesai']
+  created_at timestamptz [NOT NULL, default: 'now()']
+  updated_at timestamptz [NOT NULL, default: 'now()']
+
+  Indexes {
+    (status) [name: 'idx_reports_status']
+    (type) [name: 'idx_reports_type']
+    (user_id) [name: 'idx_reports_user_id']
+    (created_at) [name: 'idx_reports_created_at']
+  }
+
+  Note: 'Tabel inti Cari.In. Laporan mahasiswa WAJIB masuk status pending (menunggu moderasi admin). Laporan admin langsung approved. Jika created_by_admin=true, tampilkan badge Dilaporkan via Admin (indigo) di UI.'
+}
+
+Table conversations {
+  id uuid [PK, default: 'gen_random_uuid()']
+  report_id uuid [NOT NULL, note: 'Laporan yang dibahas. ON DELETE CASCADE.']
+  user_a_id uuid [NOT NULL, note: 'Pelapor (pemilik laporan). ON DELETE CASCADE.']
+  user_b_id uuid [NOT NULL, note: 'Penghubung (yang mau klaim/info). ON DELETE CASCADE.']
+  last_message text [note: 'Preview isi pesan terakhir']
+  last_at timestamptz [note: 'Waktu pesan terakhir (auto-update via trigger)']
+  created_at timestamptz [NOT NULL, default: 'now()']
+
+  Indexes {
+    (report_id, user_a_id, user_b_id) [unique, note: '1 conversation per pasangan per laporan']
+    (user_a_id) [name: 'idx_conversations_user_a']
+    (user_b_id) [name: 'idx_conversations_user_b']
+  }
+
+  Note: 'Chat antar 2 user terkait 1 laporan. Unique constraint memastikan 1 conversation per pasangan per report. CHECK: user_a_id != user_b_id (tidak bisa chat diri sendiri). Chat hanya bisa dibuat jika laporan status=approved.'
+}
+
+Table messages {
+  id uuid [PK, default: 'gen_random_uuid()']
+  conversation_id uuid [NOT NULL, note: 'Ruang chat terkait. ON DELETE CASCADE.']
+  sender_id uuid [NOT NULL, note: 'Pengirim pesan.']
+  content text [NOT NULL, note: 'Isi pesan']
+  is_read boolean [NOT NULL, default: false, note: 'Sudah dibaca penerima?']
+  created_at timestamptz [NOT NULL, default: 'now()']
+
+  Indexes {
+    (conversation_id, created_at) [name: 'idx_messages_conversation']
+  }
+
+  Note: 'Isi pesan chat real-time. Nomor HP user TIDAK PERNAH tampil di response API manapun, komunikasi lewat in-app chat saja.'
+}
+
+Table notifications {
+  id uuid [PK, default: 'gen_random_uuid()']
+  user_id uuid [NOT NULL, note: 'Penerima notifikasi. ON DELETE CASCADE.']
+  type notification_type [NOT NULL, note: 'report_approved / report_rejected / new_message']
+  title text [NOT NULL, note: 'Judul singkat (cth: Laporan Anda disetujui!)']
+  body text [NOT NULL, note: 'Isi detail notifikasi']
+  is_read boolean [NOT NULL, default: false]
+  ref_id uuid [note: 'ID referensi: report_id atau conversation_id']
+  created_at timestamptz [NOT NULL, default: 'now()']
+
+  Indexes {
+    (user_id, is_read, created_at) [name: 'idx_notifications_user']
+  }
+
+  Note: '3 tipe notifikasi: report_approved, report_rejected, new_message. Auto-insert via database trigger saat admin approve/reject laporan.'
+}
+
+// ============================================================================
+// RELATIONS
+// ============================================================================
+
+// profiles 1:N reports — seorang user bisa punya banyak laporan
+Ref: profiles.id < reports.user_id [delete: set null]
+
+// reports 1:N conversations — satu laporan bisa punya banyak percakapan
+Ref: reports.id < conversations.report_id [delete: cascade]
+
+// conversations 1:N messages — satu ruang chat berisi banyak pesan
+Ref: conversations.id < messages.conversation_id [delete: cascade]

@@ -33,6 +33,7 @@ interface AuthContextValue {
   register: typeof authService.register;
   logout: () => Promise<void>;
   resetPassword: typeof authService.resetPassword;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -99,6 +100,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserProfile(null);
   };
 
+  const refreshProfile = async () => {
+    if (session?.user.id) {
+      const profile = await fetchProfile(session.user.id);
+      setUserProfile(profile);
+    }
+  };
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
@@ -112,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register: authService.register,
       logout,
       resetPassword: authService.resetPassword,
+      refreshProfile,
     }),
     [session, userProfile, isLoading],
   );
