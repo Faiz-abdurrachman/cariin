@@ -31,8 +31,9 @@ import {
   rejectReport,
   type Report,
 } from '@/services/report.service';
+import { getOrCreateConversation } from '@/services/chat.service';
 import { COLORS } from '@/utils/constants';
-import { categoryEmoji, categoryLabel, formatFullDate } from '@/utils/formatters';
+import { formatFullDate, categoryLabel } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<AdminDashboardStackParamList, 'AdminReview'>;
 type RouteP = RouteProp<AdminDashboardStackParamList, 'AdminReview'>;
@@ -126,7 +127,7 @@ export default function AdminReviewScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.surface }}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 12 }}>
           <Feather name="alert-triangle" size={40} color={COLORS.lost} />
-          <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.primary }}>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.adminText }}>
             Laporan tidak ditemukan
           </Text>
           <Text style={{ fontSize: 13, color: COLORS.textMuted, textAlign: 'center' }}>
@@ -227,14 +228,14 @@ export default function AdminReviewScreen() {
               <Text style={{ color: typeText, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 }}>{typeLabel}</Text>
             </View>
             <View style={{ paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#F4F4F5', borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Text style={{ fontSize: 12 }}>{categoryEmoji(report.category)}</Text>
-              <Text style={{ color: COLORS.primary, fontSize: 11, fontWeight: '700' }}>{categoryLabel(report.category)}</Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: COLORS.textMuted }}>{categoryLabel(report.category)}</Text>
+              <Text style={{ color: COLORS.adminText, fontSize: 11, fontWeight: '700' }}>{categoryLabel(report.category)}</Text>
             </View>
             {report.created_by_admin ? <ViaAdminBadge /> : null}
           </View>
 
           {/* Title */}
-          <Text style={{ fontSize: 22, fontWeight: '700', color: COLORS.primary, lineHeight: 30, marginBottom: 6 }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', color: COLORS.adminText, lineHeight: 30, marginBottom: 6 }}>
             {report.title}
           </Text>
           <Text style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 20 }}>
@@ -270,7 +271,7 @@ export default function AdminReviewScreen() {
               </Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.primary }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.adminText }}>
                 {reporterName}
               </Text>
               <Text style={{ fontSize: 12, color: COLORS.textMuted }} numberOfLines={1}>
@@ -291,7 +292,7 @@ export default function AdminReviewScreen() {
           {/* Description */}
           {report.description ? (
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 11, fontWeight: '800', color: COLORS.primary, letterSpacing: 0.8, marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: COLORS.adminText, letterSpacing: 0.8, marginBottom: 8 }}>
                 DESKRIPSI
               </Text>
               <Text style={{ fontSize: 14, color: COLORS.textMuted, lineHeight: 22 }}>
@@ -303,7 +304,7 @@ export default function AdminReviewScreen() {
           {/* Admin note (jika sudah pernah direject/approved dengan note) */}
           {report.admin_note ? (
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 11, fontWeight: '800', color: COLORS.primary, letterSpacing: 0.8, marginBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: COLORS.adminText, letterSpacing: 0.8, marginBottom: 8 }}>
                 CATATAN ADMIN
               </Text>
               <Text style={{ fontSize: 14, color: COLORS.textMuted, lineHeight: 22 }}>
@@ -325,7 +326,7 @@ export default function AdminReviewScreen() {
             right: 0,
             backgroundColor: 'rgba(255,255,255,0.95)',
             borderTopWidth: 1,
-            borderTopColor: COLORS.border,
+            borderTopColor: COLORS.adminBorder,
           }}
         >
           <View style={{ flexDirection: 'row', gap: 12, padding: 16 }}>
@@ -384,6 +385,46 @@ export default function AdminReviewScreen() {
               )}
             </Pressable>
           </View>
+
+          {report.user_id ? (
+            <Pressable
+              onPress={async () => {
+                try {
+                  const conv = await getOrCreateConversation(report.id, report.user_id!);
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const parent: any = nav.getParent();
+                  parent?.navigate('ChatTab', {
+                    screen: 'ChatRoom',
+                    params: { conversationId: conv.id, reportId: report.id },
+                  });
+                } catch (e) {
+                  Alert.alert('Gagal membuka chat', e instanceof Error ? e.message : 'Coba lagi nanti.');
+                }
+              }}
+              accessibilityRole="button"
+              style={{ marginTop: 10 }}
+            >
+              {({ pressed }) => (
+                <View
+                  style={{
+                    paddingVertical: 14,
+                    backgroundColor: COLORS.admin,
+                    borderRadius: 16,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    gap: 8,
+                    opacity: pressed ? 0.85 : 1,
+                  }}
+                >
+                  <Feather name="message-circle" size={16} color="#FFFFFF" />
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>
+                    Chat Pemilik
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          ) : null}
         </SafeAreaView>
       ) : (
         <SafeAreaView
@@ -395,7 +436,7 @@ export default function AdminReviewScreen() {
             right: 0,
             backgroundColor: COLORS.surface,
             borderTopWidth: 1,
-            borderTopColor: COLORS.border,
+            borderTopColor: COLORS.adminBorder,
           }}
         >
           <View style={{ padding: 16 }}>
@@ -423,7 +464,7 @@ export default function AdminReviewScreen() {
             style={{ backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
           >
             <View style={{ padding: 20, paddingBottom: 20 + insets.bottom }}>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: 4 }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: COLORS.adminText, marginBottom: 4 }}>
                 Tolak Laporan
               </Text>
               <Text style={{ fontSize: 13, color: COLORS.textMuted, marginBottom: 16 }}>
@@ -439,12 +480,12 @@ export default function AdminReviewScreen() {
                 style={{
                   backgroundColor: '#F4F4F5',
                   borderWidth: 1,
-                  borderColor: COLORS.border,
+                  borderColor: COLORS.adminBorder,
                   borderRadius: 16,
                   paddingHorizontal: 14,
                   paddingVertical: 12,
                   fontSize: 14,
-                  color: COLORS.primary,
+                  color: COLORS.adminText,
                   minHeight: 100,
                   textAlignVertical: 'top',
                   marginBottom: 16,
@@ -513,7 +554,7 @@ function InfoRow({ icon, label, value }: { icon: keyof typeof Feather.glyphMap; 
           borderRadius: 999,
           backgroundColor: COLORS.surface,
           borderWidth: 1,
-          borderColor: COLORS.border,
+          borderColor: COLORS.adminBorder,
           alignItems: 'center',
           justifyContent: 'center',
         }}
@@ -524,7 +565,7 @@ function InfoRow({ icon, label, value }: { icon: keyof typeof Feather.glyphMap; 
         <Text style={{ fontSize: 10, fontWeight: '800', color: COLORS.textMuted, letterSpacing: 0.8, marginBottom: 3 }}>
           {label.toUpperCase()}
         </Text>
-        <Text style={{ fontSize: 14, fontWeight: '600', color: COLORS.primary }}>{value}</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: COLORS.adminText }}>{value}</Text>
       </View>
     </View>
   );

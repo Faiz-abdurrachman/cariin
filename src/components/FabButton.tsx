@@ -8,17 +8,19 @@ import { COLORS } from '@/utils/constants';
 
 interface Props {
   onPress?: () => void;
-  /** Style yang dikirim React Navigation ke tabBarButton — wajib di-spread
-   *  ke wrapper biar slot tab punya dimensi flex yang benar. */
   containerStyle?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
+  variant?: 'default' | 'admin';
 }
 
 export default function FabButton({
   onPress,
   containerStyle,
   accessibilityLabel = 'Buat laporan baru',
+  variant = 'default',
 }: Props) {
+  const bg = variant === 'admin' ? COLORS.admin : COLORS.primary;
+
   return (
     <Pressable
       onPress={onPress}
@@ -32,14 +34,14 @@ export default function FabButton({
             width: 48,
             height: 48,
             borderRadius: 24,
-            backgroundColor: COLORS.primary,
+            backgroundColor: bg,
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOpacity: 0.2,
-            shadowRadius: 6,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 4,
+            shadowColor: bg,
+            shadowOpacity: 0.25,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 6,
             opacity: pressed ? 0.85 : 1,
           }}
         >

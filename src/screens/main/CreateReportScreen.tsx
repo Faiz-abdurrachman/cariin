@@ -2,7 +2,7 @@
 // Type di-derive dari route name. Field custody_point hanya muncul untuk Found.
 // Referensi visual: cariin-web/create.html + create-found.html.
 
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useState } from 'react';
@@ -198,6 +198,7 @@ export default function CreateReportScreen() {
               padding: 4,
               borderRadius: 16,
               marginBottom: 24,
+              gap: 4,
             }}
           >
             {(['lost', 'found'] as ReportType[]).map((t) => {
@@ -208,11 +209,11 @@ export default function CreateReportScreen() {
                   key={t}
                   onPress={() => switchType(t)}
                   accessibilityRole="button"
+                  style={{ flex: 1 }}
                 >
                   {({ pressed }) => (
                     <View
                       style={{
-                        flex: 1,
                         paddingVertical: 11,
                         borderRadius: 12,
                         backgroundColor: active ? COLORS.surface : 'transparent',
@@ -332,7 +333,7 @@ export default function CreateReportScreen() {
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              gap: 8,
+              marginHorizontal: -4,
               marginBottom: 20,
             }}
           >
@@ -342,30 +343,36 @@ export default function CreateReportScreen() {
                 <Pressable
                   key={c.id}
                   onPress={() => setCategory(c.id)}
+                  style={{ width: '25%', padding: 4 }}
                 >
                   {({ pressed }) => (
                     <View
                       style={{
-                        width: '23.5%', // 4 cols dgn gap 8
-                        aspectRatio: 1,
                         borderRadius: 16,
+                        aspectRatio: 1,
                         backgroundColor: active ? COLORS.primary : COLORS.surface,
                         borderWidth: 1,
                         borderColor: active ? COLORS.primary : COLORS.border,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: 4,
                         opacity: pressed ? 0.85 : 1,
                       }}
                     >
-                      <Text style={{ fontSize: 22 }}>{c.emoji}</Text>
+                      <MaterialCommunityIcons
+                        name={c.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                        size={22}
+                        color={active ? '#FFFFFF' : COLORS.textMuted}
+                        style={{ marginBottom: 4 }}
+                      />
                       <Text
                         style={{
                           fontSize: 10,
                           fontWeight: '700',
                           color: active ? '#FFFFFF' : COLORS.primary,
                           textAlign: 'center',
+                          paddingHorizontal: 2,
                         }}
+                        numberOfLines={2}
                       >
                         {c.label}
                       </Text>

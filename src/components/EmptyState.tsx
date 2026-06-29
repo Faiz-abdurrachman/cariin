@@ -27,7 +27,7 @@ export default function EmptyState({ icon = 'inbox', title, subtitle }: Props) {
           width: 72,
           height: 72,
           borderRadius: 999,
-          backgroundColor: '#F4F4F5',
+          backgroundColor: COLORS.primaryLight,
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 16,

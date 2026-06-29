@@ -4,7 +4,7 @@
 
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import type { DrawerNavigationProp } from '@react-navigation/drawer';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
 import {
   FlatList,
@@ -19,12 +19,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
-import type { AdminDrawerParamList } from '@/navigation/types';
+import type { AdminTabParamList } from '@/navigation/types';
 import { listReports, type Report } from '@/services/report.service';
 import { COLORS, type ReportStatus } from '@/utils/constants';
-import { categoryEmoji, formatRelativeTime } from '@/utils/formatters';
+import { formatRelativeTime, categoryLabel } from '@/utils/formatters';
 
-type Nav = DrawerNavigationProp<AdminDrawerParamList, 'AllReports'>;
+type Nav = StackNavigationProp<AdminTabParamList, 'ReportsTab'>;
 
 type StatusFilter = 'all' | ReportStatus;
 
@@ -75,11 +75,11 @@ export default function AdminReportsScreen() {
   };
 
   const goToReview = (reportId: string) => {
-    nav.navigate('DashboardDrawer', { screen: 'AdminReview', params: { reportId } });
+    nav.navigate('DashboardTab', { screen: 'AdminReview', params: { reportId } });
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F4F4F5' }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.adminLight }} edges={['top']}>
       {/* Header */}
       <View
         style={{
@@ -104,19 +104,18 @@ export default function AdminReportsScreen() {
             backgroundColor: COLORS.surface,
             borderRadius: 16,
             borderWidth: 1,
-            borderColor: COLORS.border,
+            borderColor: COLORS.adminBorder,
             paddingHorizontal: 14,
             height: 48,
-            gap: 8,
           }}
         >
-          <Feather name="search" size={18} color={COLORS.textMuted} />
+          <Feather name="search" size={16} color={COLORS.textMuted} />
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="Cari laporan..."
             placeholderTextColor={COLORS.textMuted}
-            style={{ flex: 1, fontSize: 14, color: COLORS.primary, paddingVertical: 0 }}
+            style={{ flex: 1, fontSize: 14, color: COLORS.adminText, paddingVertical: 0 }}
             returnKeyType="search"
             onSubmitEditing={() => void load(true)}
           />
@@ -156,7 +155,7 @@ export default function AdminReportsScreen() {
                     backgroundColor: active ? COLORS.admin : COLORS.surface,
                     color: active ? '#FFFFFF' : COLORS.textMuted,
                     borderWidth: active ? 0 : 1,
-                    borderColor: COLORS.border,
+                    borderColor: COLORS.adminBorder,
                     paddingHorizontal: 14,
                     paddingVertical: 7,
                     borderRadius: 999,
@@ -220,7 +219,7 @@ function ReportRow({ report, onPress }: { report: Report; onPress: () => void })
           style={{
             backgroundColor: COLORS.surface,
             borderWidth: 1,
-            borderColor: COLORS.border,
+            borderColor: COLORS.adminBorder,
             borderRadius: 20,
             padding: 12,
             flexDirection: 'row',
@@ -253,14 +252,14 @@ function ReportRow({ report, onPress }: { report: Report; onPress: () => void })
               </Text>
               <Text style={{ fontSize: 10, color: COLORS.textMuted }}>• {typeLabel}</Text>
             </View>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.primary }} numberOfLines={1}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.adminText }} numberOfLines={1}>
               {report.title}
             </Text>
             <Text style={{ fontSize: 11, color: COLORS.textMuted }} numberOfLines={1}>
-              {reporterName} • {categoryEmoji(report.category)} {formatRelativeTime(report.created_at)}
+              {reporterName} • {categoryLabel(report.category)} {formatRelativeTime(report.created_at)}
             </Text>
           </View>
-          <Feather name="chevron-right" size={16} color={COLORS.border} style={{ alignSelf: 'center' }} />
+          <Feather name="chevron-right" size={16} color={COLORS.adminBorder} style={{ alignSelf: 'center' }} />
         </View>
       )}
     </Pressable>

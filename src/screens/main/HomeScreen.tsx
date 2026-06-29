@@ -103,7 +103,7 @@ export default function HomeScreen() {
                   }}
                   numberOfLines={1}
                 >
-                  {userProfile?.name ?? 'Mahasiswa'} 👋
+                  {userProfile?.name ?? 'Mahasiswa'}
                 </Text>
               </View>
               <Pressable

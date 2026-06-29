@@ -94,7 +94,7 @@ EXPO_PUBLIC_APP_ENV=development
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | `admin@cariin.app` | `admin123` |
-| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` |
+| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faiz` |
 
 ---
 

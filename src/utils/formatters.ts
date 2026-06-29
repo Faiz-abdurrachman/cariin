@@ -46,6 +46,6 @@ export function categoryLabel(id: CategoryId): string {
   return CATEGORY_BY_ID[id].label;
 }
 
-export function categoryEmoji(id: CategoryId): string {
-  return CATEGORY_BY_ID[id].emoji;
+export function categoryIcon(id: CategoryId): string {
+  return CATEGORY_BY_ID[id].icon;
 }

@@ -2,7 +2,7 @@
 
 import { Text, View } from 'react-native';
 
-import { COLORS, REPORT_STATUS_LABEL, type ReportStatus } from '@/utils/constants';
+import { REPORT_STATUS_LABEL, type ReportStatus } from '@/utils/constants';
 
 interface Props {
   status: ReportStatus;
@@ -11,16 +11,16 @@ interface Props {
 
 const STATUS_BG: Record<ReportStatus, string> = {
   pending: '#FEF3C7',
-  approved: '#D1FAE5',
-  rejected: '#FEE2E2',
-  resolved: '#EDE9FE',
+  approved: '#ECFDF5',
+  rejected: '#FFF7ED',
+  resolved: '#F3E8FF',
 };
 
 const STATUS_TEXT: Record<ReportStatus, string> = {
   pending: '#92400E',
   approved: '#065F46',
-  rejected: COLORS.lostText,
-  resolved: '#5B21B6',
+  rejected: '#9A3412',
+  resolved: '#6B21A8',
 };
 
 export default function StatusBadge({ status, size = 'sm' }: Props) {

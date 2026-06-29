@@ -18,7 +18,7 @@ export default function App() {
         <AuthProvider>
           <NotifProvider>
             <RootNavigator />
-            <StatusBar style="auto" />
+            <StatusBar style="dark" />
           </NotifProvider>
         </AuthProvider>
       </SafeAreaProvider>

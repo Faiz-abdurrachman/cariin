@@ -24,7 +24,7 @@ import type { HomeStackParamList } from '@/navigation/types';
 import { getOrCreateConversation } from '@/services/chat.service';
 import { getReportById, type Report } from '@/services/report.service';
 import { COLORS } from '@/utils/constants';
-import { categoryEmoji, categoryLabel, formatFullDate } from '@/utils/formatters';
+import { categoryLabel, formatFullDate } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<HomeStackParamList, 'DetailLost' | 'DetailFound'>;
 type RouteP = RouteProp<HomeStackParamList, 'DetailLost' | 'DetailFound'>;
@@ -236,7 +236,7 @@ export default function DetailReportScreen() {
                   gap: 4,
                 }}
               >
-                <Text style={{ fontSize: 12 }}>{categoryEmoji(report.category)}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: COLORS.textMuted }}>{categoryLabel(report.category)}</Text>
                 <Text
                   style={{
                     color: COLORS.primary,

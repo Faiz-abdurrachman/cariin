@@ -87,10 +87,24 @@ export type AdminCreateStackParamList = {
   AdminCreateFound: undefined;
 };
 
+export type AdminChatStackParamList = {
+  Inbox: undefined;
+  ChatRoom: { conversationId: string; reportId: string };
+};
+
 export type AdminDrawerParamList = {
   DashboardDrawer: NavigatorScreenParams<AdminDashboardStackParamList>;
   AllReports: undefined;
   CreateDrawer: NavigatorScreenParams<AdminCreateStackParamList>;
+  ChatDrawer: NavigatorScreenParams<AdminChatStackParamList>;
+};
+
+export type AdminTabParamList = {
+  DashboardTab: NavigatorScreenParams<AdminDashboardStackParamList>;
+  ReportsTab: undefined;
+  CreateTab: undefined;
+  ChatTab: NavigatorScreenParams<AdminChatStackParamList>;
+  AdminProfileTab: undefined;
 };
 
 // Augmentasi global untuk type-safe useNavigation di RootStack scope (mahasiswa flow).

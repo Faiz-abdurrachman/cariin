@@ -1,25 +1,79 @@
-// Konstanta global Cari.In — referensi tunggal untuk warna, kategori, dan fakultas.
-// Sumber: CONTEXT.md section 11. Update di sini akan menyebar ke seluruh aplikasi.
-
 export const COLORS = {
-  primary: '#18181B', // zinc-900
-  lost: '#EF4444', // red-500
-  lostBg: '#FEE2E2', // red-100
-  lostText: '#991B1B', // red-800
-  found: '#22C55E', // emerald-500
-  foundBg: '#D1FAE5', // emerald-100
-  foundText: '#065F46', // emerald-800
-  admin: '#4F46E5', // indigo-600
-  adminLight: '#EEF2FF', // indigo-50
-  adminText: '#3730A3', // indigo-800
-  pending: '#F59E0B', // amber-500
-  approved: '#22C55E', // emerald-500
-  rejected: '#EF4444', // red-500
-  resolved: '#8B5CF6', // violet-500
-  background: '#F4F4F5', // zinc-100
+  primary: '#2563EB',
+  primaryLight: '#DBEAFE',
+  lost: '#F97316',
+  lostBg: '#FFF7ED',
+  lostText: '#9A3412',
+  found: '#059669',
+  foundBg: '#ECFDF5',
+  foundText: '#065F46',
+  admin: '#0D9488',
+  adminLight: '#F0FDFA',
+  adminText: '#134E4A',
+  adminBorder: '#99F6E4',
+  pending: '#F59E0B',
+  approved: '#059669',
+  rejected: '#F97316',
+  resolved: '#8B5CF6',
+  background: '#EFF6FF',
   surface: '#FFFFFF',
-  border: '#E4E4E7', // zinc-200
-  textMuted: '#71717A', // zinc-500
+  border: '#BFDBFE',
+  textMuted: '#64748B',
+} as const;
+
+export const RADIUS = {
+  xs: 6,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  full: 999,
+} as const;
+
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 32,
+} as const;
+
+export const FONT_SIZE = {
+  xs: 9,
+  sm: 11,
+  base: 13,
+  md: 15,
+  lg: 18,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 28,
+} as const;
+
+export const SHADOW = {
+  subtle: {
+    shadowColor: '#2563EB',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  card: {
+    shadowColor: '#2563EB',
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  elevated: {
+    shadowColor: '#2563EB',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
 } as const;
 
 export type CategoryId =
@@ -35,22 +89,20 @@ export type CategoryId =
 export interface Category {
   id: CategoryId;
   label: string;
-  emoji: string;
+  icon: string;
 }
 
 export const CATEGORIES: readonly Category[] = [
-  { id: 'elektronik', label: 'Elektronik', emoji: '💻' },
-  { id: 'dokumen', label: 'Dokumen', emoji: '📄' },
-  { id: 'dompet_tas', label: 'Dompet/Tas', emoji: '👜' },
-  { id: 'kunci', label: 'Kunci', emoji: '🔑' },
-  { id: 'aksesoris', label: 'Aksesoris', emoji: '💍' },
-  { id: 'pakaian', label: 'Pakaian', emoji: '👕' },
-  { id: 'buku_atk', label: 'Buku/ATK', emoji: '📚' },
-  { id: 'lainnya', label: 'Lainnya', emoji: '📦' },
+  { id: 'elektronik', label: 'Elektronik', icon: 'laptop' },
+  { id: 'dokumen', label: 'Dokumen', icon: 'file-document-outline' },
+  { id: 'dompet_tas', label: 'Dompet/Tas', icon: 'wallet-outline' },
+  { id: 'kunci', label: 'Kunci', icon: 'key' },
+  { id: 'aksesoris', label: 'Aksesoris', icon: 'watch' },
+  { id: 'pakaian', label: 'Pakaian', icon: 'tshirt-crew' },
+  { id: 'buku_atk', label: 'Buku/ATK', icon: 'book-open-page-variant-outline' },
+  { id: 'lainnya', label: 'Lainnya', icon: 'dots-horizontal' },
 ] as const;
 
-// Daftar fakultas — placeholder sesuai CONTEXT.md, akan diupdate dengan data
-// resmi UNU Yogyakarta di tahap polish (FASE 6).
 export const FACULTIES: readonly string[] = [
   'Teknik',
   'Ekonomi',
@@ -62,7 +114,6 @@ export const FACULTIES: readonly string[] = [
   'Lainnya',
 ] as const;
 
-// Status laporan untuk filter & badge.
 export type ReportStatus = 'pending' | 'approved' | 'rejected' | 'resolved';
 export type ReportType = 'lost' | 'found';
 export type UserRole = 'mahasiswa' | 'admin';

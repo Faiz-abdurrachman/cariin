@@ -2,9 +2,9 @@
 // Mirip AdminCreateLostScreen + field custody_point wajib.
 // Submit via RPC `create_admin_report` → langsung approved.
 
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { DrawerNavigationProp } from '@react-navigation/drawer';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { useState } from 'react';
 import {
   Alert,
@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { AdminCreateStackParamList, AdminDrawerParamList } from '@/navigation/types';
+import type { AdminCreateStackParamList } from '@/navigation/types';
 import { createAdminReport } from '@/services/report.service';
 import { supabase } from '@/services/supabase';
 import {
@@ -30,7 +30,7 @@ import {
 } from '@/services/upload.service';
 import { CATEGORIES, COLORS, type CategoryId } from '@/utils/constants';
 
-type Nav = DrawerNavigationProp<AdminCreateStackParamList, 'AdminCreateFound'>;
+type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreateFound'>;
 
 export default function AdminCreateFoundScreen() {
   const nav = useNavigation<Nav>();
@@ -76,16 +76,12 @@ export default function AdminCreateFoundScreen() {
   };
 
   const switchToLost = () => {
-    const drawer = nav.getParent<DrawerNavigationProp<AdminDrawerParamList>>();
-    if (drawer) {
-      drawer.navigate('CreateDrawer', { screen: 'AdminCreateLost' });
-    }
+    nav.replace('AdminCreateLost');
   };
 
   const goBack = () => {
-    const drawer = nav.getParent<DrawerNavigationProp<AdminDrawerParamList>>();
-    if (drawer && drawer.canGoBack()) {
-      drawer.goBack();
+    if (nav.canGoBack()) {
+      nav.goBack();
     }
   };
 
@@ -128,7 +124,7 @@ export default function AdminCreateFoundScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.adminLight }}>
       <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.surface }}>
         <View
           style={{
@@ -138,7 +134,7 @@ export default function AdminCreateFoundScreen() {
             alignItems: 'center',
             backgroundColor: COLORS.surface,
             borderBottomWidth: 1,
-            borderBottomColor: COLORS.border,
+            borderBottomColor: COLORS.adminBorder,
           }}
         >
           <Pressable onPress={goBack} accessibilityRole="button">
@@ -154,7 +150,7 @@ export default function AdminCreateFoundScreen() {
                   opacity: pressed ? 0.7 : 1,
                 }}
               >
-                <Feather name="arrow-left" size={18} color={COLORS.primary} />
+                <Feather name="arrow-left" size={18} color={COLORS.adminText} />
               </View>
             )}
           </Pressable>
@@ -167,7 +163,7 @@ export default function AdminCreateFoundScreen() {
               textAlign: 'center',
               fontSize: 16,
               fontWeight: '700',
-              color: COLORS.primary,
+              color: COLORS.adminText,
             }}
           >
             Laporan Walk-In • Menemukan
@@ -186,7 +182,7 @@ export default function AdminCreateFoundScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Type toggle */}
-          <View style={{ flexDirection: 'row', backgroundColor: '#E4E4E7', padding: 4, borderRadius: 16, marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', backgroundColor: '#E4E4E7', padding: 4, borderRadius: 16, marginBottom: 24, gap: 4 }}>
             {(['lost', 'found'] as const).map((t) => {
               const active = t === 'found';
               const label = t === 'lost' ? 'Kehilangan' : 'Menemukan';
@@ -203,7 +199,7 @@ export default function AdminCreateFoundScreen() {
                         opacity: pressed ? 0.85 : 1,
                       }}
                     >
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: active ? COLORS.primary : COLORS.textMuted }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: active ? COLORS.adminText : COLORS.textMuted }}>
                         {label}
                       </Text>
                     </View>
@@ -226,7 +222,7 @@ export default function AdminCreateFoundScreen() {
                   </View>
                 </View>
               ) : (
-                <View style={{ height: 140, borderRadius: 24, backgroundColor: COLORS.surface, borderWidth: 2, borderStyle: 'dashed', borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, marginBottom: 24 }}>
+                <View style={{ height: 140, borderRadius: 24, backgroundColor: COLORS.surface, borderWidth: 2, borderStyle: 'dashed', borderColor: COLORS.adminBorder, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, marginBottom: 24 }}>
                   <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: '#F4F4F5', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
                     <Feather name="image" size={20} color={COLORS.textMuted} />
                   </View>
@@ -242,28 +238,26 @@ export default function AdminCreateFoundScreen() {
 
           {/* Kategori */}
           <FieldLabel required>Kategori</FieldLabel>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4, marginBottom: 20 }}>
             {CATEGORIES.map((c) => {
               const active = category === c.id;
               return (
-                <Pressable key={c.id} onPress={() => setCategory(c.id)}>
+                <Pressable key={c.id} onPress={() => setCategory(c.id)} style={{ width: '25%', padding: 4 }}>
                   {({ pressed }) => (
                     <View
                       style={{
-                        width: '23.5%',
-                        aspectRatio: 1,
                         borderRadius: 16,
+                        aspectRatio: 1,
                         backgroundColor: active ? COLORS.admin : COLORS.surface,
                         borderWidth: 1,
-                        borderColor: active ? COLORS.admin : COLORS.border,
+                        borderColor: active ? COLORS.admin : COLORS.adminBorder,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: 4,
                         opacity: pressed ? 0.85 : 1,
                       }}
                     >
-                      <Text style={{ fontSize: 22 }}>{c.emoji}</Text>
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: active ? '#FFFFFF' : COLORS.primary, textAlign: 'center' }}>
+                      <MaterialCommunityIcons name={c.icon as keyof typeof MaterialCommunityIcons.glyphMap} size={20} color={active ? '#FFFFFF' : COLORS.textMuted} style={{ marginBottom: 4 }} />
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: active ? '#FFFFFF' : COLORS.adminText, textAlign: 'center', paddingHorizontal: 2 }} numberOfLines={2}>
                         {c.label}
                       </Text>
                     </View>
@@ -310,7 +304,7 @@ export default function AdminCreateFoundScreen() {
             paddingBottom: 12 + insets.bottom,
             backgroundColor: COLORS.surface,
             borderTopWidth: 1,
-            borderTopColor: COLORS.border,
+            borderTopColor: COLORS.adminBorder,
           }}
         >
           <Pressable onPress={onSubmit} disabled={submitting} accessibilityRole="button">
@@ -346,7 +340,7 @@ export default function AdminCreateFoundScreen() {
 
 function FieldLabel({ children, required }: { children: string; required?: boolean }) {
   return (
-    <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.primary, marginBottom: 8 }}>
+    <Text style={{ fontSize: 13, fontWeight: '700', color: COLORS.adminText, marginBottom: 8 }}>
       {children} {required ? <Text style={{ color: COLORS.lost }}>*</Text> : null}
     </Text>
   );
@@ -364,7 +358,7 @@ function Input({
         alignItems: multiline ? 'flex-start' : 'center',
         backgroundColor: COLORS.surface,
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: COLORS.adminBorder,
         borderRadius: 16,
         paddingHorizontal: 14,
         paddingVertical: multiline ? 14 : 12,
@@ -381,7 +375,7 @@ function Input({
         multiline={multiline}
         textAlignVertical={multiline ? 'top' : 'center'}
         placeholderTextColor={COLORS.textMuted}
-        style={{ flex: 1, fontSize: 14, color: COLORS.primary, paddingVertical: 0, minHeight: multiline ? 80 : undefined }}
+        style={{ flex: 1, fontSize: 14, color: COLORS.adminText, paddingVertical: 0, minHeight: multiline ? 80 : undefined }}
       />
     </View>
   );

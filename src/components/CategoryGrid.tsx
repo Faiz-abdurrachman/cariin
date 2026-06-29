@@ -1,7 +1,5 @@
-// Horizontal scroll chips kategori — dipakai di HomeScreen sebagai filter.
-// Tap chip "Semua" untuk clear filter, tap chip kategori untuk filter spesifik.
-
-import { Pressable, ScrollView, Text } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { CATEGORIES, COLORS, type CategoryId } from '@/utils/constants';
 
@@ -19,7 +17,7 @@ export default function CategoryGrid({ selected, onSelect }: Props) {
     >
       <Chip
         label="Semua"
-        emoji="🌐"
+        icon="grid"
         active={selected === null}
         onPress={() => onSelect(null)}
       />
@@ -27,7 +25,7 @@ export default function CategoryGrid({ selected, onSelect }: Props) {
         <Chip
           key={c.id}
           label={c.label}
-          emoji={c.emoji}
+          icon={c.icon}
           active={selected === c.id}
           onPress={() => onSelect(c.id)}
         />
@@ -38,35 +36,47 @@ export default function CategoryGrid({ selected, onSelect }: Props) {
 
 function Chip({
   label,
-  emoji,
+  icon,
   active,
   onPress,
 }: {
   label: string;
-  emoji: string;
+  icon: string;
   active: boolean;
   onPress: () => void;
 }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="button">
       {({ pressed }) => (
-        <Text
+        <View
           style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
             backgroundColor: active ? COLORS.primary : '#FFFFFF',
-            color: active ? '#FFFFFF' : COLORS.textMuted,
             borderWidth: active ? 0 : 1,
             borderColor: COLORS.border,
             paddingHorizontal: 16,
             paddingVertical: 9,
             borderRadius: 999,
-            fontSize: 13,
-            fontWeight: '600',
             opacity: pressed ? 0.7 : 1,
-            overflow: 'hidden',
           }}
         >
-          {emoji}  {label}
-        </Text>
+          <MaterialCommunityIcons
+            name={icon as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={16}
+            color={active ? '#FFFFFF' : COLORS.textMuted}
+          />
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: '600',
+              color: active ? '#FFFFFF' : COLORS.textMuted,
+            }}
+          >
+            {label}
+          </Text>
+        </View>
       )}
     </Pressable>
   );

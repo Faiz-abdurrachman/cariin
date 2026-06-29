@@ -22,7 +22,7 @@ import type { HomeStackParamList } from '@/navigation/types';
 import { listReports, type Report } from '@/services/report.service';
 import { supabase } from '@/services/supabase';
 import { COLORS } from '@/utils/constants';
-import { categoryEmoji, formatRelativeTime } from '@/utils/formatters';
+import { formatRelativeTime, categoryLabel } from '@/utils/formatters';
 
 type Nav = RouteProp<HomeStackParamList, 'UserProfile'>;
 
@@ -363,7 +363,7 @@ export default function UserProfileScreen() {
                       {item.title}
                     </Text>
                     <Text style={{ fontSize: 12, color: COLORS.textMuted }}>
-                      {categoryEmoji(item.category)} {formatRelativeTime(item.created_at)}
+                      {categoryLabel(item.category)} {formatRelativeTime(item.created_at)}
                     </Text>
                   </View>
                 </View>
