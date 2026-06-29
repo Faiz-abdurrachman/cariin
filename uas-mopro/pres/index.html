@@ -4,82 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Cari.In — Campus Lost & Found</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --p:#2563EB;--pl:#EFF6FF;--t:#0D9488;--tl:#F0FDFA;--o:#F97316;--ol:#FFF7ED;
-  --g:#059669;--gl:#ECFDF5;--bg:#F8FAFC;--s:#FFFFFF;--b:#E2E8F0;--m:#64748B;
-  --d:#0F172A;--dt:#334155;
+  --p:#2563EB;--pl:#EFF6FF;--t:#0D9488;--tl:#F0FDFA;--o:#F97316;--g:#059669;
+  --bg:#F8FAFC;--s:#FFFFFF;--b:#E2E8F0;--m:#64748B;--d:#0F172A;--dt:#334155;
+  --x:#0b1121;
 }
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--d);overflow-x:hidden;line-height:1.6}
-
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--b)}
-nav .logo{font-weight:800;font-size:20px;color:var(--p);letter-spacing:-0.5px}
-nav .dots{display:flex;gap:6px}
-nav .dots span{width:8px;height:8px;border-radius:50%;background:var(--b);cursor:pointer;transition:all .3s}
-nav .dots span.active{background:var(--p);width:24px;border-radius:4px}
-
-.progress{position:fixed;top:64px;left:0;height:3px;background:var(--p);z-index:101;transition:width .4s}
-.toolbar{position:fixed;bottom:24px;right:32px;z-index:100;display:flex;gap:8px}
-.toolbar button{width:40px;height:40px;border-radius:50%;border:1px solid var(--b);background:var(--s);cursor:pointer;font-size:16px;color:var(--m);transition:all .2s;display:flex;align-items:center;justify-content:center}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--d);overflow-x:hidden;line-height:1.65}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--b)}
+nav .logo{font-weight:800;font-size:19px;color:var(--p);letter-spacing:-.5px}
+nav .dots{display:flex;gap:5px}
+nav .dots span{width:7px;height:7px;border-radius:50%;background:var(--b);cursor:pointer;transition:.3s}
+nav .dots span.active{background:var(--p);width:22px;border-radius:4px}
+.progress{position:fixed;top:56px;left:0;height:3px;background:var(--p);z-index:101;transition:width .4s}
+.toolbar{position:fixed;bottom:20px;right:28px;z-index:100;display:flex;gap:6px}
+.toolbar button{width:36px;height:36px;border-radius:50%;border:1px solid var(--b);background:var(--s);cursor:pointer;color:var(--m);font-size:15px;transition:.2s;display:flex;align-items:center;justify-content:center}
 .toolbar button:hover{background:var(--p);color:#fff;border-color:var(--p)}
-
-section{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 32px 80px;position:relative;opacity:0;transform:translateY(30px);transition:all .6s cubic-bezier(.4,0,.2,1)}
+section{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 32px 80px;opacity:0;transform:translateY(30px);transition:.6s cubic-bezier(.4,0,.2,1)}
 section.visible{opacity:1;transform:translateY(0)}
-.container{max-width:900px;width:100%}
-
-h1{font-size:clamp(2.4rem,5vw,4rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;color:var(--d)}
-h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;letter-spacing:-0.5px;color:var(--d);margin-bottom:8px}
-h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
-.sub{font-size:1.1rem;color:var(--m);max-width:600px}
+.container{max-width:920px;width:100%}
+h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;color:var(--d)}
+h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;letter-spacing:-.5px;color:var(--d);margin-bottom:6px}
+h3{font-size:.82rem;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.sub{font-size:1rem;color:var(--m);max-width:560px}
 .grad{background:linear-gradient(135deg,var(--p),var(--t));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.tag{display:inline-block;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.5px}
-.tag-lost{background:var(--ol);color:var(--o)}
-.tag-found{background:var(--gl);color:var(--g)}
-.tag-admin{background:var(--tl);color:var(--t)}
+.card{background:var(--s);border-radius:20px;padding:24px;border:1px solid var(--b);transition:.3s;overflow: hidden;}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(37,99,235,.07)}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.statval{font-size:2.2rem;font-weight:800;letter-spacing:-1px}
+.statlbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--m);margin-top:2px}
 
-.card{background:var(--s);border-radius:24px;padding:28px;border:1px solid var(--b);transition:all .3s}
-.card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,99,235,.08)}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.statval{font-size:2.4rem;font-weight:800;letter-spacing:-1px}
-.statlbl{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--m);margin-top:2px}
+.problem-card{padding:18px 22px;border-radius:18px;border-left:4px solid;background:var(--s)}
+.problem-card h4{font-weight:700;font-size:.9rem;margin-bottom:4px}
+.problem-card p{font-size:.82rem;color:var(--m);line-height:1.5}
 
-.problem-card{padding:20px 24px;border-radius:20px;border-left:4px solid;background:var(--s)}
-.problem-card h4{font-weight:700;font-size:.95rem;margin-bottom:4px}
-.problem-card p{font-size:.85rem;color:var(--m);line-height:1.5}
+.flow-step{padding:10px 18px;border-radius:14px;font-weight:600;font-size:.8rem;text-align:center;background:var(--pl);color:var(--p)}
+.flow-step.admin-step{background:var(--tl);color:var(--t)}
+.flow-arrow{color:var(--m);font-weight:700;font-size:1rem}
 
-.flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
-.flow-step{padding:12px 20px;border-radius:16px;font-weight:600;font-size:.85rem;text-align:center}
-.flow-arrow{color:var(--m);font-size:1.2rem;font-weight:700}
+.swatch{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600}
+.swatch span{width:24px;height:24px;border-radius:7px;border:1px solid var(--b)}
 
-.timeline{position:relative;padding-left:24px;border-left:2px solid var(--b)}
-.timeline-item{position:relative;margin-bottom:20px;padding-left:20px}
-.timeline-item::before{content:'';position:absolute;left:-30px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--p);border:2px solid var(--s)}
+.code-block{background:var(--x);color:#e2e8f0;border-radius:14px;padding:18px 22px;font-family:'SF Mono','Fira Code',monospace;font-size:.78rem;line-height:1.8;overflow-x:auto}
+.code-block .kw{color:#93c5fd}.code-block .fn{color:#c4b5fd}.code-block .str{color:#86efac}.code-block .cm{color:#64748b}
 
-.swatch{display:inline-flex;align-items:center;gap:8px;margin:4px 8px;font-size:.85rem}
-.swatch span{width:28px;height:28px;border-radius:8px;border:1px solid var(--b)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.feat-grid .c{padding:14px 16px;border-radius:14px;background:var(--s);border:1px solid var(--b);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.feat-grid .c .n{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#fff;flex-shrink:0}
 
-.code-block{background:var(--d);color:#e2e8f0;border-radius:16px;padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;overflow-x:auto}
-.code-block .kw{color:#93c5fd}
-.code-block .fn{color:#c4b5fd}
-.code-block .str{color:#86efac}
-.code-block .cm{color:#64748b}
+.shield-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.shield-grid .sh{padding:20px 16px;border-radius:16px;background:var(--s);border:1px solid var(--b);text-align:center}
+.shield-grid .sh .ic{font-size:1.6rem;margin-bottom:8px}
+.shield-grid .sh .lb{font-weight:700;font-size:.85rem;margin-bottom:4px}
 
-#hero{background:linear-gradient(160deg,var(--d) 0%,#1e3a5f 50%,var(--d) 100%);color:#fff;text-align:center}
-#hero h1{color:#fff;font-size:clamp(3rem,7vw,5.5rem)}
-#hero .sub{color:rgba(255,255,255,.6)}
-#hero .logo-icon{width:80px;height:80px;border-radius:20px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:36px;font-weight:800;color:#fff;border:1px solid rgba(255,255,255,.15)}
+.bar{height:6px;border-radius:3px;background:var(--b);overflow:hidden;margin:4px 0 10px}
+.bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+.bar-lbl{display:flex;justify-content:space-between;font-size:.78rem;font-weight:600;color:var(--dt)}
 
-.bar{height:8px;border-radius:4px;background:var(--b);overflow:hidden;margin:6px 0}
-.bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
-.bar-lbl{display:flex;justify-content:space-between;font-size:.8rem;font-weight:600}
+#hero{background:linear-gradient(160deg,#0f172a 0%,#1e2d5c 40%,#1a3a6e 70%,#0f172a 100%);color:#fff;text-align:center}
+#hero h1{color:#fff;font-size:clamp(3rem,7vw,5rem);margin-bottom:8px}
+#hero .sub{color:rgba(255,255,255,.55);font-size:1.2rem;margin:10px 0}
+#hero .badge-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+#hero .badge-row span{padding:6px 16px;border-radius:99px;font-size:.75rem;font-weight:700;letter-spacing:.5px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.75)} 
 
-@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}nav{padding:12px 16px}}
+.big-num{font-size:2.8rem;font-weight:800;letter-spacing:-1.5px}
+.big-num-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--m)}
+.num-card{text-align:center;padding:20px;border-radius:16px;background:var(--s);border:1px solid var(--b)}
+
+@media(max-width:768px){.grid2,.grid3,.grid4,.shield-grid,.feat-grid{grid-template-columns:1fr}nav{padding:10px 16px}section{padding:80px 16px 60px}}
 </style>
 </head>
 <body>
@@ -95,320 +91,333 @@ h3{font-size:clamp(1rem,1.5vw,1.2rem);font-weight:600;color:var(--p);text-transf
 </div>
 
 <section id="hero"><div class="container" style="text-align:center">
-  <div class="logo-icon">&#9851;</div>
-  <h1>Cari.In</h1>
-  <p class="sub" style="font-size:1.3rem;margin:12px 0">Campus Lost & Found — UNU Yogyakarta</p>
-  <p style="color:rgba(255,255,255,.4);font-size:.9rem;margin-top:8px">Faiz Abdurrachman &middot; Mobile Programming &middot; Semester 4</p>
+  <h1>Cari<span style="color:var(--p);background:none;-webkit-text-fill-color:#2563EB">.</span>In</h1>
+  <p class="sub">Campus Lost & Found Platform</p>
+  <p style="color:rgba(255,255,255,.35);font-size:.9rem;margin:8px 0">"Cariin barangmu di kampus"</p>
+  <div class="badge-row">
+    <span>UNU Yogyakarta</span>
+    <span>Mobile Programming</span>
+    <span>Semester 4</span>
+    <span>Faiz Abdurrachman</span>
+  </div>
 </div></section>
 
 <section><div class="container">
   <h3>The Problem</h3>
-  <h2>Kenapa Cari.In <span class="grad">Dibutuhkan</span></h2>
-  <p class="sub" style="margin-bottom:32px">Enam masalah utama yang dialami mahasiswa saat kehilangan barang di lingkungan kampus.</p>
+  <h2>Kenapa <span class="grad">Cari.In</span> Dibutuhkan</h2>
+  <p class="sub" style="margin-bottom:32px">Enam masalah nyata yang dialami mahasiswa saat kehilangan barang di lingkungan kampus.</p>
   <div class="grid2">
-    <div class="problem-card" style="border-color:var(--o)"><h4 style="color:var(--o)">Informasi Tenggelam di Grup WA</h4><p>Laporan tertumpuk obrolan — tidak terstruktur dan sulit dilacak.</p></div>
-    <div class="problem-card" style="border-color:var(--o)"><h4 style="color:var(--o)">Pencarian Tidak Efisien</h4><p>Tidak ada history atau sistem filter — laporan lama hilang selamanya.</p></div>
-    <div class="problem-card" style="border-color:var(--p)"><h4 style="color:var(--p)">Rawan Klaim Palsu</h4><p>Tanpa verifikasi identitas — siapa pun bisa mengklaim barang.</p></div>
-    <div class="problem-card" style="border-color:var(--p)"><h4 style="color:var(--p)">Privasi Terancam</h4><p>Nomor HP pribadi terekspos di grup publik — rawan penyalahgunaan.</p></div>
-    <div class="problem-card" style="border-color:var(--t)"><h4 style="color:var(--t)">Tidak Ada Standar Pelaporan</h4><p>Format tidak konsisten — informasi sering tidak lengkap.</p></div>
-    <div class="problem-card" style="border-color:var(--t)"><h4 style="color:var(--t)">Beban Psikologis</h4><p>Mahasiswa panik saat kehilangan — butuh sistem yang menenangkan.</p></div>
+    <div class="problem-card" style="border-color:var(--o)"><h4 style="color:var(--o)">Informasi Tenggelam di Grup WA</h4><p>Laporan tertumpuk obrolan, tidak terstruktur dan sulit dilacak kembali.</p></div>
+    <div class="problem-card" style="border-color:var(--o)"><h4 style="color:var(--o)">Pencarian Tidak Efisien</h4><p>Tidak ada history atau sistem filter, laporan lama hilang selamanya.</p></div>
+    <div class="problem-card" style="border-color:var(--p)"><h4 style="color:var(--p)">Rawan Klaim Palsu</h4><p>Tanpa verifikasi identitas, siapa pun dapat mengklaim barang temuan.</p></div>
+    <div class="problem-card" style="border-color:var(--p)"><h4 style="color:var(--p)">Privasi Terancam</h4><p>Nomor HP pribadi terekspos di grup publik, rawan penyalahgunaan.</p></div>
+    <div class="problem-card" style="border-color:var(--t)"><h4 style="color:var(--t)">Tidak Ada Standar Pelaporan</h4><p>Format tidak seragam, informasi yang dilaporkan sering tidak lengkap.</p></div>
+    <div class="problem-card" style="border-color:var(--t)"><h4 style="color:var(--t)">Beban Psikologis</h4><p>Mahasiswa panik saat kehilangan, butuh sistem yang memberikan ketenangan.</p></div>
   </div>
 </div></section>
 
 <section><div class="container">
   <h3>Market Validation</h3>
-  <h2>Data Survey <span class="grad">39 Mahasiswa</span> UNU</h2>
-  <p class="sub" style="margin-bottom:40px">Survey kebutuhan membuktikan urgensi aplikasi Lost & Found terpusat.</p>
-  <div class="card" style="margin-bottom:20px">
-    <div class="bar-lbl"><span>Pernah kehilangan barang</span><b style="color:var(--o)">51%</b></div>
-    <div class="bar"><div class="bar-fill" style="width:51%;background:var(--o)"></div></div>
+  <h2>Survey <span class="grad">39 Mahasiswa</span> UNU</h2>
+  <p class="sub" style="margin-bottom:36px">Data survei membuktikan urgensi platform Lost &amp; Found terpusat di lingkungan kampus.</p>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="card"><div class="statval" style="color:var(--o)">51%</div><div class="statlbl">Pernah Kehilangan Barang</div></div>
+    <div class="card"><div class="statval" style="color:var(--p)">67%</div><div class="statlbl">Mencari via Satpam</div></div>
+    <div class="card"><div class="statval" style="color:var(--g)">82%</div><div class="statlbl">Nyaman Email Kampus</div></div>
   </div>
-  <div style="margin-bottom:24px">
-    <p style="font-weight:700;font-size:.85rem;margin-bottom:12px;color:var(--m)">BARANG PALING SERING HILANG</p>
+  <div style="margin-top:8px">
+    <p style="font-weight:700;font-size:.8rem;margin-bottom:14px;color:var(--m);text-transform:uppercase;letter-spacing:1px">Barang Paling Sering Hilang</p>
     <div class="bar-lbl"><span>Kunci Kendaraan</span><b>40%</b></div><div class="bar"><div class="bar-fill" style="width:40%;background:var(--p)"></div></div>
     <div class="bar-lbl"><span>Charger</span><b>35%</b></div><div class="bar"><div class="bar-fill" style="width:35%;background:var(--p)"></div></div>
     <div class="bar-lbl"><span>Dompet</span><b>30%</b></div><div class="bar"><div class="bar-fill" style="width:30%;background:var(--p)"></div></div>
-    <div class="bar-lbl"><span>Earphone / Headset</span><b>25%</b></div><div class="bar"><div class="bar-fill" style="width:25%;background:var(--p)"></div></div>
-  </div>
-  <div class="grid2">
-    <div class="card"><p style="font-size:.8rem;color:var(--m);font-weight:600">CARA MENCARI</p><p style="font-size:1.1rem;font-weight:700;margin:4px 0">Satpam Kampus</p><p style="font-size:1.8rem;font-weight:800;color:var(--p)">67%</p></div>
-    <div class="card"><p style="font-size:.8rem;color:var(--m);font-weight:600">NYAMAN EMAIL KAMPUS?</p><p style="font-size:1.1rem;font-weight:700;margin:4px 0">Setuju Verifikasi Email</p><p style="font-size:1.8rem;font-weight:800;color:var(--g)">82%</p></div>
+    <div class="bar-lbl"><span>Earphone &amp; Headset</span><b>25%</b></div><div class="bar"><div class="bar-fill" style="width:25%;background:var(--p)"></div></div>
   </div>
 </div></section>
 
 <section><div class="container">
-  <h3>Unique Value</h3>
-  <h2>Enam <span class="grad">UVP</span> Cari.In</h2>
-  <div class="grid3" style="margin-top:32px">
-    <div class="card" style="border-top:3px solid var(--p)"><h4 style="color:var(--p);margin-bottom:6px">01</h4><p style="font-weight:700;margin-bottom:4px">Domain Email Kampus</p><p style="font-size:.85rem;color:var(--m)">Hanya @student.unu-jogja.ac.id — verifikasi identitas otomatis</p></div>
-    <div class="card" style="border-top:3px solid var(--t)"><h4 style="color:var(--t);margin-bottom:6px">02</h4><p style="font-weight:700;margin-bottom:4px">Admin Moderation</p><p style="font-size:.85rem;color:var(--m)">Pending > Review > Approve/Reject — kualitas terjaga</p></div>
-    <div class="card" style="border-top:3px solid var(--p)"><h4 style="color:var(--p);margin-bottom:6px">03</h4><p style="font-weight:700;margin-bottom:4px">In-App Chat</p><p style="font-size:.85rem;color:var(--m)">Realtime tanpa ekspos nomor HP — privasi terlindungi</p></div>
-    <div class="card" style="border-top:3px solid var(--t)"><h4 style="color:var(--t);margin-bottom:6px">04</h4><p style="font-weight:700;margin-bottom:4px">Titik Penitipan</p><p style="font-size:.85rem;color:var(--m)">Field khusus lokasi fisik barang dititipkan</p></div>
-    <div class="card" style="border-top:3px solid var(--o)"><h4 style="color:var(--o);margin-bottom:6px">05</h4><p style="font-weight:700;margin-bottom:4px">Diferensiasi Visual</p><p style="font-size:.85rem;color:var(--m)">Lost = Orange, Found = Emerald — intuitif</p></div>
-    <div class="card" style="border-top:3px solid var(--g)"><h4 style="color:var(--g);margin-bottom:6px">06</h4><p style="font-weight:700;margin-bottom:4px">Admin Walk-in</p><p style="font-size:.85rem;color:var(--m)">Satpam input laporan manual — langsung approved</p></div>
+  <h3>Unique Value Proposition</h3>
+  <h2>Enam <span class="grad">Nilai Pembeda</span></h2>
+  <p class="sub" style="margin-bottom:32px">Cari.In dirancang dengan fitur yang menjawab setiap masalah secara spesifik.</p>
+  <div class="grid3">
+    <div class="card" style="border-top:3px solid var(--p)"><p style="font-size:1.5rem;font-weight:800;color:var(--p);margin-bottom:4px">01</p><p style="font-weight:700;margin-bottom:3px">Domain Email Kampus</p><p style="font-size:.8rem;color:var(--m)">Register hanya dengan email kampus resmi untuk verifikasi identitas otomatis.</p></div>
+    <div class="card" style="border-top:3px solid var(--t)"><p style="font-size:1.5rem;font-weight:800;color:var(--t);margin-bottom:4px">02</p><p style="font-weight:700;margin-bottom:3px">Admin Moderation</p><p style="font-size:.8rem;color:var(--m)">Setiap laporan masuk status Pending dan ditinjau admin sebelum tayang publik.</p></div>
+    <div class="card" style="border-top:3px solid var(--p)"><p style="font-size:1.5rem;font-weight:800;color:var(--p);margin-bottom:4px">03</p><p style="font-weight:700;margin-bottom:3px">In-App Chat Realtime</p><p style="font-size:.8rem;color:var(--m)">Komunikasi pelapor-penemu langsung tanpa mengekspos nomor HP pribadi.</p></div>
+    <div class="card" style="border-top:3px solid var(--t)"><p style="font-size:1.5rem;font-weight:800;color:var(--t);margin-bottom:4px">04</p><p style="font-weight:700;margin-bottom:3px">Titik Penitipan</p><p style="font-size:.8rem;color:var(--m)">Lokasi fisik penitipan barang temuan terdata dan mudah ditemukan.</p></div>
+    <div class="card" style="border-top:3px solid var(--o)"><p style="font-size:1.5rem;font-weight:800;color:var(--o);margin-bottom:4px">05</p><p style="font-weight:700;margin-bottom:3px">Diferensiasi Visual</p><p style="font-size:.8rem;color:var(--m)">Warna berbeda per status: Orange untuk Hilang, Emerald untuk Ditemukan.</p></div>
+    <div class="card" style="border-top:3px solid var(--g)"><p style="font-size:1.5rem;font-weight:800;color:var(--g);margin-bottom:4px">06</p><p style="font-weight:700;margin-bottom:3px">Admin Walk-in Report</p><p style="font-size:.8rem;color:var(--m)">Satpam dapat mencatat laporan atas nama mahasiswa yang datang langsung.</p></div>
   </div>
 </div></section>
 
 <section><div class="container">
   <h3>Design System</h3>
-  <h2>Calm Campus — <span class="grad">Psikologi Warna</span></h2>
-  <p class="sub" style="margin-bottom:24px">Warna dipilih berdasarkan riset neuropsikologi untuk menenangkan pengguna yang panik.</p>
-  <div class="grid3" style="margin-bottom:32px">
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--p)"></span>Primary Blue</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Trust &bull; Calm &bull; Keamanan</p></div>
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--t)"></span>Teal Sage</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Admin &bull; Profesional &bull; Authority</p></div>
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--g)"></span>Emerald Found</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Relief &bull; Healing &bull; Positif</p></div>
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--o)"></span>Soft Orange</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Urgensi &bull; Tanpa Panic Trigger</p></div>
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--bg)"></span>Slate BG</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Lapang &bull; Kurangi Beban Visual</p></div>
-    <div class="card" style="text-align:center"><div class="swatch"><span style="background:var(--s)"></span>White Card</div><p style="font-size:.8rem;color:var(--m);margin-top:8px">Kontras &bull; Fokus &bull; Bersih</p></div>
+  <h2>Calm <span class="grad">Campus</span> Psychology</h2>
+  <p class="sub" style="margin-bottom:32px">Palet warna dipilih berdasarkan riset neuropsikologi: warna biru menurunkan detak jantung dan tekanan darah. Warna hijau memulihkan fokus kognitif. Merah pure dihindari karena memicu kecemasan.</p>
+  <div class="grid3" style="margin-bottom:28px">
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--p)"></span>#2563EB</div><p style="font-size:.78rem;color:var(--m)">Primary Blue — Trust &bull; Calm &bull; Keamanan</p></div>
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--t)"></span>#0D9488</div><p style="font-size:.78rem;color:var(--m)">Teal Sage — Admin &bull; Profesional</p></div>
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--g)"></span>#059669</div><p style="font-size:.78rem;color:var(--m)">Emerald — Found &bull; Relief &bull; Positif</p></div>
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--o)"></span>#F97316</div><p style="font-size:.78rem;color:var(--m)">Soft Orange — Lost &bull; Urgensi Aman</p></div>
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--bg)"></span>#F8FAFC</div><p style="font-size:.78rem;color:var(--m)">Slate Background — Lapang &bull; Tenang</p></div>
+    <div class="card" style="text-align:center"><div class="swatch" style="justify-content:center;margin-bottom:8px"><span style="background:var(--s);border-color:#ddd"></span>#FFFFFF</div><p style="font-size:.78rem;color:var(--m)">White Card — Kontras &bull; Fokus</p></div>
   </div>
-  <p style="font-size:.85rem;color:var(--m)">Studi empiris: Biru menurunkan detak jantung & tekanan darah. Hijau memulihkan atensi (Attention Restoration Theory). Merah pure diganti orange untuk hindari panic trigger.</p>
+  <div class="card" style="background:var(--pl);border-color:var(--p);padding:14px 18px;text-align:center"><p style="font-size:.82rem;font-weight:500;color:var(--p)">Studi: Paparan biru muda mengaktifkan respons parasimpatis. Sage green mengurangi ketegangan mata. Background luas mencegah sensory overload.</p></div>
 </div></section>
 
 <section><div class="container">
   <h3>Tech Stack</h3>
-  <h2>Teknologi <span class="grad">Modern</span></h2>
-  <div class="grid3" style="margin-top:32px">
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">FRAMEWORK</p><p style="font-weight:800;font-size:1.1rem">React Native 0.81</p><p style="font-size:.8rem;color:var(--m)">Expo SDK 54 Managed</p></div>
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">LANGUAGE</p><p style="font-weight:800;font-size:1.1rem">TypeScript 5.9</p><p style="font-size:.8rem;color:var(--m)">Strict mode, zero any</p></div>
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">BACKEND</p><p style="font-weight:800;font-size:1.1rem">Supabase</p><p style="font-size:.8rem;color:var(--m)">Auth + Postgres + Storage + Realtime</p></div>
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">STATE</p><p style="font-weight:800;font-size:1.1rem">Zustand + Context</p><p style="font-size:.8rem;color:var(--m)">Zustand v5, Context API</p></div>
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">NAVIGATION</p><p style="font-weight:800;font-size:1.1rem">React Navigation v7</p><p style="font-size:.8rem;color:var(--m)">Stack + Bottom Tabs</p></div>
-    <div class="card"><p style="font-size:.7rem;color:var(--m);font-weight:700">STYLING</p><p style="font-weight:800;font-size:1.1rem">NativeWind v4</p><p style="font-size:.8rem;color:var(--m)">Tailwind untuk React Native</p></div>
+  <h2>Arsitektur <span class="grad">Teknologi</span></h2>
+  <div class="grid3" style="margin-top:28px;margin-bottom:28px">
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Framework</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">React Native 0.81</p><p style="font-size:.78rem;color:var(--m)">Expo SDK 54 Managed<br>TypeScript 5.9 Strict</p></div>
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Backend</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">Supabase</p><p style="font-size:.78rem;color:var(--m)">Auth JWT + Postgres<br>Storage + Realtime CD</p></div>
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">State &amp; Nav</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">Zustand + Context</p><p style="font-size:.78rem;color:var(--m)">React Navigation v7<br>Stack + Tab Navigators</p></div>
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Styling</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">NativeWind v4</p><p style="font-size:.78rem;color:var(--m)">Tailwind for RN<br>Custom Design Tokens</p></div>
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Realtime</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">WebSocket CD</p><p style="font-size:.78rem;color:var(--m)">postgres_changes<br>Auto-subscribe channel</p></div>
+    <div class="card"><p style="font-size:.68rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Build &amp; Deploy</p><p style="font-weight:800;font-size:1.05rem;margin-bottom:2px">EAS Cloud Build</p><p style="font-size:.78rem;color:var(--m)">APK Android<br>Expo Go iOS</p></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:12px 0">
+    <span class="flow-step">Expo / React Native</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">Supabase Auth</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">PostgREST API</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">Row Level Security</span>
   </div>
 </div></section>
 
 <section><div class="container">
-  <h3>Database</h3>
+  <h3>Database Design</h3>
   <h2>5 Tabel + <span class="grad">RLS + Triggers</span></h2>
-  <div class="grid2" style="margin-top:24px">
-    <div class="card"><p style="font-weight:800;color:var(--p)">profiles</p><p style="font-size:.8rem;color:var(--m)">1-1 auth.users &bull; name, nim, role, faculty</p></div>
-    <div class="card"><p style="font-weight:800;color:var(--p)">reports</p><p style="font-size:.8rem;color:var(--m)">lost/found &bull; pending/approved/rejected/resolved</p></div>
-    <div class="card"><p style="font-weight:800;color:var(--t)">conversations</p><p style="font-size:.8rem;color:var(--m)">userA&#8596;userB &bull; per report &bull; last_message</p></div>
-    <div class="card"><p style="font-weight:800;color:var(--t)">messages</p><p style="font-size:.8rem;color:var(--m)">content &bull; is_read &bull; realtime channel</p></div>
+  <div class="grid3" style="margin-bottom:24px">
+    <div class="card"><p style="font-weight:800;color:var(--p);font-size:.9rem;margin-bottom:4px">profiles</p><p style="font-size:.78rem;color:var(--m);line-height:1.6">1-1 dengan auth.users<br>name, nim, email, role<br>faculty, department<br>avatar_url, expo_token</p></div>
+    <div class="card"><p style="font-weight:800;color:var(--t);font-size:.9rem;margin-bottom:4px">reports</p><p style="font-size:.78rem;color:var(--m);line-height:1.6">type: lost / found<br>status: pending / approved<br>/ rejected / resolved<br>photo_url, custody_point</p></div>
+    <div class="card"><p style="font-weight:800;color:var(--p);font-size:.9rem;margin-bottom:4px">conversations</p><p style="font-size:.78rem;color:var(--m);line-height:1.6">userA &harr; userB<br>per report_id (unique)<br>last_message, last_at</p></div>
+    <div class="card"><p style="font-weight:800;color:var(--t);font-size:.9rem;margin-bottom:4px">messages</p><p style="font-size:.78rem;color:var(--m);line-height:1.6">content, sender_id<br>is_read, created_at<br>Realtime publication</p></div>
+    <div class="card"><p style="font-weight:800;color:var(--o);font-size:.9rem;margin-bottom:4px">notifications</p><p style="font-size:.78rem;color:var(--m);line-height:1.6">type: approved/rejected<br>/new_message<br>Auto-insert via trigger</p></div>
+    <div class="card" style="background:var(--x);color:var(--s);border-color:var(--dt)"><p style="font-weight:800;font-size:.8rem;margin-bottom:6px;color:#93c5fd">Security Layer</p><p style="font-size:.75rem;color:#94a3b8;line-height:1.6">RLS di semua 5 tabel<br>RPC Security Definer<br>Storage Bucket Policies<br>Domain Email Validator</p></div>
   </div>
-  <div class="card" style="margin-top:16px">
-    <p style="font-weight:800;color:var(--g)">notifications</p>
-    <p style="font-size:.8rem;color:var(--m)">report_approved / report_rejected / new_message &bull; auto-generated via trigger</p>
-  </div>
-  <p style="margin-top:16px;font-size:.85rem;font-weight:600">4 Database Triggers &bull; 2 RPC Functions (security definer) &bull; 15+ RLS Policies</p>
+  <div class="code-block"><span class="cm">-- Trigger: notifikasi otomatis saat pesan baru</span>
+<span class="kw">CREATE TRIGGER</span> <span class="fn">trg_notify_new_message</span>
+<span class="kw">AFTER INSERT ON</span> public.messages
+<span class="kw">FOR EACH ROW EXECUTE FUNCTION</span> <span class="fn">notify_new_message</span>();
+
+<span class="cm">-- RPC: admin bypass RLS dengan aman</span>
+<span class="kw">CREATE FUNCTION</span> <span class="fn">update_report_status</span>(...)
+<span class="kw">SECURITY DEFINER SET</span> search_path = public;</div>
 </div></section>
 
 <section><div class="container">
-  <h3>Navigation</h3>
-  <h2>Arsitektur <span class="grad">Navigasi</span></h2>
-  <div class="grid2" style="margin-top:32px">
-    <div class="card">
-      <div class="tag tag-admin" style="margin-bottom:12px">ADMIN</div>
-      <div style="font-size:.85rem;line-height:2">
-        <p style="color:var(--t);font-weight:700">5 Bottom Tabs</p>
-        <p style="color:var(--m)">Dashboard &#8594; Review</p>
-        <p style="color:var(--m)">Semua Laporan</p>
-        <p style="color:var(--m)">Buat Laporan (FAB)</p>
-        <p style="color:var(--m)">Pesan &#8594; ChatRoom</p>
-        <p style="color:var(--m)">Profil &#8594; Logout</p>
-      </div>
+  <h3>Architecture</h3>
+  <h2>Navigasi <span class="grad">Dual Role</span></h2>
+  <div class="grid2" style="margin-top:28px">
+    <div class="card" style="border-top:3px solid var(--p)">
+      <p style="font-weight:800;font-size:1rem;color:var(--p);margin-bottom:12px">Mahasiswa (5 Tabs)</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">&#8226; Home — Feed + Filter + Search<br>&#8226; Pesan — Inbox + ChatRoom + Notif<br>&#8226; <b>Buat (+)</b> — Lost / Found Form + Foto<br>&#8226; Laporanku — Edit + Hapus + Selesai<br>&#8226; Profil — Avatar + Settings + Help</p>
     </div>
-    <div class="card">
-      <div class="tag tag-found" style="margin-bottom:12px">MAHASISWA</div>
-      <div style="font-size:.85rem;line-height:2">
-        <p style="color:var(--g);font-weight:700">5 Bottom Tabs</p>
-        <p style="color:var(--m)">Home &#8594; Detail / Chat / UserProfile</p>
-        <p style="color:var(--m)">Pesan &#8594; Inbox / Chat / Notif</p>
-        <p style="color:var(--m)">Buat Laporan (FAB Modal)</p>
-        <p style="color:var(--m)">Laporanku &#8594; Edit / Detail</p>
-        <p style="color:var(--m)">Profil &#8594; Settings / Help</p>
-      </div>
+    <div class="card" style="border-top:3px solid var(--t)">
+      <p style="font-weight:800;font-size:1rem;color:var(--t);margin-bottom:12px">Admin (5 Tabs)</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">&#8226; Dashboard — Stats + Moderasi<br>&#8226; Laporan — Filter + Search + Review<br>&#8226; <b>Buat (+)</b> — Walk-in Report<br>&#8226; Pesan — Chat dengan Pelapor<br>&#8226; Profil — Password + Logout</p>
     </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:24px">
+    <span class="flow-step">Auth Navigator</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step admin-step">Root Navigator</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">Mahasiswa Tabs</span><span class="flow-arrow">/</span>
+    <span class="flow-step admin-step">Admin Tabs</span>
   </div>
 </div></section>
 
 <section><div class="container">
   <h3>Features</h3>
-  <h2>Fitur <span class="grad">Mahasiswa</span></h2>
-  <div class="grid2" style="margin-top:24px">
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">01</span><p style="font-weight:700">Register Email Kampus</p><p style="font-size:.8rem;color:var(--m)">@student.unu-jogja.ac.id</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">02</span><p style="font-weight:700">Feed Publik</p><p style="font-size:.8rem;color:var(--m)">Filter kategori, tipe, search</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">03</span><p style="font-weight:700">Buat Laporan Lost/Found</p><p style="font-size:.8rem;color:var(--m)">Foto, kategori, lokasi</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">04</span><p style="font-weight:700">Detail Laporan</p><p style="font-size:.8rem;color:var(--m)">Foto, status, info pelapor</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">05</span><p style="font-weight:700">Chat Realtime</p><p style="font-size:.8rem;color:var(--m)">Supabase postgres_changes</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">06</span><p style="font-weight:700">Notifikasi In-App</p><p style="font-size:.8rem;color:var(--m)">Bell badge + list notifikasi</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">07</span><p style="font-weight:700">Laporanku</p><p style="font-size:.8rem;color:var(--m)">Edit, hapus, tandai selesai</p></div>
-    <div class="card"><span class="tag tag-found" style="margin-bottom:8px">08</span><p style="font-weight:700">Profil + Avatar</p><p style="font-size:.8rem;color:var(--m)">Upload foto, settings, help</p></div>
+  <h2><span class="grad">11 Fitur</span> Mahasiswa</h2>
+  <div class="feat-grid" style="margin-top:20px">
+    <div class="c"><span class="n" style="background:var(--p)">1</span> Register Email Kampus</div>
+    <div class="c"><span class="n" style="background:var(--p)">2</span> Feed Laporan Publik</div>
+    <div class="c"><span class="n" style="background:var(--p)">3</span> Filter Kategori &amp; Tipe</div>
+    <div class="c"><span class="n" style="background:var(--p)">4</span> Search Barang</div>
+    <div class="c"><span class="n" style="background:var(--o)">5</span> Detail + Foto + Lokasi</div>
+    <div class="c"><span class="n" style="background:var(--o)">6</span> Create Lost (Foto Wajib)</div>
+    <div class="c"><span class="n" style="background:var(--g)">7</span> Create Found (Titik Simpan)</div>
+    <div class="c"><span class="n" style="background:var(--t)">8</span> Chat Realtime In-App</div>
+    <div class="c"><span class="n" style="background:var(--t)">9</span> Notifikasi In-App</div>
+    <div class="c"><span class="n" style="background:var(--p)">10</span> Kelola Laporan Sendiri</div>
+    <div class="c"><span class="n" style="background:var(--p)">11</span> Profile + Avatar Upload</div>
   </div>
+  <div style="margin-top:28px">
+  <h3 style="margin-bottom:8px">Features Admin</h3>
+  <h2 style="font-size:1.3rem;margin-bottom:16px"><span class="grad">6 Fitur</span> Moderasi</h2>
+  <div class="feat-grid">
+    <div class="c"><span class="n" style="background:var(--t)">1</span> Dashboard Statistik</div>
+    <div class="c"><span class="n" style="background:var(--t)">2</span> Review + Approve/Reject</div>
+    <div class="c"><span class="n" style="background:var(--t)">3</span> Semua Laporan + Filter</div>
+    <div class="c"><span class="n" style="background:var(--t)">4</span> Walk-in Report Manual</div>
+    <div class="c"><span class="n" style="background:var(--t)">5</span> Chat dengan Pelapor</div>
+    <div class="c"><span class="n" style="background:var(--t)">6</span> Notifikasi Otomatis</div>
+  </div></div>
 </div></section>
 
 <section><div class="container">
-  <h3>Features</h3>
-  <h2>Fitur <span class="grad">Admin</span></h2>
-  <div class="grid2" style="margin-top:24px">
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">01</span><p style="font-weight:700">Dashboard Statistik</p><p style="font-size:.8rem;color:var(--m)">Pending, Disetujui, Ditolak, Total</p></div>
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">02</span><p style="font-weight:700">Moderasi Laporan</p><p style="font-size:.8rem;color:var(--m)">Approve / Reject dengan alasan</p></div>
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">03</span><p style="font-weight:700">Semua Laporan</p><p style="font-size:.8rem;color:var(--m)">Filter status + search</p></div>
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">04</span><p style="font-weight:700">Walk-in Report</p><p style="font-size:.8rem;color:var(--m)">Input atas nama mahasiswa</p></div>
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">05</span><p style="font-weight:700">Chat dengan Pelapor</p><p style="font-size:.8rem;color:var(--m)">Dari Review langsung ChatRoom</p></div>
-    <div class="card"><span class="tag tag-admin" style="margin-bottom:8px">06</span><p style="font-weight:700">Notifikasi Otomatis</p><p style="font-size:.8rem;color:var(--m)">Trigger DB kirim ke mahasiswa</p></div>
+  <h3>Realtime Chat</h3>
+  <h2>Supabase <span class="grad">WebSocket CD</span></h2>
+  <p class="sub" style="margin-bottom:28px">Chat realtime menggunakan Supabase Realtime channel — pesan muncul tanpa refresh manual.</p>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px">
+    <span class="flow-step" style="background:var(--ol);color:var(--o)">User A Kirim</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step" style="background:var(--pl);color:var(--p)">INSERT messages</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step" style="background:var(--tl);color:var(--t)">Trigger Notif</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step" style="background:var(--gl);color:var(--g)">Broadcast User B</span>
   </div>
-</div></section>
-
-<section><div class="container">
-  <h3>Realtime</h3>
-  <h2>Chat <span class="grad">Realtime</span> + Notifikasi</h2>
-  <div class="flow-row" style="margin:32px 0;font-size:.85rem">
-    <div class="flow-step" style="background:var(--pl)">User A<br>Kirim Pesan</div>
-    <span class="flow-arrow">&#8594;</span>
-    <div class="flow-step" style="background:var(--tl)">INSERT<br>messages</div>
-    <span class="flow-arrow">&#8594;</span>
-    <div class="flow-step" style="background:var(--gl)">Trigger<br>notif + conv</div>
-    <span class="flow-arrow">&#8594;</span>
-    <div class="flow-step" style="background:var(--ol)">Realtime<br>Broadcast</div>
-    <span class="flow-arrow">&#8594;</span>
-    <div class="flow-step" style="background:var(--pl)">User B<br>Langsung Lihat</div>
-  </div>
-  <div class="grid2" style="margin-top:24px">
-    <div class="card"><p style="font-weight:700;color:var(--p)">Channel</p><p style="font-size:.8rem;color:var(--m)">supabase.channel('messages:conv_id')</p></div>
-    <div class="card"><p style="font-weight:700;color:var(--p)">Subscribe</p><p style="font-size:.8rem;color:var(--m)">useFocusEffect — saat ChatRoom fokus</p></div>
-    <div class="card"><p style="font-weight:700;color:var(--t)">Unsubscribe</p><p style="font-size:.8rem;color:var(--m)">useEffect cleanup — cegah memory leak</p></div>
-    <div class="card"><p style="font-weight:700;color:var(--t)">Bell Badge</p><p style="font-size:.8rem;color:var(--m)">NotifContext polling 15 detik</p></div>
+  <div class="grid2">
+    <div class="card"><p style="font-weight:700;color:var(--p);margin-bottom:4px">Subscribe Channel</p><p style="font-size:.82rem;color:var(--m)">useFocusEffect saat ChatRoom aktif — subscribe ke postgres_changes per conversation ID. Unsubscribe otomatis saat leave.</p></div>
+    <div class="card"><p style="font-weight:700;color:var(--t);margin-bottom:4px">Auto Notification</p><p style="font-size:.82rem;color:var(--m)">Trigger database trg_notify_new_message — otomatis insert notifikasi ke receiver. Bell badge polling 15 detik via NotifContext.</p></div>
   </div>
 </div></section>
 
 <section><div class="container">
   <h3>Security</h3>
-  <h2>4 Layer <span class="grad">Keamanan</span></h2>
-  <div class="grid4" style="margin-top:32px">
-    <div class="card" style="text-align:center"><p style="font-weight:800;font-size:1.5rem;color:var(--p)">01</p><p style="font-weight:700;margin:8px 0">JWT Auth</p><p style="font-size:.8rem;color:var(--m)">Supabase Auth</p></div>
-    <div class="card" style="text-align:center"><p style="font-weight:800;font-size:1.5rem;color:var(--t)">02</p><p style="font-weight:700;margin:8px 0">RLS</p><p style="font-size:.8rem;color:var(--m)">5 Tabel Protected</p></div>
-    <div class="card" style="text-align:center"><p style="font-weight:800;font-size:1.5rem;color:var(--g)">03</p><p style="font-weight:700;margin:8px 0">RPC</p><p style="font-size:.8rem;color:var(--m)">Security Definer</p></div>
-    <div class="card" style="text-align:center"><p style="font-weight:800;font-size:1.5rem;color:var(--o)">04</p><p style="font-weight:700;margin:8px 0">Storage</p><p style="font-size:.8rem;color:var(--m)">Policy per Bucket</p></div>
+  <h2>4 Layer <span class="grad">Perlindungan</span></h2>
+  <div class="shield-grid" style="margin-top:28px">
+    <div class="sh"><div class="ic" style="color:var(--p)">&#9632;</div><div class="lb">Auth JWT</div><p style="font-size:.75rem;color:var(--m)">Supabase Auth<br>Email + Password</p></div>
+    <div class="sh"><div class="ic" style="color:var(--t)">&#9632;</div><div class="lb">Row Level Security</div><p style="font-size:.75rem;color:var(--m)">5 tabel<br>policy granular</p></div>
+    <div class="sh"><div class="ic" style="color:var(--o)">&#9632;</div><div class="lb">RPC Definer</div><p style="font-size:.75rem;color:var(--m)">Security definer<br>bypass aman</p></div>
+    <div class="sh"><div class="ic" style="color:var(--g)">&#9632;</div><div class="lb">Domain Validator</div><p style="font-size:.75rem;color:var(--m)">Email kampus<br>wajib register</p></div>
   </div>
-  <div class="code-block" style="margin-top:24px">
-<span class="cm">-- RLS: mahasiswa hanya lihat laporan APPROVED milik ORANG LAIN</span>
-<span class="kw">CREATE POLICY</span> reports_select_public <span class="kw">ON</span> public.reports
-  <span class="kw">FOR SELECT USING</span> (
-    status <span class="kw">IN</span> (<span class="str">'approved'</span>,<span class="str">'resolved'</span>)
-    <span class="kw">OR</span> user_id = auth.uid()
-    <span class="kw">OR</span> public.<span class="fn">is_admin</span>()
-  );
-  </div>
+  <div class="code-block" style="margin-top:24px"><span class="cm">-- Mahasiswa: lihat laporan approved/resolved milik orang lain</span>
+<span class="cm">--         atau semua laporan milik sendiri (termasuk pending)</span>
+<span class="kw">CREATE POLICY</span> <span class="fn">reports_select_public</span> <span class="kw">ON</span> public.reports
+<span class="kw">FOR SELECT USING</span> (
+  status <span class="kw">IN</span> (<span class="str">'approved'</span>,<span class="str">'resolved'</span>)
+  <span class="kw">OR</span> user_id = auth.uid()
+  <span class="kw">OR</span> public.is_admin()
+);</div>
 </div></section>
 
 <section><div class="container">
-  <h3>Code Quality</h3>
-  <h2>Statistik & <span class="grad">Kualitas Kode</span></h2>
-  <div class="grid4" style="margin-top:32px">
-    <div class="card" style="text-align:center"><p class="statval" style="color:var(--p)">4</p><p class="statlbl">Users</p></div>
-    <div class="card" style="text-align:center"><p class="statval" style="color:var(--t)">10</p><p class="statlbl">Reports</p></div>
-    <div class="card" style="text-align:center"><p class="statval" style="color:var(--g)">20</p><p class="statlbl">Messages</p></div>
-    <div class="card" style="text-align:center"><p class="statval" style="color:var(--o)">25</p><p class="statlbl">Notifications</p></div>
+  <h3>Statistics</h3>
+  <h2>Data <span class="grad">Aplikasi</span> Aktual</h2>
+  <div class="grid4" style="margin-top:28px;margin-bottom:28px">
+    <div class="num-card"><div class="big-num" style="color:var(--p)">4</div><div class="big-num-label">Users</div></div>
+    <div class="num-card"><div class="big-num" style="color:var(--o)">10</div><div class="big-num-label">Reports</div></div>
+    <div class="num-card"><div class="big-num" style="color:var(--t)">6</div><div class="big-num-label">Conversations</div></div>
+    <div class="num-card"><div class="big-num" style="color:var(--g)">20</div><div class="big-num-label">Messages</div></div>
   </div>
-  <div class="grid3" style="margin-top:24px">
-    <div class="card"><p style="font-weight:700;color:var(--g)">tsc --noEmit</p><p style="font-size:2rem;font-weight:800;color:var(--g)">0</p><p style="font-size:.8rem;color:var(--m)">TypeScript errors</p></div>
-    <div class="card"><p style="font-weight:700;color:var(--g)">npm run lint</p><p style="font-size:2rem;font-weight:800;color:var(--g)">0</p><p style="font-size:.8rem;color:var(--m)">ESLint warnings</p></div>
-    <div class="card"><p style="font-weight:700;color:var(--g)">expo-doctor</p><p style="font-size:2rem;font-weight:800;color:var(--g)">18/18</p><p style="font-size:.8rem;color:var(--m)">Checks passed</p></div>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="card" style="text-align:center"><div class="statval" style="color:var(--p)">6</div><div class="statlbl">Approved</div></div>
+    <div class="card" style="text-align:center"><div class="statval" style="color:var(--g)">4</div><div class="statlbl">Resolved</div></div>
+    <div class="card" style="text-align:center"><div class="statval" style="color:var(--t)">25</div><div class="statlbl">Notifications</div></div>
   </div>
+  <div class="card" style="background:var(--pl);border-color:var(--p);text-align:center"><p style="font-weight:600;color:var(--p)">Code Quality: tsc 0 error &bull; lint 0 warning &bull; expo-doctor 18/18 &bull; 1,294 modules bundled</p></div>
 </div></section>
 
 <section><div class="container">
   <h3>Demo Flow</h3>
   <h2>Skenario <span class="grad">5 Menit</span></h2>
-  <div class="timeline" style="margin-top:32px">
-    <div class="timeline-item"><p style="font-weight:700">0:00 — Splash & Login</p><p style="font-size:.85rem;color:var(--m)">Login mahasiswa dengan email kampus</p></div>
-    <div class="timeline-item"><p style="font-weight:700">0:30 — Feed & Detail</p><p style="font-size:.85rem;color:var(--m)">Browse feed, filter kategori, buka detail laporan</p></div>
-    <div class="timeline-item"><p style="font-weight:700">1:30 — Create Laporan</p><p style="font-size:.85rem;color:var(--m)">Form lost/found + foto + kategori + submit</p></div>
-    <div class="timeline-item"><p style="font-weight:700">2:30 — Admin Moderation</p><p style="font-size:.85rem;color:var(--m)">Dashboard > Review > Approve laporan</p></div>
-    <div class="timeline-item"><p style="font-weight:700">3:30 — Chat Realtime</p><p style="font-size:.85rem;color:var(--m)">Notifikasi > Inbox > ChatRoom > kirim pesan</p></div>
-    <div class="timeline-item"><p style="font-weight:700">4:30 — MyPosts & Profile</p><p style="font-size:.85rem;color:var(--m)">Tandai selesai, edit, avatar upload</p></div>
+  <div class="grid2" style="margin-top:28px">
+    <div class="card" style="border-left:3px solid var(--p)">
+      <p style="font-weight:700;font-size:.9rem;color:var(--p);margin-bottom:6px">00:00 &#8212; 02:00 Mahasiswa</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">&#8226; Splash + Role Selection<br>&#8226; Login email kampus<br>&#8226; Home: feed + filter + search<br>&#8226; Detail laporan + Chat Penemu<br>&#8226; Create laporan + foto + submit</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--t)">
+      <p style="font-weight:700;font-size:.9rem;color:var(--t);margin-bottom:6px">02:00 &#8212; 03:30 Admin</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">&#8226; Login admin<br>&#8226; Dashboard: 4 stat cards<br>&#8226; Review + Approve laporan<br>&#8226; Chat dengan pelapor<br>&#8226; Walk-in report</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:24px">
+    <span class="flow-step">03:30 Mahasiswa</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step admin-step">Notifikasi</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">Chat Realtime</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step admin-step">My Posts Selesai</span><span class="flow-arrow">&#8594;</span>
+    <span class="flow-step">Profile Logout</span>
   </div>
 </div></section>
 
 <section><div class="container">
   <h3>Deployment</h3>
-  <h2>Cara <span class="grad">Install</span></h2>
-  <div class="grid2" style="margin-top:32px">
+  <h2>Cara <span class="grad">Install &amp; Build</span></h2>
+  <div class="grid2" style="margin-top:28px">
     <div class="card" style="border-top:3px solid var(--p)">
-      <p style="font-weight:800;font-size:1.1rem;color:var(--p)">Expo Go (iOS & Android)</p>
-      <p style="font-size:.85rem;color:var(--m);margin:8px 0">1. Install Expo Go dari App Store / Play Store</p>
-      <p style="font-size:.85rem;color:var(--m)">2. Scan QR dari terminal</p>
-      <p style="font-size:.85rem;color:var(--m)">3. App langsung berjalan</p>
+      <p style="font-weight:800;color:var(--p);margin-bottom:8px">Expo Go (iOS &amp; Android)</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">1. Install Expo Go dari Store<br>2. Scan QR dari npx expo start<br>3. App langsung berjalan<br><br><b>Gratis, tanpa build</b></p>
     </div>
     <div class="card" style="border-top:3px solid var(--t)">
-      <p style="font-weight:800;font-size:1.1rem;color:var(--t)">APK (Android)</p>
-      <p style="font-size:.85rem;color:var(--m);margin:8px 0">1. Download CariIn-v1.apk</p>
-      <p style="font-size:.85rem;color:var(--m)">2. Buka file & install</p>
-      <p style="font-size:.85rem;color:var(--m)">3. Production build — 76 MB</p>
+      <p style="font-weight:800;color:var(--t);margin-bottom:8px">Standalone APK (Android)</p>
+      <p style="font-size:.82rem;color:var(--m);line-height:1.8">1. Download CariIn-v1.apk<br>2. Buka file &rarr; Install<br>3. Izinkan sumber tidak dikenal<br><br><b>76 MB, production build</b></p>
     </div>
   </div>
+  <div class="code-block" style="margin-top:20px"><span class="cm"># Build ulang kapan saja</span>
+eas login
+eas build --platform android --profile production
+<span class="cm"># iOS (butuh Apple Developer)</span>
+eas build --platform ios --profile preview</div>
 </div></section>
 
-<section><div class="container">
+<section><div class="container" style="text-align:center">
   <h3>Conclusion</h3>
-  <h2>Apa yang <span class="grad">Dicapai</span></h2>
-  <div class="grid2" style="margin-top:24px">
-    <div class="card"><p style="color:var(--g);font-weight:800;font-size:1.2rem">26</p><p style="font-size:.85rem;color:var(--m)">Screens implemented</p></div>
-    <div class="card"><p style="color:var(--p);font-weight:800;font-size:1.2rem">17</p><p style="font-size:.85rem;color:var(--m)">Total fitur (11 mhs + 6 admin)</p></div>
-    <div class="card"><p style="color:var(--t);font-weight:800;font-size:1.2rem">5</p><p style="font-size:.85rem;color:var(--m)">Database tables + RLS</p></div>
-    <div class="card"><p style="color:var(--g);font-weight:800;font-size:1.2rem">0</p><p style="font-size:.85rem;color:var(--m)">TypeScript + ESLint errors</p></div>
+  <h2><span class="grad">Capaian</span> Project</h2>
+  <div class="grid2" style="margin-top:28px;margin-bottom:24px;text-align:left">
+    <div class="card" style="border-top:3px solid var(--p)"><p style="font-size:.82rem;font-weight:600;color:var(--p)">Desain &amp; Arsitektur</p><p style="font-size:.82rem;color:var(--m);line-height:1.8">26 screen penuh 0 stub<br>Design system Calm Campus<br>Dual role navigator<br>RLS + RPC security</p></div>
+    <div class="card" style="border-top:3px solid var(--t)"><p style="font-size:.82rem;font-weight:600;color:var(--t)">Fitur Lengkap</p><p style="font-size:.82rem;color:var(--m);line-height:1.8">11 fitur mahasiswa<br>6 fitur admin<br>Chat realtime WebSocket<br>Notifikasi otomatis</p></div>
+    <div class="card" style="border-top:3px solid var(--o)"><p style="font-size:.82rem;font-weight:600;color:var(--o)">Validasi &amp; Testing</p><p style="font-size:.82rem;color:var(--m);line-height:1.8">Survey 39 mahasiswa<br>tsc 0 error lint 0 warning<br>expo-doctor 18/18<br>E2E database test</p></div>
+    <div class="card" style="border-top:3px solid var(--g)"><p style="font-size:.82rem;font-weight:600;color:var(--g)">Deployment</p><p style="font-size:.82rem;color:var(--m);line-height:1.8">APK production 76 MB<br>Expo Go iOS instant<br>GitHub public repo<br>EAS Cloud build</p></div>
   </div>
-  <p style="margin-top:24px;font-size:1rem;color:var(--m)">Stack: React Native 0.81 + Expo SDK 54 + TypeScript + Supabase + Realtime</p>
-  <p style="font-size:1rem;color:var(--m)">Cari.In siap digunakan dan dapat dikembangkan lebih lanjut.</p>
+  <div class="card" style="text-align:center;padding:16px 24px">
+    <p style="font-size:.85rem;color:var(--m)">"Kampus Lebih Aman"</p>
+  </div>
 </div></section>
 
-<section id="thanks" style="background:linear-gradient(160deg,var(--d),#1e3a5f,var(--d));color:#fff;text-align:center">
-<div class="container">
-  <div class="logo-icon" style="margin:0 auto 24px">&#9851;</div>
-  <h1 style="color:#fff">Terima Kasih</h1>
-  <p style="color:rgba(255,255,255,.6);font-size:1.1rem;margin-top:12px">Cari.In — Cariin barangmu di kampus</p>
-  <p style="color:rgba(255,255,255,.4);font-size:.85rem;margin-top:24px">Faiz Abdurrachman &middot; UNU Yogyakarta &middot; Mobile Programming</p>
-</div></section>
+<section id="closing" style="background:linear-gradient(160deg,#0f172a 0%,#1e2d5c 50%,#0f172a 100%);color:#fff;text-align:center">
+  <div class="container">
+    <p style="font-size:1rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:12px">Terima Kasih</p>
+    <h1 style="color:#fff;font-size:clamp(2.4rem,5vw,4rem);margin-bottom:16px">Cari<span style="color:var(--p);background:none;-webkit-text-fill-color:#2563EB">.</span>In</h1>
+    <p style="color:rgba(255,255,255,.5);font-size:1rem;margin-bottom:6px">Campus Lost &amp; Found — UNU Yogyakarta</p>
+    <p style="color:rgba(255,255,255,.3);font-size:.82rem">Faiz Abdurrachman &middot; Mobile Programming &middot; Semester 4 &middot; 2026</p>
+    <div style="margin-top:28px">
+      <p style="font-size:.82rem;color:rgba(255,255,255,.25)">Gunakan tombol &#8592; &#8594; untuk navigasi antar slide</p>
+    </div>
+  </div>
+</section>
 
 <script>
 const sections=document.querySelectorAll('section');
-const dots=document.getElementById('dots');
+const dotsContainer=document.getElementById('dots');
 const progress=document.getElementById('progress');
-let current=0,animating=false;
+let idx=0;
 
 sections.forEach((_,i)=>{
-  const d=document.createElement('span');
-  d.addEventListener('click',()=>goTo(i));
-  dots.appendChild(d);
+  const dot=document.createElement('span');
+  dot.addEventListener('click',()=>goTo(i));
+  dotsContainer.appendChild(dot);
 });
-
-function updateNav(){
-  document.querySelectorAll('#dots span').forEach((d,i)=>d.classList.toggle('active',i===current));
-  progress.style.width=((current/(sections.length-1))*100)+'%';
-}
+const dots=dotsContainer.querySelectorAll('span');
 
 function goTo(i){
-  if(i<0||i>=sections.length||animating)return;
-  animating=true;
-  sections[current].classList.remove('visible');
-  sections[i].classList.add('visible');
-  current=i;updateNav();
-  setTimeout(()=>animating=false,600);
+  sections[idx].classList.remove('visible');
+  dots[idx].classList.remove('active');
+  idx=Math.max(0,Math.min(i,sections.length-1));
+  sections[idx].classList.add('visible');
+  dots[idx].classList.add('active');
+  progress.style.width=((idx+1)/sections.length*100)+'%';
+  sections[idx].scrollIntoView({behavior:'smooth'});
 }
 
-function goNext(){goTo(current+1)}
-function goPrev(){goTo(current-1)}
-
-let touchX=0;
-document.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX});
-document.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-touchX;
-  if(Math.abs(dx)>50) dx>0?goPrev():goNext();
-});
+function goNext(){goTo(idx+1)}
+function goPrev(){goTo(idx-1)}
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key===' ')goNext();
-  if(e.key==='ArrowLeft')goPrev();
-  if(e.key==='Escape')goTo(0);
-  if(e.key==='f')document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') {e.preventDefault();goNext();}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') {e.preventDefault();goPrev();}
+  if(e.key==='Home') {e.preventDefault();goTo(0)}
+  if(e.key==='End') {e.preventDefault();goTo(sections.length-1)}
+  if(e.key==='f'||e.key==='F') {e.preventDefault();document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
 });
 
-const observer=new IntersectionObserver((entries)=>{
+let touchY;document.addEventListener('touchstart',e=>{touchY=e.touches[0].clientY});
+document.addEventListener('touchend',e=>{
+  const diff=touchY-e.changedTouches[0].clientY;
+  if(Math.abs(diff)>50){diff>0?goNext():goPrev()}
+});
+
+const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
-      const idx=Array.from(sections).indexOf(e.target);
-      if(idx!==-1&&!animating){current=idx;updateNav()}
+      const i=Array.from(sections).indexOf(e.target);
+      if(i!==idx) goTo(i);
     }
   });
 },{threshold:.5});
