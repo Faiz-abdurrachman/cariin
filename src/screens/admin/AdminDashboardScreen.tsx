@@ -43,13 +43,13 @@ export default function AdminDashboardScreen() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabFilter>('pending');
 
-  const load = useCallback(async (showSpinner = true) => {
-    if (showSpinner) setLoading(true);
+  const refreshData = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
       const [statsData, reportsData] = await Promise.all([
         getAdminStats(),
-        listReports({ status: 'pending' as ReportStatus }),
+        listReports({ status: activeTab as ReportStatus }),
       ]);
       setStats(statsData);
       setReports(reportsData);
@@ -57,17 +57,20 @@ export default function AdminDashboardScreen() {
       setError(e instanceof Error ? e.message : 'Gagal memuat data.');
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  }, []);
+  }, [activeTab]);
 
   const loadTab = useCallback(async (tab: TabFilter) => {
     setActiveTab(tab);
     setLoading(true);
     setError(null);
     try {
-      const data = await listReports({ status: tab as ReportStatus });
-      setReports(data);
+      const [statsData, reportsData] = await Promise.all([
+        getAdminStats(),
+        listReports({ status: tab as ReportStatus }),
+      ]);
+      setStats(statsData);
+      setReports(reportsData);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Gagal memuat data.');
     } finally {
@@ -77,13 +80,14 @@ export default function AdminDashboardScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      void load(true);
-    }, [load]),
+      void refreshData();
+    }, [refreshData]),
   );
 
   const onRefresh = () => {
     setRefreshing(true);
-    void load(false);
+    setLoading(false);
+    void refreshData().finally(() => setRefreshing(false));
   };
 
   return (

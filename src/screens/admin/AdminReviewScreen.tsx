@@ -170,7 +170,7 @@ export default function AdminReviewScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.surface }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
         {/* Hero photo */}
         <View style={{ height: 260, backgroundColor: '#F4F4F5' }}>
           {report.photo_url ? (
