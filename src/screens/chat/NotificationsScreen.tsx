@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import EmptyState from '@/components/EmptyState';
 import { useNotif } from '@/context/NotifContext';
-import type { ChatStackParamList, HomeStackParamList } from '@/navigation/types';
+import type { ChatStackParamList, MainTabParamList } from '@/navigation/types';
 import * as notifService from '@/services/notification.service';
 import type { AppNotification } from '@/services/notification.service';
 import { COLORS } from '@/utils/constants';
@@ -76,9 +76,10 @@ export default function NotificationsScreen() {
         reportId: '',
       });
     } else if (item.ref_id) {
-      // Cross-stack navigation ke HomeTab → Detail
-      nav.getParent<StackNavigationProp<HomeStackParamList>>()?.navigate('DetailLost', {
-        reportId: item.ref_id,
+      const parent = nav.getParent<StackNavigationProp<MainTabParamList>>();
+      parent?.navigate('HomeTab', {
+        screen: 'DetailLost',
+        params: { reportId: item.ref_id },
       });
     }
   };

@@ -20,7 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import StatusBadge from '@/components/StatusBadge';
 import ViaAdminBadge from '@/components/ViaAdminBadge';
 import { useAuth } from '@/context/AuthContext';
-import type { HomeStackParamList } from '@/navigation/types';
+import type { HomeStackParamList, MainTabParamList } from '@/navigation/types';
 import { getOrCreateConversation } from '@/services/chat.service';
 import { getReportById, type Report } from '@/services/report.service';
 import { COLORS } from '@/utils/constants';
@@ -327,7 +327,8 @@ export default function DetailReportScreen() {
           <Pressable
             onPress={() => {
               if (report.user_id) {
-                nav.navigate('UserProfile', { userId: report.user_id });
+                const parent = nav.getParent<StackNavigationProp<MainTabParamList>>();
+                parent?.navigate('HomeTab', { screen: 'UserProfile', params: { userId: report.user_id } });
               }
             }}
             disabled={report.created_by_admin || !report.user_id}
