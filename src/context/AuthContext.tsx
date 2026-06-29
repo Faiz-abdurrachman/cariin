@@ -29,7 +29,6 @@ interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   loginWithEmail: typeof authService.loginWithEmail;
-  loginWithGoogle: typeof authService.loginWithGoogle;
   register: typeof authService.register;
   logout: () => Promise<void>;
   resetPassword: typeof authService.resetPassword;
@@ -122,7 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       isAuthenticated: !!session,
       loginWithEmail: authService.loginWithEmail,
-      loginWithGoogle: authService.loginWithGoogle,
       register: authService.register,
       logout,
       resetPassword: authService.resetPassword,

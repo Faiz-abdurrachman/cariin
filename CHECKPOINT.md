@@ -41,7 +41,7 @@
 - **`.env`** lokal terisi (URL + ANON_KEY + ALLOWED_EMAIL_DOMAIN=`student.unu-jogja.ac.id` + APP_NAME + APP_ENV)
 - **Schema:** lihat `supabase-schema.sql` (idempotent, aman di-rerun). 5 tabel + RLS + triggers + GRANTs.
 - **Email Auth:** ✅ Enabled, **Confirm email: OFF** (dev convenience)
-- **Google OAuth:** ❌ Belum disetup (defer FASE 6)
+- **Google OAuth:** ❌ Dihapus — login hanya via email kampus (UVP domain validation)
 - **Redirect URLs deep link:** ❌ Belum dipasang di URL Configuration (defer FASE 6)
 
 ### Storage Buckets
