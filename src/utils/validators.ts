@@ -17,6 +17,7 @@ export const EMAIL_DOMAIN_ERROR = `Email harus menggunakan alamat resmi kampus (
 
 // Validator dasar password — minimal 6 karakter sesuai default Supabase Auth.
 export const isValidPassword = (password: string): boolean => {
+  if (!password) return false;
   return password.length >= 6;
 };
 

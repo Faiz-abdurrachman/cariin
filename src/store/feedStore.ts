@@ -30,8 +30,6 @@ const DEFAULT_FILTER: FeedFilter = {
   search: '',
 };
 
-// Debounce search supaya gak nge-bombardir Supabase tiap keystroke.
-let searchTimer: ReturnType<typeof setTimeout> | null = null;
 const SEARCH_DEBOUNCE_MS = 300;
 
 function toServiceFilter(f: FeedFilter): ReportFilter {
@@ -42,54 +40,56 @@ function toServiceFilter(f: FeedFilter): ReportFilter {
   };
 }
 
-export const useFeedStore = create<FeedState>((set, get) => ({
-  reports: [],
-  loading: false,
-  refreshing: false,
-  error: null,
-  filter: DEFAULT_FILTER,
+export const useFeedStore = create<FeedState>((set, get) => {
+  let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
-  async fetch() {
-    set({ loading: true, error: null });
-    try {
-      const data = await listReports(toServiceFilter(get().filter));
-      set({ reports: data, loading: false });
-    } catch (e) {
-      set({
-        loading: false,
-        error: e instanceof Error ? e.message : 'Gagal memuat laporan.',
-      });
-    }
-  },
+  return {
+    reports: [],
+    loading: false,
+    refreshing: false,
+    error: null,
+    filter: DEFAULT_FILTER,
 
-  async refresh() {
-    set({ refreshing: true, error: null });
-    try {
-      const data = await listReports(toServiceFilter(get().filter));
-      set({ reports: data, refreshing: false });
-    } catch (e) {
-      set({
-        refreshing: false,
-        error: e instanceof Error ? e.message : 'Gagal memuat laporan.',
-      });
-    }
-  },
+    async fetch() {
+      set({ loading: true, error: null });
+      try {
+        const data = await listReports(toServiceFilter(get().filter));
+        set({ reports: data, loading: false });
+      } catch (e) {
+        set({
+          loading: false,
+          error: e instanceof Error ? e.message : 'Gagal memuat laporan.',
+        });
+      }
+    },
 
-  setFilter(patch) {
-    set((s) => ({ filter: { ...s.filter, ...patch } }));
-    // Search field: debounce fetch biar cuma trigger setelah user berhenti ngetik.
-    // Filter lain (type/category): langsung fetch tanpa delay.
-    if (patch.search !== undefined) {
+    async refresh() {
+      set({ refreshing: true, error: null });
+      try {
+        const data = await listReports(toServiceFilter(get().filter));
+        set({ reports: data, refreshing: false });
+      } catch (e) {
+        set({
+          refreshing: false,
+          error: e instanceof Error ? e.message : 'Gagal memuat laporan.',
+        });
+      }
+    },
+
+    setFilter(patch) {
+      set((s) => ({ filter: { ...s.filter, ...patch } }));
       if (searchTimer) clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => void get().fetch(), SEARCH_DEBOUNCE_MS);
-    } else {
-      void get().fetch();
-    }
-  },
+      if (patch.search !== undefined && patch.search.length > 0) {
+        searchTimer = setTimeout(() => void get().fetch(), SEARCH_DEBOUNCE_MS);
+      } else {
+        void get().fetch();
+      }
+    },
 
-  clearFilter() {
-    set({ filter: DEFAULT_FILTER });
-    if (searchTimer) clearTimeout(searchTimer);
-    void get().fetch();
-  },
-}));
+    clearFilter() {
+      set({ filter: DEFAULT_FILTER });
+      if (searchTimer) clearTimeout(searchTimer);
+      void get().fetch();
+    },
+  };
+});

@@ -21,6 +21,7 @@ import StatusBadge from '@/components/StatusBadge';
 import ViaAdminBadge from '@/components/ViaAdminBadge';
 import { useAuth } from '@/context/AuthContext';
 import type { HomeStackParamList } from '@/navigation/types';
+import { getOrCreateConversation } from '@/services/chat.service';
 import { getReportById, type Report } from '@/services/report.service';
 import { COLORS } from '@/utils/constants';
 import { categoryEmoji, categoryLabel, formatFullDate } from '@/utils/formatters';
@@ -430,12 +431,24 @@ export default function DetailReportScreen() {
             </View>
           ) : canChat ? (
             <Pressable
-              onPress={() =>
-                Alert.alert(
-                  'Segera hadir',
-                  'Fitur chat akan tersedia di update berikutnya. Untuk sementara, hubungi admin via kontak resmi.',
-                )
-              }
+              onPress={async () => {
+                if (!report.user_id) {
+                  Alert.alert('Tidak dapat chat', 'Pengguna sudah tidak tersedia.');
+                  return;
+                }
+                try {
+                  const conv = await getOrCreateConversation(report.id, report.user_id);
+                  nav.navigate('ChatRoom', {
+                    conversationId: conv.id,
+                    reportId: report.id,
+                  });
+                } catch (e) {
+                  Alert.alert(
+                    'Gagal membuka chat',
+                    e instanceof Error ? e.message : 'Coba lagi nanti.',
+                  );
+                }
+              }}
             >
               {({ pressed }) => (
                 <View

@@ -5,16 +5,59 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
 import type { ProfileStackParamList } from '@/navigation/types';
+import { supabase } from '@/services/supabase';
+import { pickImageFromLibrary, takePhoto, uploadAvatar } from '@/services/upload.service';
 import { COLORS } from '@/utils/constants';
 
 export default function ProfileScreen() {
-  const { logout, userProfile } = useAuth();
+  const { logout, userProfile, refreshProfile } = useAuth();
   const nav = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  const onAvatarPress = () => {
+    if (avatarUploading || !userProfile) return;
+    Alert.alert('Foto Profil', 'Pilih sumber gambar.', [
+      {
+        text: 'Ambil Foto',
+        onPress: async () => {
+          setAvatarUploading(true);
+          const picked = await takePhoto();
+          if (picked && userProfile) {
+            const url = await uploadAvatar(picked, userProfile.id);
+            await supabase
+              .from('profiles')
+              .update({ avatar_url: url })
+              .eq('id', userProfile.id);
+            await refreshProfile();
+          }
+          setAvatarUploading(false);
+        },
+      },
+      {
+        text: 'Pilih dari Galeri',
+        onPress: async () => {
+          setAvatarUploading(true);
+          const picked = await pickImageFromLibrary();
+          if (picked && userProfile) {
+            const url = await uploadAvatar(picked, userProfile.id);
+            await supabase
+              .from('profiles')
+              .update({ avatar_url: url })
+              .eq('id', userProfile.id);
+            await refreshProfile();
+          }
+          setAvatarUploading(false);
+        },
+      },
+      { text: 'Batal', style: 'cancel' },
+    ]);
+  };
 
   const onLogout = () => {
     Alert.alert('Keluar dari Cari.In?', 'Sesi akan diakhiri.', [
@@ -57,35 +100,47 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={{ paddingTop: 24, paddingBottom: 32 }}>
         {/* Avatar + identitas */}
         <View style={{ alignItems: 'center', paddingHorizontal: 20, marginBottom: 28 }}>
-          <View
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: 999,
-              backgroundColor: '#E4E4E7',
-              borderWidth: 4,
-              borderColor: COLORS.surface,
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              marginBottom: 14,
-              shadowColor: '#000',
-              shadowOpacity: 0.08,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 4 },
-              elevation: 4,
-            }}
-          >
-            {userProfile?.avatar_url ? (
-              <Image
-                source={{ uri: userProfile.avatar_url }}
-                style={{ width: 96, height: 96 }}
-                resizeMode="cover"
-              />
-            ) : (
-              <Feather name="user" size={40} color={COLORS.textMuted} />
+          <Pressable onPress={onAvatarPress} accessibilityRole="button" accessibilityLabel="Ganti foto profil">
+            {({ pressed }) => (
+              <View
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 999,
+                  backgroundColor: '#E4E4E7',
+                  borderWidth: 4,
+                  borderColor: COLORS.surface,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  marginBottom: 14,
+                  opacity: pressed ? 0.8 : 1,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.08,
+                  shadowRadius: 10,
+                  shadowOffset: { width: 0, height: 4 },
+                  elevation: 4,
+                }}
+              >
+                {avatarUploading ? (
+                  <ActivityIndicator color={COLORS.textMuted} />
+                ) : userProfile?.avatar_url ? (
+                  <Image
+                    source={{ uri: userProfile.avatar_url }}
+                    style={{ width: 96, height: 96 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={{ alignItems: 'center' }}>
+                    <Feather name="user" size={36} color={COLORS.textMuted} />
+                    <Text style={{ fontSize: 9, color: COLORS.textMuted, marginTop: 4 }}>
+                      Tambah Foto
+                    </Text>
+                  </View>
+                )}
+              </View>
             )}
-          </View>
+          </Pressable>
           <Text
             style={{
               fontSize: 20,

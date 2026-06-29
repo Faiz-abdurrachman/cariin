@@ -1,7 +1,7 @@
 // AuthContext — single source of truth untuk status otentikasi user.
 // Subscribe Supabase auth state + sinkronkan dengan tabel `profiles` untuk dapat role.
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 
 import { supabase } from '@/services/supabase';
@@ -63,15 +63,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function loadInitial() {
-      const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
-      setSession(data.session);
-      if (data.session) {
-        const profile = await fetchProfile(data.session.user.id);
+      try {
+        const { data } = await supabase.auth.getSession();
         if (!mounted) return;
-        setUserProfile(profile);
+        setSession(data.session);
+        if (data.session) {
+          const profile = await fetchProfile(data.session.user.id);
+          if (!mounted) return;
+          setUserProfile(profile);
+        }
+      } catch {
+        // Network error atau Supabase unreachable — user tetap bisa
+        // lanjut ke AuthNavigator, nanti login balik.
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     void loadInitial();
@@ -100,12 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserProfile(null);
   };
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (session?.user.id) {
       const profile = await fetchProfile(session.user.id);
       setUserProfile(profile);
     }
-  };
+  }, [session?.user.id]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -122,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resetPassword: authService.resetPassword,
       refreshProfile,
     }),
-    [session, userProfile, isLoading],
+    [session, userProfile, isLoading, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -173,6 +173,43 @@ create trigger trg_messages_update_conversation
   after insert on public.messages
   for each row execute function public.update_conversation_last_message();
 
+-- Notifikasi ke receiver saat ada pesan baru masuk.
+create or replace function public.notify_new_message() returns trigger as $$
+declare
+  v_receiver_id uuid;
+  v_sender_name text;
+begin
+  select case
+    when c.user_a_id = new.sender_id then c.user_b_id
+    else c.user_a_id
+  end into v_receiver_id
+  from public.conversations c
+  where c.id = new.conversation_id;
+
+  select name into v_sender_name
+  from public.profiles
+  where id = new.sender_id;
+
+  if v_receiver_id is not null then
+    insert into public.notifications (user_id, type, title, body, ref_id)
+    values (
+      v_receiver_id,
+      'new_message',
+      'Pesan Baru',
+      coalesce(v_sender_name, 'Seseorang') || ': ' || left(new.content, 80),
+      new.conversation_id
+    );
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+drop trigger if exists trg_notify_new_message on public.messages;
+create trigger trg_notify_new_message
+  after insert on public.messages
+  for each row execute function public.notify_new_message();
+
 -- ============================================================================
 -- 4. HELPER FUNCTIONS (untuk RLS)
 -- ============================================================================

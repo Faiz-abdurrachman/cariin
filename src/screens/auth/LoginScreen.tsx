@@ -22,7 +22,7 @@ type Route = RouteProp<AuthStackParamList, 'Login'>;
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
-  const { loginWithEmail } = useAuth();
+  const { loginWithEmail, loginWithGoogle } = useAuth();
   const isAdmin = !!route.params?.isAdmin;
   const variant = isAdmin ? 'admin' : 'default';
 
@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const [emailError, setEmailError] = useState<string | undefined>();
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   function validate(): boolean {
     let valid = true;
@@ -66,6 +67,20 @@ export default function LoginScreen() {
       setLoading(false);
     }
   }
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (e) {
+      Alert.alert(
+        'Gagal login Google',
+        e instanceof Error ? e.message : 'Coba lagi nanti.',
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
@@ -210,6 +225,62 @@ export default function LoginScreen() {
               />
             </View>
           </View>
+
+          {!isAdmin ? (
+            <View style={{ marginTop: 24 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}
+              >
+                <View style={{ flex: 1, height: 1, backgroundColor: COLORS.border }} />
+                <Text
+                  style={{
+                    marginHorizontal: 12,
+                    fontSize: 12,
+                    color: COLORS.textMuted,
+                    fontWeight: '600',
+                  }}
+                >
+                  atau
+                </Text>
+                <View style={{ flex: 1, height: 1, backgroundColor: COLORS.border }} />
+              </View>
+              <Pressable onPress={handleGoogleLogin} disabled={googleLoading}>
+                {({ pressed }) => (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingVertical: 14,
+                      borderRadius: 16,
+                      backgroundColor: '#FFFFFF',
+                      borderWidth: 1,
+                      borderColor: '#E4E4E7',
+                      gap: 10,
+                      opacity: pressed || googleLoading ? 0.7 : 1,
+                    }}
+                  >
+                    <Ionicons name="logo-google" size={20} />
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: '700',
+                        color: COLORS.primary,
+                      }}
+                    >
+                      {googleLoading
+                        ? 'Menghubungkan...'
+                        : 'Masuk dengan Google'}
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+            </View>
+          ) : null}
 
           {/* Footer (mahasiswa only) */}
           {!isAdmin ? (

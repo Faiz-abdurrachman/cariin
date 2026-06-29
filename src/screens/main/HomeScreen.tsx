@@ -21,6 +21,7 @@ import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ReportCard from '@/components/ReportCard';
 import { useAuth } from '@/context/AuthContext';
+import { useNotif } from '@/context/NotifContext';
 import type { HomeStackParamList } from '@/navigation/types';
 import { useFeedStore } from '@/store/feedStore';
 import { COLORS } from '@/utils/constants';
@@ -36,6 +37,7 @@ const TYPE_FILTERS: { value: 'all' | 'lost' | 'found'; label: string }[] = [
 export default function HomeScreen() {
   const nav = useNavigation<Nav>();
   const { userProfile } = useAuth();
+  const { unread } = useNotif();
   const { reports, loading, refreshing, error, filter, fetch, refresh, setFilter } =
     useFeedStore();
 
@@ -131,6 +133,34 @@ export default function HomeScreen() {
                     ) : (
                       <Feather name="bell" size={20} color={COLORS.primary} />
                     )}
+                    {unread > 0 ? (
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          minWidth: 18,
+                          height: 18,
+                          borderRadius: 999,
+                          backgroundColor: '#EF4444',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingHorizontal: 4,
+                          borderWidth: 1.5,
+                          borderColor: COLORS.surface,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#FFFFFF',
+                            fontSize: 10,
+                            fontWeight: '800',
+                          }}
+                        >
+                          {unread > 99 ? '99+' : unread}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                 )}
               </Pressable>
