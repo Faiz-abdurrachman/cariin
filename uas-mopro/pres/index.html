@@ -4,606 +4,420 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Cari.In - Presentation</title>
+    <title>Cari.In - Campus Lost & Found</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
     
-    <!-- Google Fonts: Space Grotesk for bold, unique headings; Plus Jakarta Sans for body -->
+    <!-- Google Fonts: Clash Display & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700,400&display=swap" rel="stylesheet">
     
-    <!-- Phosphor Icons (Sleek Icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         :root {
-            /* Hyper-modern Light Theme */
-            --bg-color: #F3F4F6;
-            --text-color: #111827;
-            --text-muted: #6B7280;
-            
-            --blue: #2563EB;
-            --teal: #0D9488;
-            --emerald: #059669;
+            /* Warna solid, no gradient, no bullshit */
+            --black: #0A0A0A;
+            --white: #FDFDFD;
+            --blue: #1D4ED8;
             --orange: #EA580C;
+            --emerald: #047857;
+            --teal: #0F766E;
+            --yellow: #FACC15;
             
-            --card-bg: #FFFFFF;
-            --card-border: #E5E7EB;
+            --heading-font: 'Clash Display', sans-serif;
+            --body-font: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            background-color: var(--black);
         }
 
-        /* Override Reveal Default Scaling for HD */
+        /* Override Reveal Default */
         .reveal .slides {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            text-align: left; /* Default to left alignment */
-        }
-        
-        .reveal .slide-background {
-            background-color: var(--bg-color) !important;
+            font-family: var(--body-font);
+            text-align: left; 
         }
 
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
-            font-family: 'Space Grotesk', sans-serif;
-            text-transform: none;
-            letter-spacing: -0.04em;
-            color: var(--text-color);
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal p {
             margin: 0;
-            font-weight: 700;
+            color: inherit;
         }
 
-        .reveal h1 { font-size: 6rem; line-height: 1.1; margin-bottom: 20px; }
-        .reveal h2 { font-size: 3.5rem; line-height: 1.2; margin-bottom: 40px; }
-        .reveal h3 { font-size: 1.5rem; color: var(--text-muted); font-weight: 600; margin-bottom: 15px; letter-spacing: -0.01em; text-transform: uppercase; }
-
-        /* Custom Bento Box / Editorial Cards */
-        .bento-card {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            border-radius: 32px;
-            padding: 40px;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+        .reveal h1 { 
+            font-family: var(--heading-font);
+            font-weight: 700;
+            font-size: 8.5rem; 
+            line-height: 0.95; 
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
         }
         
-        .bento-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
-            border-color: #D1D5DB;
+        .reveal h2 { 
+            font-family: var(--heading-font);
+            font-weight: 600;
+            font-size: 5.5rem; 
+            line-height: 1.1; 
+            letter-spacing: -0.02em;
+            margin-bottom: 40px;
+        }
+        
+        .reveal h3 { 
+            font-family: var(--heading-font);
+            font-weight: 600;
+            font-size: 3.5rem; 
+            line-height: 1.2;
+            margin-bottom: 20px;
         }
 
-        .bento-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .bento-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .bento-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+        .reveal p {
+            font-family: var(--body-font);
+            font-size: 2.2rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
 
-        .stat-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 4.5rem;
+        .tagline {
+            font-family: var(--body-font);
+            font-size: 2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        /* Slide layout khusus (Apple Style / Swiss Minimalist) */
+        .slide-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 120px;
+            box-sizing: border-box;
+        }
+
+        .slide-wrapper.center-all {
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Helper text sizing */
+        .text-huge { font-size: 14rem !important; line-height: 0.9 !important; }
+        .text-accent { font-family: var(--heading-font); color: var(--yellow); }
+        .text-muted-dark { color: rgba(255,255,255,0.5); }
+        .text-muted-light { color: rgba(0,0,0,0.5); }
+
+        /* Asymmetric Layouts (Anti-AI Grid) */
+        .split-screen {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .split-left { flex: 1; }
+        .split-right { flex: 1; }
+
+        .stat-block {
+            border-left: 8px solid currentColor;
+            padding-left: 40px;
+            margin: 40px 0;
+        }
+
+        .stat-block .number {
+            font-family: var(--heading-font);
+            font-size: 8rem;
             font-weight: 700;
             line-height: 1;
             margin-bottom: 10px;
-            letter-spacing: -0.05em;
-        }
-        
-        .stat-label {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            font-weight: 600;
         }
 
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            border-radius: 100px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            color: var(--text-color);
-        }
-
-        .icon-box {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 20px;
-            font-size: 2rem;
-            margin-bottom: 24px;
-        }
-
-        p.body-text {
-            font-size: 1.4rem;
-            line-height: 1.6;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* Specific Accents */
-        .c-blue { color: var(--blue); }
-        .c-teal { color: var(--teal); }
-        .c-orange { color: var(--orange); }
-        .c-emerald { color: var(--emerald); }
-
-        .bg-blue { background: #DBEAFE; color: var(--blue); }
-        .bg-teal { background: #CCFBF1; color: var(--teal); }
-        .bg-orange { background: #FFEDD5; color: var(--orange); }
-        .bg-emerald { background: #D1FAE5; color: var(--emerald); }
-        
-        .border-blue { border-color: var(--blue) !important; }
-        .border-teal { border-color: var(--teal) !important; }
-
-        .code-window {
-            background: #111827;
-            border-radius: 24px;
-            padding: 40px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.2rem;
-            line-height: 1.7;
-            color: #F3F4F6;
-            text-align: left;
-            overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
-        }
-
-        .code-window span.keyword { color: #F87171; }
-        .code-window span.function { color: #60A5FA; }
-        .code-window span.string { color: #34D399; }
-        .code-window span.comment { color: #9CA3AF; }
-
-        ul.feature-list {
+        /* Custom ul / list - no boring bullets */
+        ul.clean {
             list-style: none;
             padding: 0;
             margin: 0;
         }
         
-        ul.feature-list li {
-            position: relative;
-            padding-left: 45px;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+        ul.clean li {
+            font-size: 2.5rem;
+            font-family: var(--heading-font);
             font-weight: 500;
-            color: var(--text-color);
-        }
-        
-        ul.feature-list li i {
-            position: absolute;
-            left: 0;
-            top: 4px;
-            font-size: 1.8rem;
-        }
-
-        /* Navigation */
-        .reveal .controls { color: var(--text-color) !important; }
-        .reveal .progress { height: 6px !important; color: var(--text-color) !important; background: var(--card-border) !important; }
-
-        /* Slide wrappers for consistent padding */
-        .slide-content {
-            padding: 40px 60px;
-            height: 100%;
+            margin-bottom: 24px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            opacity: 0.9;
         }
 
-        /* Highlight mark */
-        mark {
-            background-color: transparent;
-            color: var(--blue);
-            position: relative;
+        /* Pill / Badges minimalis */
+        .pill-solid {
+            display: inline-block;
+            background: currentColor;
+            color: var(--black);
+            padding: 10px 30px;
+            border-radius: 100px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: var(--heading-font);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        /* Override Reveal navigation */
+        .reveal .controls { display: none !important; } /* Sembunyikan panah bawaan, buat clean */
+        .reveal .progress { height: 8px !important; color: var(--yellow) !important; background: rgba(255,255,255,0.1) !important; }
+        
+        /* Gambar / Dekorasi minimalis */
+        .circle-decor {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: var(--yellow);
+            position: absolute;
+            right: -100px;
+            top: -100px;
+            z-index: -1;
+            opacity: 0.9;
+        }
+
+        .photo-frame {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            transform: rotate(3deg);
             display: inline-block;
         }
-        mark::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: #DBEAFE;
-            z-index: -1;
-            transform: rotate(-1deg);
-        }
-        
-        .bento-img {
-            width: 100%;
-            height: 120px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
 
+        /* Tech stack typography */
+        .tech-word {
+            font-family: var(--heading-font);
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            display: block;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding: 20px 0;
+        }
     </style>
 </head>
 <body>
     <div class="reveal">
         <div class="slides">
 
-            <!-- Slide 1: Cover -->
-            <section>
-                <div class="slide-content" style="text-align: center; justify-content: center;">
-                    <div style="display: flex; justify-content: center; margin-bottom: 30px;">
-                        <div style="background: var(--text-color); color: #fff; width: 100px; height: 100px; border-radius: 32px; display: flex; align-items: center; justify-content: center; font-size: 3rem; transform: rotate(-5deg);">
-                            <i class="ph ph-magnifying-glass"></i>
-                        </div>
-                    </div>
+            <!-- 1. Intro -->
+            <section data-background-color="var(--blue)">
+                <div class="slide-wrapper center-all" style="color: var(--white);">
+                    <div style="font-size: 2rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Tugas Mobile Programming</div>
+                    <h1>Cari.In</h1>
+                    <p class="tagline" style="font-size: 2.8rem; font-weight: 500; margin-top: 20px;">Sistem "Hilang & Temu" kampus<br>yang seharusnya ada dari dulu.</p>
                     
-                    <h1 style="font-size: 8rem;">Cari.In</h1>
-                    <p style="font-size: 2.2rem; font-weight: 500; color: var(--text-muted); margin-bottom: 60px;">Campus Lost & Found Platform.</p>
-                    
-                    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                        <div class="pill"><i class="ph ph-buildings"></i> UNU Yogyakarta</div>
-                        <div class="pill"><i class="ph ph-device-mobile"></i> Mobile Programming</div>
-                        <div class="pill"><i class="ph ph-user"></i> Faiz Abdurrachman</div>
+                    <div style="margin-top: 80px; display: flex; gap: 40px; opacity: 0.6; font-size: 1.5rem; justify-content: center;">
+                        <span>Faiz Abdurrachman</span>
+                        <span>•</span>
+                        <span>UNU Yogyakarta</span>
+                        <span>•</span>
+                        <span>Semester 4</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 2: Problem -->
-            <section>
-                <div class="slide-content">
-                    <h3>The Problem</h3>
-                    <h2>Realitas di <mark>Lapangan</mark></h2>
-                    <p class="body-text" style="margin-bottom: 50px; max-width: 800px;">Mahasiswa kehilangan barang. Grup WhatsApp menjadi sarana utama, namun menimbulkan berbagai masalah operasional dan privasi.</p>
-                    
-                    <div class="bento-grid-3">
-                        <div class="bento-card fragment fade-up">
-                            <div class="icon-box bg-orange"><i class="ph ph-chat-teardrop-slash"></i></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 15px;">Informasi Tenggelam</h4>
-                            <p class="body-text" style="font-size: 1.2rem;">Laporan barang hilang di grup WA tertumpuk oleh obrolan lain. Sulit dilacak dan tidak ada sistem pencarian yang terstruktur.</p>
-                        </div>
-                        <div class="bento-card fragment fade-up" data-fragment-index="1">
-                            <div class="icon-box bg-blue"><i class="ph ph-mask-sad"></i></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 15px;">Klaim Palsu</h4>
-                            <p class="body-text" style="font-size: 1.2rem;">Tanpa sistem verifikasi identitas, siapa saja di grup publik dapat mengaku sebagai pemilik barang yang ditemukan.</p>
-                        </div>
-                        <div class="bento-card fragment fade-up" data-fragment-index="2">
-                            <div class="icon-box bg-teal"><i class="ph ph-eye-slash"></i></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 15px;">Privasi Terancam</h4>
-                            <p class="body-text" style="font-size: 1.2rem;">Nomor handphone pelapor langsung terekspos ke ratusan orang di grup publik, berpotensi memicu spam atau penyalahgunaan.</p>
-                        </div>
-                    </div>
+            <!-- 2. Problem Statement (Punchy) -->
+            <section data-background-color="var(--black)">
+                <div class="slide-wrapper" style="color: var(--white);">
+                    <div class="pill-solid" style="color: var(--black); background: var(--white);">Realitas saat ini</div>
+                    <h2>Grup WhatsApp itu untuk ngobrol.</h2>
+                    <h2 class="text-muted-dark">Bukan untuk nyari kunci motor yang hilang.</h2>
                 </div>
             </section>
 
-            <!-- Slide 3: Validation -->
-            <section>
-                <div class="slide-content">
-                    <h3>Market Validation</h3>
-                    <h2>Survei <mark>39 Mahasiswa</mark></h2>
-                    
-                    <div class="bento-grid-3" style="margin: 40px 0;">
-                        <div class="bento-card text-center fragment zoom-in" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div class="stat-value c-orange">51%</div>
-                            <div class="stat-label">Pernah Kehilangan Barang</div>
-                        </div>
-                        <div class="bento-card text-center fragment zoom-in" data-fragment-index="1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div class="stat-value c-blue">67%</div>
-                            <div class="stat-label">Mencari via Satpam Kampus</div>
-                        </div>
-                        <div class="bento-card text-center fragment zoom-in" data-fragment-index="2" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div class="stat-value c-emerald">82%</div>
-                            <div class="stat-label">Nyaman Pakai Email Kampus</div>
-                        </div>
-                    </div>
-
-                    <div class="bento-card fragment fade-up" style="padding: 30px 40px; display: flex; align-items: center; justify-content: space-between; background: var(--text-color); color: white;">
-                        <h4 style="font-size: 1.4rem; margin: 0; color: #9CA3AF; font-weight: 500;">Barang Paling Sering Hilang:</h4>
-                        <div style="display: flex; gap: 20px;">
-                            <span style="font-size: 1.2rem; font-weight: 600;"><i class="ph ph-key c-blue"></i> Kunci (40%)</span>
-                            <span style="font-size: 1.2rem; font-weight: 600;"><i class="ph ph-plug-charging c-teal"></i> Charger (35%)</span>
-                            <span style="font-size: 1.2rem; font-weight: 600;"><i class="ph ph-wallet c-orange"></i> Dompet (30%)</span>
-                            <span style="font-size: 1.2rem; font-weight: 600;"><i class="ph ph-headphones c-emerald"></i> Earphone (25%)</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 4: UVP -->
-            <section>
-                <div class="slide-content">
-                    <h3>Unique Value Proposition</h3>
-                    <h2>Apa yang <mark>Berbeda?</mark></h2>
-                    
-                    <div class="bento-grid-3" style="margin-top: 40px;">
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-blue"><i class="ph ph-envelope-simple"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">Domain Email</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Registrasi hanya menggunakan @student.unu-jogja.ac.id. Identitas terjamin.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-teal"><i class="ph ph-shield-check"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">Admin Moderation</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Laporan difilter (Approve/Reject) sebelum tayang untuk mencegah spam.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-blue"><i class="ph ph-chats"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">In-App Chat</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Komunikasi realtime aman tanpa perlu bertukar nomor WhatsApp.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-emerald"><i class="ph ph-map-pin"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">Titik Penitipan</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Informasi lokasi fisik (Pos Satpam/Fakultas) tempat barang diamankan.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-orange"><i class="ph ph-palette"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">Visual Intuitif</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Orange untuk label Hilang, Emerald untuk Ditemukan. Mata cepat mengenali.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <div class="icon-box bg-teal"><i class="ph ph-user-plus"></i></div>
-                            <h4 style="font-size: 1.6rem; margin-bottom: 10px;">Walk-in Report</h4>
-                            <p class="body-text" style="font-size: 1.15rem;">Fitur bagi satpam untuk input manual jika mahasiswa lapor langsung secara fisik.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Slide 5: Tech Stack -->
-            <section>
-                <div class="slide-content">
-                    <h3>Architecture</h3>
-                    <h2>Tech <mark>Stack</mark></h2>
-                    
-                    <div class="bento-grid-3" style="margin-top: 40px;">
-                        <div class="bento-card border-blue" style="border-width: 3px;">
-                            <div class="icon-box bg-blue"><i class="ph ph-device-mobile"></i></div>
-                            <h4 style="font-size: 2rem; margin-bottom: 20px;">Frontend</h4>
-                            <ul class="feature-list">
-                                <li><i class="ph ph-check-circle c-blue"></i>React Native 0.81</li>
-                                <li><i class="ph ph-check-circle c-blue"></i>Expo SDK 54</li>
-                                <li><i class="ph ph-check-circle c-blue"></i>TypeScript 5.9</li>
-                                <li><i class="ph ph-check-circle c-blue"></i>NativeWind v4</li>
+            <!-- 3. Problem Impact -->
+            <section data-background-color="var(--white)">
+                <div class="slide-wrapper" style="color: var(--black);">
+                    <div class="split-screen">
+                        <div class="split-left">
+                            <h2 style="font-size: 4.5rem;">Kalau pakai WA:</h2>
+                            <ul class="clean" style="margin-top: 40px;">
+                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Info ketumpuk chat lain.</li>
+                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Privasi (nomor HP) terekspos.</li>
+                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Rawan orang ngaku-ngaku (klaim palsu).</li>
                             </ul>
                         </div>
-                        <div class="bento-card border-teal" style="border-width: 3px;">
-                            <div class="icon-box bg-teal"><i class="ph ph-database"></i></div>
-                            <h4 style="font-size: 2rem; margin-bottom: 20px;">Backend</h4>
-                            <ul class="feature-list">
-                                <li><i class="ph ph-check-circle c-teal"></i>Supabase Auth</li>
-                                <li><i class="ph ph-check-circle c-teal"></i>PostgreSQL</li>
-                                <li><i class="ph ph-check-circle c-teal"></i>Storage Buckets</li>
-                                <li><i class="ph ph-check-circle c-teal"></i>Realtime DB</li>
-                            </ul>
-                        </div>
-                        <div class="bento-card" style="border-color: var(--text-color); border-width: 3px;">
-                            <div class="icon-box" style="background: var(--text-color); color: white;"><i class="ph ph-cpu"></i></div>
-                            <h4 style="font-size: 2rem; margin-bottom: 20px;">State & Build</h4>
-                            <ul class="feature-list">
-                                <li><i class="ph ph-check-circle" style="color: var(--text-color)"></i>Zustand v5</li>
-                                <li><i class="ph ph-check-circle" style="color: var(--text-color)"></i>React Nav v7</li>
-                                <li><i class="ph ph-check-circle" style="color: var(--text-color)"></i>EAS Cloud Build</li>
-                                <li><i class="ph ph-check-circle" style="color: var(--text-color)"></i>ESLint v9 Flat</li>
-                            </ul>
+                        <div class="split-right" style="background: var(--black); color: var(--white); padding: 80px; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                            <h3 style="color: var(--yellow);">Masa depan kok masih manual?</h3>
+                            <p style="opacity: 0.8; font-size: 1.8rem;">Mahasiswa butuh kepastian. Kehilangan barang bikin panik, sistem yang berantakan bikin makin stres.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 6: Database & Security -->
-            <section>
-                <div class="slide-content">
-                    <div class="bento-grid-2">
-                        <!-- Database Box -->
-                        <div>
-                            <h3>Database Design</h3>
-                            <h2 style="font-size: 3rem;">5 Tabel Inti</h2>
-                            
-                            <div class="bento-card" style="margin-bottom: 30px; padding: 30px;">
-                                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                                    <div class="pill"><i class="ph ph-user"></i> profiles</div>
-                                    <div class="pill"><i class="ph ph-file-text"></i> reports</div>
-                                    <div class="pill"><i class="ph ph-chats"></i> conversations</div>
-                                    <div class="pill"><i class="ph ph-chat-teardrop-text"></i> messages</div>
-                                    <div class="pill"><i class="ph ph-bell"></i> notifications</div>
-                                </div>
-                            </div>
-                            
-                            <div class="bento-card" style="padding: 30px;">
-                                <h4 style="font-size: 1.5rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><i class="ph ph-lightning c-orange"></i> Auto Triggers</h4>
-                                <p class="body-text" style="font-size: 1.15rem; margin-bottom: 10px;">• Create profile otomatis pasca register</p>
-                                <p class="body-text" style="font-size: 1.15rem; margin-bottom: 10px;">• Update timestamp <code>last_message</code> chat</p>
-                                <p class="body-text" style="font-size: 1.15rem;">• Insert notifikasi untuk penerima pesan</p>
-                            </div>
+            <!-- 4. Data Validation -->
+            <section data-background-color="var(--orange)">
+                <div class="slide-wrapper" style="color: var(--white);">
+                    <div class="pill-solid" style="color: var(--orange); background: var(--white);">Fakta Lapangan</div>
+                    <h2>Kita tanya ke 39 anak kampus...</h2>
+                    
+                    <div style="display: flex; gap: 80px; margin-top: 60px;">
+                        <div class="stat-block">
+                            <div class="number">51%</div>
+                            <p>Pernah kehilangan barang di kampus.</p>
+                        </div>
+                        <div class="stat-block">
+                            <div class="number">67%</div>
+                            <p>Larinya minta tolong ke Satpam.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Solution -->
+            <section data-background-color="var(--emerald)">
+                <div class="slide-wrapper center-all" style="color: var(--white);">
+                    <h2>Jawabannya ada di <span style="color: var(--yellow);">Cari.In</span>.</h2>
+                    <p style="max-width: 900px; font-size: 2.5rem; line-height: 1.6;">Platform terpusat khusus mahasiswa. Aman, terverifikasi, dan langsung hubungi penemu tanpa perlu sebar nomor pribadi.</p>
+                </div>
+            </section>
+
+            <!-- 6. UVP (No grid, just bold statements) -->
+            <section data-background-color="var(--black)">
+                <div class="slide-wrapper" style="color: var(--white);">
+                    <div class="pill-solid" style="color: var(--black); background: var(--yellow);">Kenapa Beda?</div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="padding: 40px 0; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">1.</span> Khusus Email Kampus</h3>
+                            <p class="text-muted-dark">Wajib pakai @student.unu-jogja.ac.id. Identitas 100% valid, gak ada akun bodong.</p>
                         </div>
                         
-                        <!-- Security Box -->
-                        <div class="fragment">
-                            <h3>Security Layer</h3>
-                            <h2 style="font-size: 3rem;"><mark>Row Level Security</mark></h2>
-                            
-                            <div class="code-window" style="margin-top: 20px;">
-<span class="comment">-- Mahasiswa hanya akses laporan publik</span>
-<span class="comment">-- atau laporan miliknya sendiri</span>
-<span class="keyword">CREATE POLICY</span> reports_public <span class="keyword">ON</span> reports
-<span class="keyword">FOR SELECT USING</span> (
-  status <span class="keyword">IN</span> (<span class="string">'approved'</span>, <span class="string">'resolved'</span>)
-  <span class="keyword">OR</span> user_id = <span class="function">auth.uid()</span>
-  <span class="keyword">OR</span> <span class="function">public.is_admin()</span>
-);
+                        <div style="padding: 40px 0; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">2.</span> Chat In-App Realtime</h3>
+                            <p class="text-muted-dark">Langsung ngobrol di dalam aplikasi. Nomor WhatsApp kamu tetap rahasia.</p>
+                        </div>
 
-<span class="comment">-- Admin bypass RLS via RPC</span>
-<span class="keyword">CREATE FUNCTION</span> <span class="function">update_status(...)</span>
-<span class="keyword">SECURITY DEFINER</span>;
-                            </div>
+                        <div style="padding: 40px 0;">
+                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">3.</span> Satpam Punya Akses</h3>
+                            <p class="text-muted-dark">Mahasiswa bisa lapor langsung ke pos, satpam yang bantu input ke sistem.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 7: Features UI -->
-            <section>
-                <div class="slide-content">
-                    <h3>App Capabilities</h3>
-                    <h2><mark>Dual Role</mark> Experience</h2>
+            <!-- 7. Design System Psychology -->
+            <section data-background-color="var(--white)">
+                <div class="slide-wrapper" style="color: var(--black); position: relative; overflow: hidden;">
+                    <div class="circle-decor"></div>
+                    <h2>Desain <br>Bukan Cuma Kosmetik.</h2>
+                    <p style="max-width: 700px; margin-bottom: 60px;">Kita pakai pendekatan psikologi warna <strong>"Calm Campus"</strong>.</p>
                     
-                    <div class="bento-grid-2" style="margin-top: 30px;">
-                        <div class="bento-card border-blue" style="border-width: 4px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                                <h4 style="font-size: 2.2rem; margin: 0;">Mahasiswa</h4>
-                                <div class="pill bg-blue" style="border: none;">11 Fitur</div>
-                            </div>
-                            <ul class="feature-list">
-                                <li><i class="ph ph-check c-blue"></i> Feed publik & pencarian filter terpadu</li>
-                                <li><i class="ph ph-check c-blue"></i> Form laporan detail + Wajib Upload Foto</li>
-                                <li><i class="ph ph-check c-blue"></i> Chat realtime in-app dengan penemu</li>
-                                <li><i class="ph ph-check c-blue"></i> Kelola laporan mandiri (Edit/Hapus)</li>
-                                <li><i class="ph ph-check c-blue"></i> Notifikasi update status laporan</li>
-                            </ul>
+                    <div style="display: flex; gap: 30px; margin-top: 40px;">
+                        <div style="flex: 1;">
+                            <div style="background: var(--blue); height: 150px; margin-bottom: 20px;"></div>
+                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Blue (Utama)</h4>
+                            <p class="text-muted-light" style="font-size: 1.5rem;">Menurunkan detak jantung & panik.</p>
                         </div>
-                        <div class="bento-card border-teal" style="border-width: 4px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                                <h4 style="font-size: 2.2rem; margin: 0;">Administrator</h4>
-                                <div class="pill bg-teal" style="border: none;">6 Fitur</div>
-                            </div>
-                            <ul class="feature-list">
-                                <li><i class="ph ph-check c-teal"></i> Dashboard overview & statistik</li>
-                                <li><i class="ph ph-check c-teal"></i> Moderasi: Approve/Reject laporan</li>
-                                <li><i class="ph ph-check c-teal"></i> Walk-in manual input (atas nama mhs)</li>
-                                <li><i class="ph ph-check c-teal"></i> Chat intervensi langsung dengan pelapor</li>
-                                <li><i class="ph ph-check c-teal"></i> Auto-notify mahasiswa pasca moderasi</li>
-                            </ul>
+                        <div style="flex: 1;">
+                            <div style="background: var(--orange); height: 150px; margin-bottom: 20px;"></div>
+                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Soft Orange</h4>
+                            <p class="text-muted-light" style="font-size: 1.5rem;">Urgensi, tapi tidak bikin stres seperti merah.</p>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="background: var(--emerald); height: 150px; margin-bottom: 20px;"></div>
+                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Emerald</h4>
+                            <p class="text-muted-light" style="font-size: 1.5rem;">Simbol barang ditemukan (Relief).</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 8: Realtime Engine -->
-            <section>
-                <div class="slide-content">
-                    <h3>Realtime Engine</h3>
-                    <h2>Supabase <mark>WebSockets</mark></h2>
+            <!-- 8. Tech Stack (Raw Typography) -->
+            <section data-background-color="var(--blue)">
+                <div class="slide-wrapper" style="color: var(--white);">
+                    <p style="font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px;">Mesin di Balik Layar</p>
                     
-                    <div class="code-window" style="margin-bottom: 30px;">
-<span class="comment">// Subscribe event spesifik secara live tanpa reload halaman</span>
-<span class="keyword">const</span> channel = supabase
-  .<span class="function">channel</span>(<span class="string">`messages:${conversationId}`</span>)
-  .<span class="function">on</span>(
-    <span class="string">'postgres_changes'</span>,
-    { event: <span class="string">'INSERT'</span>, schema: <span class="string">'public'</span>, table: <span class="string">'messages'</span> },
-    (payload) => <span class="function">addMessageToState</span>(payload.new)
-  ).<span class="function">subscribe</span>();
-                    </div>
-
-                    <div class="bento-grid-3">
-                        <div class="bento-card fragment">
-                            <h4 class="c-blue" style="font-size: 1.4rem; margin-bottom: 10px;">postgres_changes</h4>
-                            <p class="body-text" style="font-size: 1.1rem;">Listen spesifik pada event INSERT di level database PostgreSQL.</p>
+                    <div style="display: flex; gap: 100px;">
+                        <div style="flex: 1;">
+                            <span class="tech-word">React Native 0.81</span>
+                            <span class="tech-word">Expo SDK 54</span>
+                            <span class="tech-word">NativeWind v4</span>
+                            <span class="tech-word">Zustand State</span>
                         </div>
-                        <div class="bento-card fragment">
-                            <h4 class="c-teal" style="font-size: 1.4rem; margin-bottom: 10px;">DB Trigger Hook</h4>
-                            <p class="body-text" style="font-size: 1.1rem;">Insert pesan otomatis men-trigger notifikasi dan update badge bell.</p>
-                        </div>
-                        <div class="bento-card fragment">
-                            <h4 class="c-emerald" style="font-size: 1.4rem; margin-bottom: 10px;">useFocusEffect</h4>
-                            <p class="body-text" style="font-size: 1.1rem;">Koneksi websocket hanya aktif saat layar ChatRoom sedang dibuka (hemat memori).</p>
+                        <div style="flex: 1;">
+                            <span class="tech-word">Supabase Auth</span>
+                            <span class="tech-word">PostgreSQL</span>
+                            <span class="tech-word">Realtime WebSockets</span>
+                            <span class="tech-word">EAS Cloud Build</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 9: Stats -->
-            <section>
-                <div class="slide-content">
-                    <h3>Production Ready</h3>
-                    <h2>Capaian <mark>Proyek</mark></h2>
+            <!-- 9. Security (Database) -->
+            <section data-background-color="var(--black)">
+                <div class="slide-wrapper" style="color: var(--white);">
+                    <div class="pill-solid" style="color: var(--black); background: var(--white);">Keamanan Database</div>
+                    <h2>Data kamu <br>nggak bisa diintip.</h2>
                     
-                    <div class="bento-grid-4" style="margin: 40px 0;">
-                        <div class="bento-card text-center fragment zoom-in">
-                            <div class="stat-value c-text">26</div>
-                            <div class="stat-label">Screens UI</div>
-                        </div>
-                        <div class="bento-card text-center fragment zoom-in" data-fragment-index="1">
-                            <div class="stat-value c-blue">17</div>
-                            <div class="stat-label">Fitur Utama</div>
-                        </div>
-                        <div class="bento-card text-center fragment zoom-in" data-fragment-index="2">
-                            <div class="stat-value c-teal">4</div>
-                            <div class="stat-label">Layer Security</div>
-                        </div>
-                        <div class="bento-card text-center fragment zoom-in" data-fragment-index="3">
-                            <div class="stat-value c-emerald">0</div>
-                            <div class="stat-label">Error / Warning</div>
-                        </div>
-                    </div>
+                    <p style="max-width: 900px; font-size: 2.2rem; color: var(--yellow); margin-top: 40px;">Menggunakan RLS (Row Level Security).</p>
+                    <p class="text-muted-dark" style="max-width: 900px; margin-top: 20px;">Mahasiswa hanya bisa mengedit laporannya sendiri. Laporan milik orang lain hanya bisa dilihat jika sudah di-approve oleh admin. Admin menggunakan RPC (Remote Procedure Call) untuk intervensi aman.</p>
+                </div>
+            </section>
 
-                    <div class="bento-card fragment fade-up" style="background: var(--text-color); color: white; display: flex; align-items: center; justify-content: center; gap: 40px;">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <i class="ph ph-check-circle" style="font-size: 2.5rem; color: #34D399;"></i>
-                            <h4 style="color: white; font-size: 1.6rem; margin: 0;">expo-doctor 18/18 Passed</h4>
+            <!-- 10. The Realtime Engine -->
+            <section data-background-color="var(--yellow)">
+                <div class="slide-wrapper center-all" style="color: var(--black);">
+                    <h1 class="text-huge">Instan.</h1>
+                    <p style="font-size: 3rem; margin-top: 30px;">Chat masuk detik itu juga tanpa perlu <em>refresh</em>.</p>
+                    <p style="font-size: 1.8rem; margin-top: 20px; opacity: 0.8; max-width: 800px;">Supabase <code style="background: var(--black); color: var(--yellow); padding: 5px 15px;">postgres_changes</code> secara konstan me-listen setiap <em>INSERT</em> pesan baru, langsung memicu notifikasi <em>in-app</em> ke penerima.</p>
+                </div>
+            </section>
+
+            <!-- 11. Results/Conclusion -->
+            <section data-background-color="var(--white)">
+                <div class="slide-wrapper" style="color: var(--black);">
+                    <h2>Hasil Akhir? <br>Aplikasi Matang.</h2>
+                    
+                    <div style="display: flex; gap: 40px; margin-top: 60px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h1 style="color: var(--blue);">26</h1>
+                            <p style="font-size: 1.8rem; font-weight: 600;">Screen UI di-desain rapi.</p>
                         </div>
-                        <div style="width: 2px; height: 40px; background: #374151;"></div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <i class="ph ph-android-logo" style="font-size: 2.5rem; color: #34D399;"></i>
-                            <h4 style="color: white; font-size: 1.6rem; margin: 0;">APK Production (76MB)</h4>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h1 style="color: var(--teal);">17</h1>
+                            <p style="font-size: 1.8rem; font-weight: 600;">Fitur Utama berfungsi.</p>
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h1 style="color: var(--orange);">0</h1>
+                            <p style="font-size: 1.8rem; font-weight: 600;">Error pada Expo Doctor.</p>
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h1 style="color: var(--emerald);">76<span style="font-size: 4rem;">MB</span></h1>
+                            <p style="font-size: 1.8rem; font-weight: 600;">APK Production Ready.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 10: Demo -->
-            <section>
-                <div class="slide-content">
-                    <h3>Live Demo</h3>
-                    <h2>Skenario <mark>5 Menit</mark></h2>
-                    
-                    <div class="bento-card" style="margin-top: 30px; padding: 50px 60px; position: relative;">
-                        <!-- Timeline line -->
-                        <div style="position: absolute; left: 78px; top: 60px; bottom: 60px; width: 4px; background: var(--card-border); border-radius: 4px;"></div>
-                        
-                        <div style="position: relative; margin-bottom: 40px; padding-left: 70px;" class="fragment fade-right">
-                            <div style="position: absolute; left: 16px; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--blue); z-index: 2; border: 4px solid var(--card-bg); box-shadow: 0 0 0 4px #DBEAFE;"></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 10px;">00:00 - Mahasiswa Akses</h4>
-                            <p class="body-text" style="font-size: 1.3rem;">Login SSO Kampus &rarr; Buka Home Feed &rarr; Detail Barang &rarr; Buat Laporan Baru</p>
-                        </div>
-                        
-                        <div style="position: relative; margin-bottom: 40px; padding-left: 70px;" class="fragment fade-right" data-fragment-index="1">
-                            <div style="position: absolute; left: 16px; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--teal); z-index: 2; border: 4px solid var(--card-bg); box-shadow: 0 0 0 4px #CCFBF1;"></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 10px;">02:00 - Admin Moderasi</h4>
-                            <p class="body-text" style="font-size: 1.3rem;">Login Admin &rarr; Cek Dashboard &rarr; Review Laporan Pending &rarr; Approve (Setuju)</p>
-                        </div>
-                        
-                        <div style="position: relative; padding-left: 70px;" class="fragment fade-right" data-fragment-index="2">
-                            <div style="position: absolute; left: 16px; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--orange); z-index: 2; border: 4px solid var(--card-bg); box-shadow: 0 0 0 4px #FFEDD5;"></div>
-                            <h4 style="font-size: 1.8rem; margin-bottom: 10px;">03:30 - Interaksi Live</h4>
-                            <p class="body-text" style="font-size: 1.3rem;">Push Notification Muncul &rarr; Buka Chat In-App &rarr; Diskusi Realtime &rarr; Tandai Selesai</p>
-                        </div>
-                    </div>
+            <!-- 12. Demo Call to action -->
+            <section data-background-color="var(--black)">
+                <div class="slide-wrapper center-all" style="color: var(--white);">
+                    <h2 style="font-size: 6rem; margin-bottom: 20px;">Mari kita lihat <br><span style="color: var(--yellow);">demonstrasinya.</span></h2>
+                    <p style="font-size: 2rem; opacity: 0.7;">(Atau install APK-nya langsung di HP kamu)</p>
                 </div>
             </section>
 
-            <!-- Slide 11: Closing -->
-            <section>
-                <div class="slide-content" style="text-align: center; justify-content: center;">
-                    <div style="display: flex; justify-content: center; margin-bottom: 40px;">
-                        <div style="background: var(--blue); color: #fff; width: 120px; height: 120px; border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 4rem;">
-                            <i class="ph ph-handshake"></i>
-                        </div>
-                    </div>
+            <!-- 13. Closing -->
+            <section data-background-color="var(--blue)">
+                <div class="slide-wrapper center-all" style="color: var(--white);">
+                    <h1>Terima Kasih.</h1>
                     
-                    <h1 style="font-size: 7rem; margin-bottom: 20px;">Terima Kasih</h1>
-                    <p style="font-size: 2rem; font-weight: 500; color: var(--text-muted); margin-bottom: 60px;">Q & A Session</p>
-                    
-                    <div style="display: flex; justify-content: center; gap: 30px;">
-                        <div class="pill" style="padding: 16px 32px; font-size: 1.3rem;">
-                            <i class="ph ph-github-logo" style="font-size: 1.8rem;"></i>
-                            github.com/faiz/cariin
-                        </div>
-                        <div class="pill bg-teal" style="padding: 16px 32px; font-size: 1.3rem; border: none;">
-                            <i class="ph ph-android-logo" style="font-size: 1.8rem;"></i>
-                            CariIn-v1.apk
+                    <div style="margin-top: 80px; display: flex; gap: 30px; justify-content: center;">
+                        <div style="border: 2px solid var(--white); padding: 15px 40px; border-radius: 100px; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 15px;">
+                            <i class="ph-fill ph-github-logo" style="font-size: 2rem;"></i> github.com/faiz/cariin
                         </div>
                     </div>
                 </div>
@@ -616,17 +430,18 @@
     <script>
         Reveal.initialize({
             hash: true,
-            controls: true,
+            controls: false, // Menghilangkan kontrol panah, navigasi pakai keyboard/swipe
             progress: true,
-            center: false, // Turned off to allow absolute custom padding via .slide-content
-            transition: 'slide',
+            center: false,
+            transition: 'fade', // Transisi fade sangat smooth, gaya Apple
             backgroundTransition: 'fade',
             // High Resolution Settings
             width: 1920,
             height: 1080,
             margin: 0,
             minScale: 0.2,
-            maxScale: 2.0
+            maxScale: 2.0,
+            disableLayout: false
         });
     </script>
 </body>
