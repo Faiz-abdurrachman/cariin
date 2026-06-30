@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -30,6 +30,7 @@
             
             --font-heading: 'Outfit', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,7 +39,7 @@
             font-family: var(--font-body);
             background-color: var(--bg);
             color: var(--slate-900);
-            overflow: hidden; /* Hide default scrollbar */
+            overflow: hidden; 
         }
 
         /* Nav & Progress */
@@ -59,6 +60,10 @@
             transform: translateX(-50%);
             display: flex; gap: 8px;
             z-index: 100;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 100px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
         .dot {
             width: 8px; height: 8px;
@@ -83,8 +88,8 @@
             overflow-y: hidden;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
         }
         .slides-wrapper::-webkit-scrollbar { display: none; }
 
@@ -92,7 +97,7 @@
             min-width: 100vw;
             height: 100vh;
             scroll-snap-align: start;
-            padding: 80px 120px;
+            padding: 80px 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -135,6 +140,7 @@
         .bg-blue-light { background: #EFF6FF; color: var(--primary); }
         .bg-teal-light { background: #F0FDFA; color: var(--teal); }
         .bg-orange-light { background: #FFF7ED; color: var(--orange); }
+        .bg-emerald-light { background: #ECFDF5; color: var(--emerald); }
 
         /* Data Viz Containers */
         .chart-container {
@@ -143,7 +149,7 @@
             padding: 30px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
             border: 1px solid var(--slate-100);
-            height: 350px;
+            height: 320px;
             display: flex;
             flex-direction: column;
         }
@@ -160,12 +166,12 @@
         .stat-label { font-size: 1rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: 1px; }
 
         /* Tech Stack / List */
-        .clean-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .clean-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .clean-list li {
             display: flex;
             align-items: center;
             gap: 16px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 500;
             color: var(--slate-800);
             padding: 16px;
@@ -186,17 +192,34 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        /* Architecture Flow */
-        .flow-box {
+        /* Architecture Flow / Code */
+        .code-box {
             background: var(--slate-900);
             color: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 24px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            line-height: 1.6;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+            overflow: auto;
         }
+        
+        /* Table Styles */
+        table.modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        table.modern-table th, table.modern-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--slate-100);
+        }
+        table.modern-table th { background: var(--slate-100); color: var(--slate-500); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
 
         /* Controls hint */
         .controls-hint {
@@ -243,20 +266,48 @@
                 <p style="font-size: 1.5rem; max-width: 600px; margin-bottom: 40px;">Solusi digital modern untuk mengatasi masalah kehilangan barang di lingkungan Universitas Nahdlatul Ulama Yogyakarta.</p>
                 
                 <div class="pill-group">
-                    <div class="pill"><i class="ph-fill ph-user-circle"></i> Faiz Abdurrachman</div>
-                    <div class="pill"><i class="ph-fill ph-student"></i> NIM: 241111021</div>
+                    <div class="pill"><i class="ph-fill ph-user-circle"></i> Faiz Abdurrachman (2023012321)</div>
+                    <div class="pill"><i class="ph-fill ph-chalkboard-teacher"></i> Dosen: Yana Hendriana</div>
                     <div class="pill"><i class="ph-fill ph-calendar-blank"></i> Semester 4</div>
                 </div>
             </div>
         </section>
 
-        <!-- Slide 2: Data Visualization (Survey) -->
+        <!-- Slide 2: Masalah -->
+        <section class="slide">
+            <div class="grid-2">
+                <div>
+                    <h3>Problem Statement</h3>
+                    <h2>Realitas <span style="color: var(--orange);">Saat Ini</span></h2>
+                    <p>Mahasiswa sering panik saat kehilangan barang, namun sistem yang ada tidak mendukung pencarian yang efisien.</p>
+                </div>
+                
+                <div class="card" style="background: var(--slate-900); color: white;">
+                    <ul class="clean-list" style="color: white;">
+                        <li style="background: rgba(255,255,255,0.05); border: none; color: white;">
+                            <i class="ph-fill ph-whatsapp-logo" style="color: #22C55E; font-size: 1.5rem;"></i>
+                            <div><b>Grup WA:</b> Laporan tertumpuk obrolan lain & tidak terstruktur.</div>
+                        </li>
+                        <li style="background: rgba(255,255,255,0.05); border: none; color: white;">
+                            <i class="ph-fill ph-detective" style="color: var(--orange); font-size: 1.5rem;"></i>
+                            <div><b>Pencarian Sulit:</b> Tidak bisa lacak laporan lama, tidak ada history.</div>
+                        </li>
+                        <li style="background: rgba(255,255,255,0.05); border: none; color: white;">
+                            <i class="ph-fill ph-shield-warning" style="color: #EF4444; font-size: 1.5rem;"></i>
+                            <div><b>Klaim Palsu & Privasi:</b> Nomor HP pribadi terekspos di grup publik.</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Validasi Data (Survey) -->
         <section class="slide">
             <div class="grid-2">
                 <div>
                     <h3>Market Validation</h3>
                     <h2>Survei <span class="highlight">38 Mahasiswa</span> UNU</h2>
-                    <p style="margin-bottom: 40px;">Data menunjukkan bahwa kehilangan barang adalah masalah nyata dan sistem WhatsApp grup saat ini tidak efektif (Informasi tertumpuk, pencarian sulit, dan privasi terekspos).</p>
+                    <p style="margin-bottom: 40px;">Data menunjukkan bahwa kehilangan barang adalah masalah nyata dan sistem WhatsApp grup saat ini tidak efektif.</p>
                     
                     <div style="display: flex; gap: 40px;">
                         <div class="stat-box">
@@ -289,7 +340,7 @@
             </div>
         </section>
 
-        <!-- Slide 3: UVP (Editorial Layout) -->
+        <!-- Slide 4: UVP -->
         <section class="slide">
             <div style="text-align: center; margin-bottom: 60px;">
                 <h3>Unique Value Proposition</h3>
@@ -300,58 +351,199 @@
                 <div class="card">
                     <div class="card-icon bg-blue-light"><i class="ph-fill ph-shield-check"></i></div>
                     <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Keamanan Identitas</h4>
-                    <p style="font-size: 1.1rem;">Registrasi terkunci hanya untuk email <b>@student.unu-jogja.ac.id</b>. Memastikan tidak ada klaim palsu dari pihak luar.</p>
+                    <p style="font-size: 1.1rem;">Registrasi hanya untuk email <b>@student.unu-jogja.ac.id</b>. Mencegah klaim palsu.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon bg-teal-light"><i class="ph-fill ph-chat-circle-text"></i></div>
                     <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Privasi Terjaga</h4>
-                    <p style="font-size: 1.1rem;">Fitur <b>In-App Chat Realtime</b>. Mahasiswa bisa berkomunikasi langsung tanpa mengekspos nomor WhatsApp pribadi.</p>
+                    <p style="font-size: 1.1rem;">Fitur <b>In-App Chat Realtime</b>. Mahasiswa bisa ngobrol tanpa mengekspos nomor WA.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon bg-orange-light"><i class="ph-fill ph-users-three"></i></div>
                     <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Admin Moderation</h4>
-                    <p style="font-size: 1.1rem;">Setiap laporan difilter oleh admin kampus. Dilengkapi fitur <b>Walk-in Report</b> untuk pelaporan fisik di pos satpam.</p>
+                    <p style="font-size: 1.1rem;">Laporan difilter admin. Fitur <b>Walk-in Report</b> untuk pelaporan fisik di satpam.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Slide 4: Realtime Engine (Data Architecture) -->
+        <!-- Slide 5: Design System -->
         <section class="slide">
             <div class="grid-2">
-                <div class="flow-box">
-                    <div style="color: #60A5FA; margin-bottom: 16px;">// Supabase Realtime WebSocket</div>
-                    <div>User A: <span style="color: #34D399;">Kirim Pesan</span></div>
-                    <div style="margin-left: 20px; color: #94A3B8;">↓ (INSERT into messages)</div>
-                    <div>Database: <span style="color: #FBBF24;">Trigger Notification</span></div>
-                    <div style="margin-left: 20px; color: #94A3B8;">↓ (postgres_changes channel)</div>
-                    <div>User B: <span style="color: #A78BFA;">Terima Instan (No Refresh)</span></div>
-                    
-                    <hr style="border: 0; border-top: 1px solid #334155; margin: 30px 0;">
-                    
-                    <div style="color: #60A5FA; margin-bottom: 16px;">// Keamanan Row Level Security (RLS)</div>
-                    <div style="color: #94A3B8;">Policy: Mahasiswa HANYA dapat melihat<br>laporan publik atau miliknya sendiri.</div>
-                </div>
-
                 <div>
-                    <h3>Arsitektur Teknologi</h3>
-                    <h2>Realtime & <span class="highlight">Aman</span></h2>
-                    <p style="margin-bottom: 32px;">Menggunakan arsitektur modern Serverless untuk memastikan performa tinggi dan keamanan data.</p>
+                    <h3>Design System</h3>
+                    <h2>Psikologi <span class="highlight-teal">Calm Campus</span></h2>
+                    <p>Mahasiswa panik saat kehilangan barang. Kami mendesain UI untuk menurunkan detak jantung dan tidak memicu kecemasan.</p>
+                    <p style="margin-top: 10px;"><i>SEBELUM: zinc-950 (formal, berat) → SESUDAH: blue & teal (menenangkan).</i></p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 16px;"></div>
+                        <div><h4 style="font-size: 1.2rem;">Primary Blue</h4><p style="font-size: 1rem;">Trust, calm, turunkan detak jantung.</p></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div style="width: 80px; height: 80px; background: var(--teal); border-radius: 16px;"></div>
+                        <div><h4 style="font-size: 1.2rem;">Teal Sage</h4><p style="font-size: 1rem;">Admin area. Profesional, authority.</p></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div style="width: 80px; height: 80px; background: var(--orange); border-radius: 16px;"></div>
+                        <div><h4 style="font-size: 1.2rem;">Lost Orange</h4><p style="font-size: 1rem;">Urgensi tanpa panic trigger (hindari merah pure).</p></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div style="width: 80px; height: 80px; background: var(--emerald); border-radius: 16px;"></div>
+                        <div><h4 style="font-size: 1.2rem;">Found Emerald</h4><p style="font-size: 1rem;">Relief, healing, positif.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Tech Stack -->
+        <section class="slide">
+            <div class="grid-2">
+                <div>
+                    <h3>Architecture</h3>
+                    <h2>Tech <span class="highlight">Stack</span></h2>
+                    <p style="margin-bottom: 32px;">Menggunakan ekosistem modern untuk performa maksimal dan DX (Developer Experience) terbaik.</p>
+                    <div class="card bg-blue-light" style="padding: 24px;">
+                        <h4 style="margin-bottom: 8px;">Frontend (Mobile)</h4>
+                        <p style="color: var(--primary); font-weight: 500;">React Native 0.81 • Expo SDK 54 • TypeScript 5.9 • Zustand v5 • NativeWind v4</p>
+                    </div>
+                    <div class="card bg-teal-light" style="padding: 24px; margin-top: 16px;">
+                        <h4 style="margin-bottom: 8px;">Backend (BaaS)</h4>
+                        <p style="color: var(--teal); font-weight: 500;">Supabase Auth • PostgresDB • Storage • Realtime</p>
+                    </div>
+                </div>
+                
+                <div class="code-box">
+                    <div style="color: #60A5FA;">// The Stack Blueprint</div>
+                    <div>FRONTEND:    Expo/React Native → Mobile App</div>
+                    <div>AUTH:        Supabase Auth → JWT</div>
+                    <div>DATABASE:    Supabase Postgres → 5 tabel + RLS</div>
+                    <div>STORAGE:     Supabase Storage → 3 bucket</div>
+                    <div>REALTIME:    Supabase Realtime → Chat + Notif</div>
+                    <div>BUILD:       EAS Cloud → APK (Android)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Database & Security -->
+        <section class="slide">
+            <div class="grid-2">
+                <div class="code-box" style="font-size: 0.9rem;">
+                    <div style="color: #60A5FA;">-- Row Level Security (RLS)</div>
+                    <div style="color: #A78BFA;">CREATE POLICY</div> <div>reports_select_public ON public.reports</div>
+                    <div style="color: #A78BFA;">FOR SELECT USING</div> <div>(</div>
+                    <div>  status IN ('approved','resolved') <span style="color: #94A3B8;">-- publik</span></div>
+                    <div>  OR user_id = auth.uid()           <span style="color: #94A3B8;">-- milik sendiri</span></div>
+                    <div>  OR public.is_admin()              <span style="color: #94A3B8;">-- admin bypass</span></div>
+                    <div>);</div>
+                    <br>
+                    <div style="color: #60A5FA;">// Database Triggers</div>
+                    <div><span style="color: #34D399;">✓</span> trg_on_auth_user_created  <span style="color: #94A3B8;">→ auto-create profile</span></div>
+                    <div><span style="color: #34D399;">✓</span> trg_update_conversation   <span style="color: #94A3B8;">→ auto-update last_msg</span></div>
+                    <div><span style="color: #34D399;">✓</span> trg_notify_new_message    <span style="color: #94A3B8;">→ auto-insert notif</span></div>
+                </div>
+                
+                <div>
+                    <h3>Security Layer</h3>
+                    <h2>RLS & <span class="highlight">Triggers</span></h2>
+                    <p style="margin-bottom: 24px;">Keamanan 4 layer memastikan data terlindungi. Mahasiswa tidak bisa sembarangan mengedit data orang lain.</p>
                     
                     <ul class="clean-list">
-                        <li>
-                            <div class="card-icon bg-blue-light" style="width: 40px; height: 40px; margin: 0; font-size: 1.2rem;"><i class="ph-fill ph-device-mobile"></i></div>
-                            <div><b>Frontend:</b> React Native 0.81, Expo SDK 54, Zustand</div>
-                        </li>
-                        <li>
-                            <div class="card-icon bg-teal-light" style="width: 40px; height: 40px; margin: 0; font-size: 1.2rem;"><i class="ph-fill ph-database"></i></div>
-                            <div><b>Backend:</b> Supabase (PostgreSQL, Auth, Storage)</div>
-                        </li>
+                        <li><b>Auth Layer:</b> JWT + Validasi Email @student</li>
+                        <li><b>Database Layer:</b> Row Level Security (RLS) di 5 tabel</li>
+                        <li><b>Admin Ops:</b> RPC Security Definer (bypass RLS secara aman)</li>
+                        <li><b>Automation:</b> PostgreSQL Triggers untuk notifikasi otomatis</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- Slide 5: Project Capaian (Stats Data Viz) -->
+        <!-- Slide 8: Navigasi -->
+        <section class="slide">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h3>User Experience</h3>
+                <h2>Arsitektur <span class="highlight">Navigasi</span></h2>
+            </div>
+            
+            <div class="card code-box" style="margin: 0 auto; max-width: 900px; display: flex; gap: 40px; font-size: 1rem;">
+                <div style="flex: 1;">
+                    <div style="color: #60A5FA; margin-bottom: 10px;">// Mahasiswa (Bottom Tabs)</div>
+                    <div>├── 🏠 Home → Detail | ChatRoom</div>
+                    <div>├── 💬 Pesan → Inbox | Notifikasi</div>
+                    <div>├── <span style="color: var(--emerald);">➕ Buat (FAB Modal)</span></div>
+                    <div>├── 📄 Laporanku → Edit | Detail</div>
+                    <div>└── 👤 Profil → Settings | Help</div>
+                </div>
+                <div style="flex: 1;">
+                    <div style="color: #FBBF24; margin-bottom: 10px;">// Admin (Bottom Tabs)</div>
+                    <div>├── 📊 Dashboard → Review</div>
+                    <div>├── 📋 Semua Laporan</div>
+                    <div>├── <span style="color: var(--emerald);">➕ Buat (Walk-in Report)</span></div>
+                    <div>├── 💬 Pesan → ChatRoom</div>
+                    <div>└── 👤 Profil → Logout</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 24px;">Navigasi dua role terpisah dengan <b>FAB (Floating Action Button)</b> yang *raised* di tengah untuk kemudahan pelaporan.</p>
+        </section>
+
+        <!-- Slide 9: Fitur Role -->
+        <section class="slide">
+            <div class="grid-2">
+                <div>
+                    <h3 style="color: var(--primary);">11 Fitur Mahasiswa</h3>
+                    <ul class="clean-list" style="font-size: 1rem;">
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Register Email Kampus</li>
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Feed Laporan Publik (Filter & Search)</li>
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Detail (Foto, Lokasi, Deskripsi)</li>
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Create Lost (Kategori Grid) & Found</li>
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Chat Realtime & In-App Notification</li>
+                        <li><i class="ph-fill ph-check-circle highlight"></i> Kelola Laporan (Edit, Hapus, Selesai)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: var(--teal);">6 Fitur Admin</h3>
+                    <ul class="clean-list" style="font-size: 1rem;">
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Dashboard Statistik (4 Cards)</li>
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Review Laporan (Approve/Reject + Alasan)</li>
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Semua Laporan (Filter Status)</li>
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Walk-in Report (Input Manual Mahasiswa)</li>
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Chat Admin to Pelapor</li>
+                        <li><i class="ph-fill ph-check-circle highlight-teal"></i> Trigger Auto-Notifikasi ke Pelapor</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Chat Realtime -->
+        <section class="slide">
+            <div class="grid-2">
+                <div class="flow-box code-box">
+                    <div style="color: #60A5FA; margin-bottom: 16px;">// Supabase Realtime WebSocket</div>
+                    <div>User A: <span style="color: #34D399;">Kirim Pesan</span></div>
+                    <div style="margin-left: 20px; color: #94A3B8;">↓ (INSERT into messages)</div>
+                    <div>Database: <span style="color: #FBBF24;">Trigger Notif & Broadcast</span></div>
+                    <div style="margin-left: 20px; color: #94A3B8;">↓ (postgres_changes channel)</div>
+                    <div>User B: <span style="color: #A78BFA;">Pesan Muncul Instan (No Refresh)</span></div>
+                </div>
+
+                <div>
+                    <h3>Realtime Engine</h3>
+                    <h2>Chat <span class="highlight-teal">Tanpa Refresh</span></h2>
+                    <p style="margin-bottom: 32px;">Memanfaatkan <b>Supabase Realtime</b>, pesan akan langsung muncul di sisi penerima layaknya aplikasi WhatsApp.</p>
+                    
+                    <table class="modern-table">
+                        <tr><th>Aspek</th><th>Implementasi</th></tr>
+                        <tr><td>Channel</td><td><code style="background: var(--slate-100); padding: 4px;">supabase.channel('messages:ID')</code></td></tr>
+                        <tr><td>Event</td><td><code style="background: var(--slate-100); padding: 4px;">postgres_changes</code> → INSERT</td></tr>
+                        <tr><td>Notifikasi</td><td>Trigger <code style="background: var(--slate-100); padding: 4px;">trg_notify_new_message</code></td></tr>
+                        <tr><td>Bell Badge</td><td><code style="background: var(--slate-100); padding: 4px;">NotifContext</code> polling tiap 15 detik</td></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Statistik Aplikasi -->
         <section class="slide">
             <div style="text-align: center; margin-bottom: 60px;">
                 <h3>Production Ready</h3>
@@ -359,7 +551,6 @@
             </div>
             
             <div class="grid-3">
-                <!-- Bar chart for Features -->
                 <div class="chart-container" style="height: 350px;">
                     <h4>Implementasi Fitur & Screen</h4>
                     <div style="position: relative; height: 100%; width: 100%;">
@@ -367,44 +558,77 @@
                     </div>
                 </div>
                 
-                <!-- KPI Board -->
                 <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--slate-900); color: white;">
-                    <i class="ph-fill ph-android-logo" style="font-size: 4rem; color: #34D399; margin-bottom: 16px;"></i>
-                    <div class="stat-num" style="color: white; margin-bottom: 8px;">76<span style="font-size: 1.5rem;">MB</span></div>
-                    <div class="stat-label" style="color: var(--slate-500);">APK Production Size</div>
-                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #334155; width: 100%;">
-                        <div style="font-weight: 600; color: #60A5FA;">✓ expo-doctor 18/18 passed</div>
-                        <div style="font-weight: 600; color: #34D399; margin-top: 8px;">✓ 0 TypeScript Errors</div>
+                    <i class="ph-fill ph-database" style="font-size: 3rem; color: #60A5FA; margin-bottom: 16px;"></i>
+                    <div class="stat-num" style="color: white; margin-bottom: 8px;">Data Real</div>
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #334155; width: 100%; text-align: left; padding-left: 20px;">
+                        <div style="font-weight: 600; color: #CBD5E1;">4 Users & 10 Reports</div>
+                        <div style="font-weight: 600; color: #CBD5E1; margin-top: 8px;">6 Conversations</div>
+                        <div style="font-weight: 600; color: #CBD5E1; margin-top: 8px;">25 Notifications</div>
                     </div>
                 </div>
 
-                <!-- Dual Role Summary -->
-                <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
-                    <div style="margin-bottom: 24px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 700; font-size: 1.2rem;">Role Mahasiswa</span>
-                            <span style="background: var(--blue); color: white; padding: 4px 12px; border-radius: 100px; font-weight: 700;">11 Fitur</span>
-                        </div>
-                        <p style="font-size: 1rem;">Feed, Filter, Detail, Chat, Notifikasi, Edit Laporan.</p>
-                    </div>
-                    <hr style="border:0; border-top: 1px solid var(--slate-100); margin-bottom: 24px;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 700; font-size: 1.2rem;">Role Admin</span>
-                            <span style="background: var(--teal); color: white; padding: 4px 12px; border-radius: 100px; font-weight: 700;">6 Fitur</span>
-                        </div>
-                        <p style="font-size: 1rem;">Dashboard, Review (Approve/Reject), Walk-in Report.</p>
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--emerald); color: white;">
+                    <i class="ph-fill ph-android-logo" style="font-size: 3rem; color: white; margin-bottom: 16px;"></i>
+                    <div class="stat-num" style="color: white; margin-bottom: 8px;">76<span style="font-size: 1.5rem;">MB</span></div>
+                    <div class="stat-label" style="color: rgba(255,255,255,0.8);">APK Production Size</div>
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.2); width: 100%;">
+                        <div style="font-weight: 600; color: white;">✓ expo-doctor 18/18 passed</div>
+                        <div style="font-weight: 600; color: white; margin-top: 8px;">✓ 0 TypeScript/ESLint Errors</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Slide 6: Closing -->
+        <!-- Slide 12: Demo Flow -->
+        <section class="slide">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h3>Showcase</h3>
+                <h2>Skenario <span class="highlight">Demo 5 Menit</span></h2>
+            </div>
+            
+            <table class="modern-table" style="max-width: 900px; margin: 0 auto;">
+                <tr><th>Waktu</th><th>Aktor</th><th>Aksi</th></tr>
+                <tr><td>0:00</td><td>—</td><td>Splash → Role Selection</td></tr>
+                <tr><td>0:15</td><td>Mahasiswa</td><td>Login → Home Feed</td></tr>
+                <tr><td>0:45</td><td>Mahasiswa</td><td>Filter + Detail Laporan</td></tr>
+                <tr><td>1:15</td><td>Mahasiswa</td><td>Buat Laporan (Upload Foto + Kategori + Submit)</td></tr>
+                <tr><td>2:00</td><td>Admin</td><td>Login → Dashboard Review</td></tr>
+                <tr><td>2:30</td><td>Admin</td><td>Review + Approve Laporan</td></tr>
+                <tr><td>3:00</td><td>Mahasiswa</td><td>Cek Notifikasi + Buka Inbox + Chat Realtime</td></tr>
+                <tr><td>4:00</td><td>Mahasiswa</td><td>MyPosts → Tandai Selesai (Resolved)</td></tr>
+                <tr><td>4:30</td><td>—</td><td>Profile → Logout</td></tr>
+            </table>
+        </section>
+
+        <!-- Slide 13: Deployment -->
+        <section class="slide">
+            <div class="grid-2">
+                <div>
+                    <h3>Deployment</h3>
+                    <h2>Cara <span class="highlight-teal">Install & Build</span></h2>
+                    <p style="margin-bottom: 24px;">Aplikasi dapat dijalankan langsung via Expo Go atau diinstal sebagai APK Production yang sudah jadi.</p>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="card bg-blue-light" style="padding: 24px;">
+                        <h4 style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="ph-fill ph-rocket-launch"></i> Install via Expo Go</h4>
+                        <p style="font-size: 1rem; color: var(--slate-800);">1. Install Expo Go dari App Store / Play Store<br>2. Scan QR code dari <code>npx expo start</code><br>3. App langsung jalan (no build required)</p>
+                    </div>
+                    <div class="card bg-emerald-light" style="padding: 24px;">
+                        <h4 style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="ph-fill ph-android-logo"></i> Install APK (Android)</h4>
+                        <p style="font-size: 1rem; color: var(--slate-800);">1. Download CariIn-v1.apk (76 MB)<br>2. Buka file → Install → Izinkan unknown sources</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Closing -->
         <section class="slide">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%;">
                 <div class="card-icon bg-blue-light" style="width: 80px; height: 80px; font-size: 2.5rem; margin-bottom: 32px;"><i class="ph-fill ph-handshake"></i></div>
                 <h1 style="margin-bottom: 16px;">Terima Kasih</h1>
-                <p style="font-size: 1.5rem; margin-bottom: 40px;">Aplikasi Cari.In siap digunakan.</p>
+                <p style="font-size: 1.5rem; margin-bottom: 40px; font-weight: 500;">Aplikasi Cari.In siap digunakan.</p>
                 
                 <div style="display: flex; gap: 24px;">
                     <a href="#" style="text-decoration: none; display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid var(--slate-100); padding: 16px 32px; border-radius: 100px; color: var(--slate-900); font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
@@ -418,11 +642,10 @@
 
     <!-- JS for Charts and Scroll -->
     <script>
-        // --- 1. Init Charts ---
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.color = '#64748B';
         
-        // Chart 1: Donut Chart (Kehilangan Barang)
+        // Chart 1: Donut Chart
         const ctxLoss = document.getElementById('lossChart').getContext('2d');
         new Chart(ctxLoss, {
             type: 'doughnut',
@@ -435,17 +658,10 @@
                     hoverOffset: 4
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } } }
         });
 
-        // Chart 2: Bar Chart (Top Items)
+        // Chart 2: Bar Chart
         const ctxItems = document.getElementById('itemsChart').getContext('2d');
         new Chart(ctxItems, {
             type: 'bar',
@@ -459,26 +675,15 @@
                     borderWidth: 0
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y', // Horizontal bar
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { grid: { display: false }, max: 50 },
-                    y: { grid: { display: false } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, max: 25 }, y: { grid: { display: false } } } }
         });
 
-        // Chart 3: Bar Chart (Features & Screens)
+        // Chart 3: Bar Chart (Features)
         const ctxFeatures = document.getElementById('featuresChart').getContext('2d');
         new Chart(ctxFeatures, {
             type: 'bar',
             data: {
-                labels: ['Screens UI', 'Fitur Mhs', 'Fitur Admin', 'Layer Security'],
+                labels: ['Screens UI', 'Fitur Mhs', 'Fitur Admin', 'Security Layer'],
                 datasets: [{
                     label: 'Total',
                     data: [26, 11, 6, 4],
@@ -486,23 +691,14 @@
                     borderRadius: 8
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
-                    x: { grid: { display: false } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } }
         });
 
-        // --- 2. Scroll & Navigation Logic ---
+        // Scroll & Nav Logic
         const slider = document.getElementById('slider');
         const slides = document.querySelectorAll('.slide');
         const dotsContainer = document.getElementById('dots');
         
-        // Create dots
         slides.forEach((_, i) => {
             const dot = document.createElement('div');
             dot.className = i === 0 ? 'dot active' : 'dot';
@@ -515,40 +711,17 @@
             slides[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
         }
 
-        function scrollNext() {
-            const currentScroll = slider.scrollLeft;
-            const slideWidth = slider.clientWidth;
-            const targetScroll = currentScroll + slideWidth;
-            slider.scrollTo({ left: targetScroll, behavior: 'smooth' });
-        }
+        function scrollNext() { slider.scrollTo({ left: slider.scrollLeft + slider.clientWidth, behavior: 'smooth' }); }
+        function scrollPrev() { slider.scrollTo({ left: slider.scrollLeft - slider.clientWidth, behavior: 'smooth' }); }
 
-        function scrollPrev() {
-            const currentScroll = slider.scrollLeft;
-            const slideWidth = slider.clientWidth;
-            const targetScroll = currentScroll - slideWidth;
-            slider.scrollTo({ left: targetScroll, behavior: 'smooth' });
-        }
-
-        // Update active dot on scroll
         slider.addEventListener('scroll', () => {
-            const scrollPos = slider.scrollLeft;
-            const slideWidth = slider.clientWidth;
-            const activeIndex = Math.round(scrollPos / slideWidth);
-            
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === activeIndex);
-            });
+            const activeIndex = Math.round(slider.scrollLeft / slider.clientWidth);
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
         });
 
-        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                e.preventDefault();
-                scrollNext();
-            } else if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                scrollPrev();
-            }
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); scrollNext(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); scrollPrev(); }
         });
     </script>
 </body>
