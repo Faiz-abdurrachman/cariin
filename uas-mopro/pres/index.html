@@ -1,447 +1,554 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <title>Cari.In - Campus Lost & Found</title>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari.In - Presentation</title>
     
-    <!-- Google Fonts: Clash Display & Plus Jakarta Sans -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* Warna solid, no gradient, no bullshit */
-            --black: #0A0A0A;
-            --white: #FDFDFD;
-            --blue: #1D4ED8;
+            --primary: #2563EB; /* Blue */
+            --teal: #0D9488;
+            --emerald: #059669;
             --orange: #EA580C;
-            --emerald: #047857;
-            --teal: #0F766E;
-            --yellow: #FACC15;
+            --slate-900: #0F172A;
+            --slate-800: #1E293B;
+            --slate-500: #64748B;
+            --slate-100: #F1F5F9;
+            --bg: #F8FAFC;
             
-            --heading-font: 'Clash Display', sans-serif;
-            --body-font: 'Plus Jakarta Sans', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: var(--black);
+            font-family: var(--font-body);
+            background-color: var(--bg);
+            color: var(--slate-900);
+            overflow: hidden; /* Hide default scrollbar */
         }
 
-        /* Override Reveal Default */
-        .reveal .slides {
-            font-family: var(--body-font);
-            text-align: left; 
+        /* Nav & Progress */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
         }
-
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal p {
-            margin: 0;
-            color: inherit;
-        }
-
-        .reveal h1 { 
-            font-family: var(--heading-font);
-            font-weight: 700;
-            font-size: 8.5rem; 
-            line-height: 0.95; 
-            letter-spacing: -0.02em;
-            margin-bottom: 20px;
-        }
+        .logo { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
         
-        .reveal h2 { 
-            font-family: var(--heading-font);
-            font-weight: 600;
-            font-size: 5.5rem; 
-            line-height: 1.1; 
-            letter-spacing: -0.02em;
-            margin-bottom: 40px;
+        .progress-container {
+            position: absolute;
+            bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 8px;
+            z-index: 100;
         }
-        
-        .reveal h3 { 
-            font-family: var(--heading-font);
-            font-weight: 600;
-            font-size: 3.5rem; 
-            line-height: 1.2;
-            margin-bottom: 20px;
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 4px;
+            background: var(--slate-500);
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-
-        .reveal p {
-            font-family: var(--body-font);
-            font-size: 2.2rem;
-            line-height: 1.5;
-            font-weight: 500;
+        .dot.active {
+            width: 24px;
+            background: var(--primary);
+            opacity: 1;
         }
 
-        .tagline {
-            font-family: var(--body-font);
-            font-size: 2rem;
-            font-weight: 400;
-            opacity: 0.9;
-        }
-
-        /* Slide layout khusus (Apple Style / Swiss Minimalist) */
-        .slide-wrapper {
+        /* Slides Container (Horizontal Scroll Snap) */
+        .slides-wrapper {
+            display: flex;
+            width: 100vw;
             height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .slides-wrapper::-webkit-scrollbar { display: none; }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            padding: 80px 120px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 80px 120px;
-            box-sizing: border-box;
+            position: relative;
         }
 
-        .slide-wrapper.center-all {
-            align-items: center;
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); letter-spacing: -0.02em; }
+        h1 { font-size: 5rem; font-weight: 800; line-height: 1.1; margin-bottom: 24px; }
+        h2 { font-size: 3.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 32px; color: var(--slate-900); }
+        h3 { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 16px; }
+        p { font-size: 1.25rem; line-height: 1.6; color: var(--slate-500); }
+
+        .highlight { color: var(--primary); }
+        .highlight-teal { color: var(--teal); }
+
+        /* Layout Grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; height: 100%; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+        /* Modern UI Cards (Editorial Style) */
+        .card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-icon {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+        }
+
+        .bg-blue-light { background: #EFF6FF; color: var(--primary); }
+        .bg-teal-light { background: #F0FDFA; color: var(--teal); }
+        .bg-orange-light { background: #FFF7ED; color: var(--orange); }
+
+        /* Data Viz Containers */
+        .chart-container {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            border: 1px solid var(--slate-100);
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-container h4 {
+            font-size: 1.1rem;
+            color: var(--slate-500);
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        /* Helper text sizing */
-        .text-huge { font-size: 14rem !important; line-height: 0.9 !important; }
-        .text-accent { font-family: var(--heading-font); color: var(--yellow); }
-        .text-muted-dark { color: rgba(255,255,255,0.5); }
-        .text-muted-light { color: rgba(0,0,0,0.5); }
+        /* Stat Numbers */
+        .stat-box { display: flex; flex-direction: column; gap: 8px; }
+        .stat-num { font-family: var(--font-heading); font-size: 4rem; font-weight: 800; line-height: 1; }
+        .stat-label { font-size: 1rem; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Asymmetric Layouts (Anti-AI Grid) */
-        .split-screen {
+        /* Tech Stack / List */
+        .clean-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .clean-list li {
             display: flex;
-            height: 100%;
-            width: 100%;
             align-items: center;
-            gap: 60px;
-        }
-        
-        .split-left { flex: 1; }
-        .split-right { flex: 1; }
-
-        .stat-block {
-            border-left: 8px solid currentColor;
-            padding-left: 40px;
-            margin: 40px 0;
-        }
-
-        .stat-block .number {
-            font-family: var(--heading-font);
-            font-size: 8rem;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-
-        /* Custom ul / list - no boring bullets */
-        ul.clean {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        ul.clean li {
-            font-size: 2.5rem;
-            font-family: var(--heading-font);
+            gap: 16px;
+            font-size: 1.3rem;
             font-weight: 500;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            opacity: 0.9;
+            color: var(--slate-800);
+            padding: 16px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            border: 1px solid var(--slate-100);
         }
 
-        /* Pill / Badges minimalis */
-        .pill-solid {
-            display: inline-block;
-            background: currentColor;
-            color: var(--black);
-            padding: 10px 30px;
-            border-radius: 100px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: var(--heading-font);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+        .pill-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+        .pill { 
+            padding: 8px 20px; 
+            border-radius: 100px; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            background: #FFFFFF; 
+            border: 1px solid var(--slate-100); 
+            color: var(--slate-500); 
+            display: flex; align-items: center; gap: 8px;
         }
 
-        /* Override Reveal navigation */
-        .reveal .controls { display: none !important; } /* Sembunyikan panah bawaan, buat clean */
-        .reveal .progress { height: 8px !important; color: var(--yellow) !important; background: rgba(255,255,255,0.1) !important; }
-        
-        /* Gambar / Dekorasi minimalis */
-        .circle-decor {
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: var(--yellow);
-            position: absolute;
-            right: -100px;
-            top: -100px;
-            z-index: -1;
-            opacity: 0.9;
+        /* Architecture Flow */
+        .flow-box {
+            background: var(--slate-900);
+            color: white;
+            padding: 40px;
+            border-radius: 24px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
         }
 
-        .photo-frame {
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            transform: rotate(3deg);
-            display: inline-block;
+        /* Controls hint */
+        .controls-hint {
+            position: fixed;
+            bottom: 40px; right: 40px;
+            display: flex; gap: 10px;
+            z-index: 100;
         }
-
-        /* Tech stack typography */
-        .tech-word {
-            font-family: var(--heading-font);
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1.2;
-            display: block;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-            padding: 20px 0;
+        .key-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: #FFFFFF;
+            border: 1px solid var(--slate-100);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            color: var(--slate-500);
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .key-btn:hover { background: var(--slate-100); color: var(--primary); }
     </style>
 </head>
 <body>
-    <div class="reveal">
-        <div class="slides">
 
-            <!-- 1. Intro -->
-            <section data-background-color="var(--blue)">
-                <div class="slide-wrapper center-all" style="color: var(--white);">
-                    <div style="font-size: 2rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Tugas Mobile Programming</div>
-                    <h1>Cari.In</h1>
-                    <p class="tagline" style="font-size: 2.8rem; font-weight: 500; margin-top: 20px;">Sistem "Hilang & Temu" kampus<br>yang seharusnya ada dari dulu.</p>
-                    
-                    <div style="margin-top: 80px; display: flex; gap: 40px; opacity: 0.6; font-size: 1.5rem; justify-content: center;">
-                        <span>Faiz Abdurrachman</span>
-                        <span>•</span>
-                        <span>UNU Yogyakarta</span>
-                        <span>•</span>
-                        <span>Semester 4</span>
-                    </div>
-                </div>
-            </section>
+    <nav>
+        <div class="logo">Cari<span class="highlight">.In</span></div>
+        <div style="font-weight: 600; color: var(--slate-500);">Mobile Programming</div>
+    </nav>
 
-            <!-- 2. Problem Statement (Punchy) -->
-            <section data-background-color="var(--black)">
-                <div class="slide-wrapper" style="color: var(--white);">
-                    <div class="pill-solid" style="color: var(--black); background: var(--white);">Realitas saat ini</div>
-                    <h2>Grup WhatsApp itu untuk ngobrol.</h2>
-                    <h2 class="text-muted-dark">Bukan untuk nyari kunci motor yang hilang.</h2>
-                </div>
-            </section>
+    <div class="progress-container" id="dots"></div>
 
-            <!-- 3. Problem Impact -->
-            <section data-background-color="var(--white)">
-                <div class="slide-wrapper" style="color: var(--black);">
-                    <div class="split-screen">
-                        <div class="split-left">
-                            <h2 style="font-size: 4.5rem;">Kalau pakai WA:</h2>
-                            <ul class="clean" style="margin-top: 40px;">
-                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Info ketumpuk chat lain.</li>
-                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Privasi (nomor HP) terekspos.</li>
-                                <li><i class="ph-fill ph-x-circle" style="color: red;"></i> Rawan orang ngaku-ngaku (klaim palsu).</li>
-                            </ul>
-                        </div>
-                        <div class="split-right" style="background: var(--black); color: var(--white); padding: 80px; height: 100%; display: flex; flex-direction: column; justify-content: center;">
-                            <h3 style="color: var(--yellow);">Masa depan kok masih manual?</h3>
-                            <p style="opacity: 0.8; font-size: 1.8rem;">Mahasiswa butuh kepastian. Kehilangan barang bikin panik, sistem yang berantakan bikin makin stres.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4. Data Validation -->
-            <section data-background-color="var(--orange)">
-                <div class="slide-wrapper" style="color: var(--white);">
-                    <div class="pill-solid" style="color: var(--orange); background: var(--white);">Fakta Lapangan</div>
-                    <h2>Kita tanya ke 39 anak kampus...</h2>
-                    
-                    <div style="display: flex; gap: 80px; margin-top: 60px;">
-                        <div class="stat-block">
-                            <div class="number">51%</div>
-                            <p>Pernah kehilangan barang di kampus.</p>
-                        </div>
-                        <div class="stat-block">
-                            <div class="number">67%</div>
-                            <p>Larinya minta tolong ke Satpam.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 5. Solution -->
-            <section data-background-color="var(--emerald)">
-                <div class="slide-wrapper center-all" style="color: var(--white);">
-                    <h2>Jawabannya ada di <span style="color: var(--yellow);">Cari.In</span>.</h2>
-                    <p style="max-width: 900px; font-size: 2.5rem; line-height: 1.6;">Platform terpusat khusus mahasiswa. Aman, terverifikasi, dan langsung hubungi penemu tanpa perlu sebar nomor pribadi.</p>
-                </div>
-            </section>
-
-            <!-- 6. UVP (No grid, just bold statements) -->
-            <section data-background-color="var(--black)">
-                <div class="slide-wrapper" style="color: var(--white);">
-                    <div class="pill-solid" style="color: var(--black); background: var(--yellow);">Kenapa Beda?</div>
-                    
-                    <div style="margin-top: 20px;">
-                        <div style="padding: 40px 0; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">1.</span> Khusus Email Kampus</h3>
-                            <p class="text-muted-dark">Wajib pakai @student.unu-jogja.ac.id. Identitas 100% valid, gak ada akun bodong.</p>
-                        </div>
-                        
-                        <div style="padding: 40px 0; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">2.</span> Chat In-App Realtime</h3>
-                            <p class="text-muted-dark">Langsung ngobrol di dalam aplikasi. Nomor WhatsApp kamu tetap rahasia.</p>
-                        </div>
-
-                        <div style="padding: 40px 0;">
-                            <h3 style="font-size: 4rem; display: flex; align-items: center; gap: 30px;"><span style="color: var(--yellow);">3.</span> Satpam Punya Akses</h3>
-                            <p class="text-muted-dark">Mahasiswa bisa lapor langsung ke pos, satpam yang bantu input ke sistem.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 7. Design System Psychology -->
-            <section data-background-color="var(--white)">
-                <div class="slide-wrapper" style="color: var(--black); position: relative; overflow: hidden;">
-                    <div class="circle-decor"></div>
-                    <h2>Desain <br>Bukan Cuma Kosmetik.</h2>
-                    <p style="max-width: 700px; margin-bottom: 60px;">Kita pakai pendekatan psikologi warna <strong>"Calm Campus"</strong>.</p>
-                    
-                    <div style="display: flex; gap: 30px; margin-top: 40px;">
-                        <div style="flex: 1;">
-                            <div style="background: var(--blue); height: 150px; margin-bottom: 20px;"></div>
-                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Blue (Utama)</h4>
-                            <p class="text-muted-light" style="font-size: 1.5rem;">Menurunkan detak jantung & panik.</p>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="background: var(--orange); height: 150px; margin-bottom: 20px;"></div>
-                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Soft Orange</h4>
-                            <p class="text-muted-light" style="font-size: 1.5rem;">Urgensi, tapi tidak bikin stres seperti merah.</p>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="background: var(--emerald); height: 150px; margin-bottom: 20px;"></div>
-                            <h4 style="font-family: var(--heading-font); font-size: 2rem;">Emerald</h4>
-                            <p class="text-muted-light" style="font-size: 1.5rem;">Simbol barang ditemukan (Relief).</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 8. Tech Stack (Raw Typography) -->
-            <section data-background-color="var(--blue)">
-                <div class="slide-wrapper" style="color: var(--white);">
-                    <p style="font-size: 2rem; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px;">Mesin di Balik Layar</p>
-                    
-                    <div style="display: flex; gap: 100px;">
-                        <div style="flex: 1;">
-                            <span class="tech-word">React Native 0.81</span>
-                            <span class="tech-word">Expo SDK 54</span>
-                            <span class="tech-word">NativeWind v4</span>
-                            <span class="tech-word">Zustand State</span>
-                        </div>
-                        <div style="flex: 1;">
-                            <span class="tech-word">Supabase Auth</span>
-                            <span class="tech-word">PostgreSQL</span>
-                            <span class="tech-word">Realtime WebSockets</span>
-                            <span class="tech-word">EAS Cloud Build</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 9. Security (Database) -->
-            <section data-background-color="var(--black)">
-                <div class="slide-wrapper" style="color: var(--white);">
-                    <div class="pill-solid" style="color: var(--black); background: var(--white);">Keamanan Database</div>
-                    <h2>Data kamu <br>nggak bisa diintip.</h2>
-                    
-                    <p style="max-width: 900px; font-size: 2.2rem; color: var(--yellow); margin-top: 40px;">Menggunakan RLS (Row Level Security).</p>
-                    <p class="text-muted-dark" style="max-width: 900px; margin-top: 20px;">Mahasiswa hanya bisa mengedit laporannya sendiri. Laporan milik orang lain hanya bisa dilihat jika sudah di-approve oleh admin. Admin menggunakan RPC (Remote Procedure Call) untuk intervensi aman.</p>
-                </div>
-            </section>
-
-            <!-- 10. The Realtime Engine -->
-            <section data-background-color="var(--yellow)">
-                <div class="slide-wrapper center-all" style="color: var(--black);">
-                    <h1 class="text-huge">Instan.</h1>
-                    <p style="font-size: 3rem; margin-top: 30px;">Chat masuk detik itu juga tanpa perlu <em>refresh</em>.</p>
-                    <p style="font-size: 1.8rem; margin-top: 20px; opacity: 0.8; max-width: 800px;">Supabase <code style="background: var(--black); color: var(--yellow); padding: 5px 15px;">postgres_changes</code> secara konstan me-listen setiap <em>INSERT</em> pesan baru, langsung memicu notifikasi <em>in-app</em> ke penerima.</p>
-                </div>
-            </section>
-
-            <!-- 11. Results/Conclusion -->
-            <section data-background-color="var(--white)">
-                <div class="slide-wrapper" style="color: var(--black);">
-                    <h2>Hasil Akhir? <br>Aplikasi Matang.</h2>
-                    
-                    <div style="display: flex; gap: 40px; margin-top: 60px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 300px;">
-                            <h1 style="color: var(--blue);">26</h1>
-                            <p style="font-size: 1.8rem; font-weight: 600;">Screen UI di-desain rapi.</p>
-                        </div>
-                        <div style="flex: 1; min-width: 300px;">
-                            <h1 style="color: var(--teal);">17</h1>
-                            <p style="font-size: 1.8rem; font-weight: 600;">Fitur Utama berfungsi.</p>
-                        </div>
-                        <div style="flex: 1; min-width: 300px;">
-                            <h1 style="color: var(--orange);">0</h1>
-                            <p style="font-size: 1.8rem; font-weight: 600;">Error pada Expo Doctor.</p>
-                        </div>
-                        <div style="flex: 1; min-width: 300px;">
-                            <h1 style="color: var(--emerald);">76<span style="font-size: 4rem;">MB</span></h1>
-                            <p style="font-size: 1.8rem; font-weight: 600;">APK Production Ready.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 12. Demo Call to action -->
-            <section data-background-color="var(--black)">
-                <div class="slide-wrapper center-all" style="color: var(--white);">
-                    <h2 style="font-size: 6rem; margin-bottom: 20px;">Mari kita lihat <br><span style="color: var(--yellow);">demonstrasinya.</span></h2>
-                    <p style="font-size: 2rem; opacity: 0.7;">(Atau install APK-nya langsung di HP kamu)</p>
-                </div>
-            </section>
-
-            <!-- 13. Closing -->
-            <section data-background-color="var(--blue)">
-                <div class="slide-wrapper center-all" style="color: var(--white);">
-                    <h1>Terima Kasih.</h1>
-                    
-                    <div style="margin-top: 80px; display: flex; gap: 30px; justify-content: center;">
-                        <div style="border: 2px solid var(--white); padding: 15px 40px; border-radius: 100px; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 15px;">
-                            <i class="ph-fill ph-github-logo" style="font-size: 2rem;"></i> github.com/faiz/cariin
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </div>
+    <div class="controls-hint">
+        <div class="key-btn" onclick="scrollPrev()"><i class="ph ph-caret-left"></i></div>
+        <div class="key-btn" onclick="scrollNext()"><i class="ph ph-caret-right"></i></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.js"></script>
+    <div class="slides-wrapper" id="slider">
+
+        <!-- Slide 1: Cover -->
+        <section class="slide">
+            <div style="max-width: 900px;">
+                <h3>Platform Inovasi Kampus</h3>
+                <h1>Sistem <span class="highlight">Lost & Found</span> Terintegrasi.</h1>
+                <p style="font-size: 1.5rem; max-width: 600px; margin-bottom: 40px;">Solusi digital modern untuk mengatasi masalah kehilangan barang di lingkungan Universitas Nahdlatul Ulama Yogyakarta.</p>
+                
+                <div class="pill-group">
+                    <div class="pill"><i class="ph-fill ph-user-circle"></i> Faiz Abdurrachman</div>
+                    <div class="pill"><i class="ph-fill ph-student"></i> NIM: 2023012321</div>
+                    <div class="pill"><i class="ph-fill ph-calendar-blank"></i> Semester 4</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Data Visualization (Survey) -->
+        <section class="slide">
+            <div class="grid-2">
+                <div>
+                    <h3>Market Validation</h3>
+                    <h2>Survei <span class="highlight">39 Mahasiswa</span> UNU</h2>
+                    <p style="margin-bottom: 40px;">Data menunjukkan bahwa kehilangan barang adalah masalah nyata dan sistem WhatsApp grup saat ini tidak efektif (Informasi tertumpuk, pencarian sulit, dan privasi terekspos).</p>
+                    
+                    <div style="display: flex; gap: 40px;">
+                        <div class="stat-box">
+                            <span class="stat-num highlight">67%</span>
+                            <span class="stat-label">Mencari via Satpam</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-num highlight-teal">82%</span>
+                            <span class="stat-label">Nyaman Email Kampus</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Chart 1: Donut -->
+                    <div class="chart-container" style="height: 250px;">
+                        <h4>Proporsi Pengalaman Kehilangan Barang</h4>
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="lossChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Chart 2: Bar -->
+                    <div class="chart-container" style="height: 250px;">
+                        <h4>Top Barang Paling Sering Hilang</h4>
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="itemsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: UVP (Editorial Layout) -->
+        <section class="slide">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h3>Unique Value Proposition</h3>
+                <h2>Solusi yang <span class="highlight">Kami Tawarkan</span></h2>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon bg-blue-light"><i class="ph-fill ph-shield-check"></i></div>
+                    <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Keamanan Identitas</h4>
+                    <p style="font-size: 1.1rem;">Registrasi terkunci hanya untuk email <b>@student.unu-jogja.ac.id</b>. Memastikan tidak ada klaim palsu dari pihak luar.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon bg-teal-light"><i class="ph-fill ph-chat-circle-text"></i></div>
+                    <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Privasi Terjaga</h4>
+                    <p style="font-size: 1.1rem;">Fitur <b>In-App Chat Realtime</b>. Mahasiswa bisa berkomunikasi langsung tanpa mengekspos nomor WhatsApp pribadi.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon bg-orange-light"><i class="ph-fill ph-users-three"></i></div>
+                    <h4 style="font-size: 1.5rem; margin-bottom: 12px;">Admin Moderation</h4>
+                    <p style="font-size: 1.1rem;">Setiap laporan difilter oleh admin kampus. Dilengkapi fitur <b>Walk-in Report</b> untuk pelaporan fisik di pos satpam.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Realtime Engine (Data Architecture) -->
+        <section class="slide">
+            <div class="grid-2">
+                <div class="flow-box">
+                    <div style="color: #60A5FA; margin-bottom: 16px;">// Supabase Realtime WebSocket</div>
+                    <div>User A: <span style="color: #34D399;">Kirim Pesan</span></div>
+                    <div style="margin-left: 20px; color: #94A3B8;">↓ (INSERT into messages)</div>
+                    <div>Database: <span style="color: #FBBF24;">Trigger Notification</span></div>
+                    <div style="margin-left: 20px; color: #94A3B8;">↓ (postgres_changes channel)</div>
+                    <div>User B: <span style="color: #A78BFA;">Terima Instan (No Refresh)</span></div>
+                    
+                    <hr style="border: 0; border-top: 1px solid #334155; margin: 30px 0;">
+                    
+                    <div style="color: #60A5FA; margin-bottom: 16px;">// Keamanan Row Level Security (RLS)</div>
+                    <div style="color: #94A3B8;">Policy: Mahasiswa HANYA dapat melihat<br>laporan publik atau miliknya sendiri.</div>
+                </div>
+
+                <div>
+                    <h3>Arsitektur Teknologi</h3>
+                    <h2>Realtime & <span class="highlight">Aman</span></h2>
+                    <p style="margin-bottom: 32px;">Menggunakan arsitektur modern Serverless untuk memastikan performa tinggi dan keamanan data.</p>
+                    
+                    <ul class="clean-list">
+                        <li>
+                            <div class="card-icon bg-blue-light" style="width: 40px; height: 40px; margin: 0; font-size: 1.2rem;"><i class="ph-fill ph-device-mobile"></i></div>
+                            <div><b>Frontend:</b> React Native 0.81, Expo SDK 54, Zustand</div>
+                        </li>
+                        <li>
+                            <div class="card-icon bg-teal-light" style="width: 40px; height: 40px; margin: 0; font-size: 1.2rem;"><i class="ph-fill ph-database"></i></div>
+                            <div><b>Backend:</b> Supabase (PostgreSQL, Auth, Storage)</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Project Capaian (Stats Data Viz) -->
+        <section class="slide">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h3>Production Ready</h3>
+                <h2>Capaian <span class="highlight">Aplikasi</span></h2>
+            </div>
+            
+            <div class="grid-3">
+                <!-- Bar chart for Features -->
+                <div class="chart-container" style="height: 350px;">
+                    <h4>Implementasi Fitur & Screen</h4>
+                    <div style="position: relative; height: 100%; width: 100%;">
+                        <canvas id="featuresChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- KPI Board -->
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: var(--slate-900); color: white;">
+                    <i class="ph-fill ph-android-logo" style="font-size: 4rem; color: #34D399; margin-bottom: 16px;"></i>
+                    <div class="stat-num" style="color: white; margin-bottom: 8px;">76<span style="font-size: 1.5rem;">MB</span></div>
+                    <div class="stat-label" style="color: var(--slate-500);">APK Production Size</div>
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #334155; width: 100%;">
+                        <div style="font-weight: 600; color: #60A5FA;">✓ expo-doctor 18/18 passed</div>
+                        <div style="font-weight: 600; color: #34D399; margin-top: 8px;">✓ 0 TypeScript Errors</div>
+                    </div>
+                </div>
+
+                <!-- Dual Role Summary -->
+                <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 700; font-size: 1.2rem;">Role Mahasiswa</span>
+                            <span style="background: var(--blue); color: white; padding: 4px 12px; border-radius: 100px; font-weight: 700;">11 Fitur</span>
+                        </div>
+                        <p style="font-size: 1rem;">Feed, Filter, Detail, Chat, Notifikasi, Edit Laporan.</p>
+                    </div>
+                    <hr style="border:0; border-top: 1px solid var(--slate-100); margin-bottom: 24px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 700; font-size: 1.2rem;">Role Admin</span>
+                            <span style="background: var(--teal); color: white; padding: 4px 12px; border-radius: 100px; font-weight: 700;">6 Fitur</span>
+                        </div>
+                        <p style="font-size: 1rem;">Dashboard, Review (Approve/Reject), Walk-in Report.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Closing -->
+        <section class="slide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%;">
+                <div class="card-icon bg-blue-light" style="width: 80px; height: 80px; font-size: 2.5rem; margin-bottom: 32px;"><i class="ph-fill ph-handshake"></i></div>
+                <h1 style="margin-bottom: 16px;">Terima Kasih</h1>
+                <p style="font-size: 1.5rem; margin-bottom: 40px;">Aplikasi Cari.In siap digunakan.</p>
+                
+                <div style="display: flex; gap: 24px;">
+                    <a href="#" style="text-decoration: none; display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid var(--slate-100); padding: 16px 32px; border-radius: 100px; color: var(--slate-900); font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <i class="ph-fill ph-github-logo" style="font-size: 1.5rem;"></i> github.com/faiz/cariin
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JS for Charts and Scroll -->
     <script>
-        Reveal.initialize({
-            hash: true,
-            controls: false, // Menghilangkan kontrol panah, navigasi pakai keyboard/swipe
-            progress: true,
-            center: false,
-            transition: 'fade', // Transisi fade sangat smooth, gaya Apple
-            backgroundTransition: 'fade',
-            // High Resolution Settings
-            width: 1920,
-            height: 1080,
-            margin: 0,
-            minScale: 0.2,
-            maxScale: 2.0,
-            disableLayout: false
+        // --- 1. Init Charts ---
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748B';
+        
+        // Chart 1: Donut Chart (Kehilangan Barang)
+        const ctxLoss = document.getElementById('lossChart').getContext('2d');
+        new Chart(ctxLoss, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pernah', 'Tidak Pernah'],
+                datasets: [{
+                    data: [51, 49],
+                    backgroundColor: ['#2563EB', '#F1F5F9'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                }
+            }
+        });
+
+        // Chart 2: Bar Chart (Top Items)
+        const ctxItems = document.getElementById('itemsChart').getContext('2d');
+        new Chart(ctxItems, {
+            type: 'bar',
+            data: {
+                labels: ['Kunci', 'Charger', 'Dompet', 'Earphone'],
+                datasets: [{
+                    label: '% Persentase',
+                    data: [40, 35, 30, 25],
+                    backgroundColor: '#0D9488',
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Horizontal bar
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false }, max: 50 },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Chart 3: Bar Chart (Features & Screens)
+        const ctxFeatures = document.getElementById('featuresChart').getContext('2d');
+        new Chart(ctxFeatures, {
+            type: 'bar',
+            data: {
+                labels: ['Screens UI', 'Fitur Mhs', 'Fitur Admin', 'Layer Security'],
+                datasets: [{
+                    label: 'Total',
+                    data: [26, 11, 6, 4],
+                    backgroundColor: ['#2563EB', '#0D9488', '#EA580C', '#64748B'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // --- 2. Scroll & Navigation Logic ---
+        const slider = document.getElementById('slider');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('dots');
+        
+        // Create dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = i === 0 ? 'dot active' : 'dot';
+            dot.onclick = () => scrollToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+        const dots = document.querySelectorAll('.dot');
+
+        function scrollToSlide(index) {
+            slides[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+
+        function scrollNext() {
+            const currentScroll = slider.scrollLeft;
+            const slideWidth = slider.clientWidth;
+            const targetScroll = currentScroll + slideWidth;
+            slider.scrollTo({ left: targetScroll, behavior: 'smooth' });
+        }
+
+        function scrollPrev() {
+            const currentScroll = slider.scrollLeft;
+            const slideWidth = slider.clientWidth;
+            const targetScroll = currentScroll - slideWidth;
+            slider.scrollTo({ left: targetScroll, behavior: 'smooth' });
+        }
+
+        // Update active dot on scroll
+        slider.addEventListener('scroll', () => {
+            const scrollPos = slider.scrollLeft;
+            const slideWidth = slider.clientWidth;
+            const activeIndex = Math.round(scrollPos / slideWidth);
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === activeIndex);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                scrollNext();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                scrollPrev();
+            }
         });
     </script>
 </body>
