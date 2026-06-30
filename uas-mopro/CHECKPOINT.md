@@ -1,4 +1,4 @@
-# CHECKPOINT — Cari.In Mobile
+# CHECKPOINT — Cariin Mobile
 
 > Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
 >

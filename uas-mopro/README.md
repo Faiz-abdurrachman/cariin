@@ -1,4 +1,4 @@
-# Cari.In — Campus Lost & Found App
+# Cariin — Campus Lost & Found App
 
 > **"Cariin barangmu di kampus."**
 
@@ -83,7 +83,7 @@ npx expo start
 EXPO_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
 EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN=student.unu-jogja.ac.id
-EXPO_PUBLIC_APP_NAME=Cari.In
+EXPO_PUBLIC_APP_NAME=Cariin
 EXPO_PUBLIC_APP_ENV=development
 ```
 
@@ -131,7 +131,6 @@ src/
 | Item | Detail |
 |------|--------|
 | **Mata Kuliah** | Mobile Programming — UNU Yogyakarta |
-| **Dosen** | Yana Hendriana |
 | **Semester** | 4 (Genap 2025/2026) |
 | **Package ID** | `id.cariin.app` |
 | **Scheme** | `cariin://` |

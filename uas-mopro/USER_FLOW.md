@@ -1,23 +1,23 @@
-# User Flow Cari.In — Demo & Video Submission
+# User Flow Cariin — Demo & Video Submission
 
 ---
 
 ## NARASI PEMBUKA
 
-> "Cari.In adalah aplikasi lost & found untuk mahasiswa UNU Yogyakarta. Mahasiswa login dengan email kampus, melaporkan barang hilang atau temuan, mencari barang di feed, dan berkomunikasi via chat. Admin memoderasi setiap laporan sebelum tayang."
+> "Cariin adalah aplikasi lost & found untuk mahasiswa UNU Yogyakarta. Mahasiswa login dengan email kampus, melaporkan barang hilang atau temuan, mencari barang di feed, dan berkomunikasi via chat. Admin memoderasi setiap laporan sebelum tayang."
 
 ---
 
 # FLOW 1 — MAHASISWA: Lapor Barang Hilang
 
 ## Narasi:
-> "Faiz adalah mahasiswa yang baru saja kehilangan AirPods di perpustakaan. Ia membuka Cari.In untuk melaporkan."
+> "Faiz adalah mahasiswa yang baru saja kehilangan AirPods di perpustakaan. Ia membuka Cariin untuk melaporkan."
 
 ## Step-by-step:
 
 | Step | Action | Layar | Narasi |
 |------|--------|-------|--------|
-| 1 | Buka app | **Splash** | "Cari.In — Kampus Lebih Aman" |
+| 1 | Buka app | **Splash** | "Cariin — Kampus Lebih Aman" |
 | 2 | Auto redirect | **Role Selection** | "Pilih peran: Mahasiswa atau Admin" |
 | 3 | Tap **Mahasiswa** | **Login** | "Masuk dengan email kampus" |
 | 4 | Isi email: `faiz@student.unu-jogja.ac.id` | Login | "Email kampus sebagai verifikasi identitas" |
@@ -37,7 +37,7 @@
 # FLOW 2 — ADMIN: Moderasi Laporan
 
 ## Narasi:
-> "Admin Cari.In membuka dashboard dan melihat ada laporan baru yang perlu direview."
+> "Admin Cariin membuka dashboard dan melihat ada laporan baru yang perlu direview."
 
 ## Step-by-step:
 
@@ -147,7 +147,7 @@
 | 5 | Isi **Lokasi**: "Kantin Pusat" | Form | |
 | 6 | Scroll ke **Info Pelapor** | Form | "Walk-in: admin input manual" |
 | 7 | Isi Nama: "Budi Santoso" | Form | |
-| 8 | Isi NIM: "2023012345" | Form | |
+| 8 | Isi NIM: "241111021" | Form | |
 | 9 | Tap **Kirim Laporan** | Success | "Langsung approved — tayang di feed" |
 | 10 | Tap **Kembali** | Dashboard | "Laporan muncul di tab Aktif" |
 

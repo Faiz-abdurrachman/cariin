@@ -1,10 +1,9 @@
-# LAPORAN AKHIR — Cari.In: Aplikasi Lost & Found Kampus
+# LAPORAN AKHIR — Cariin: Aplikasi Lost & Found Kampus
 
 > **Mata Kuliah:** Mobile Programming — Semester 4  
-> **Dosen:** Yana Hendriana, S.Kom., M.Kom.  
 > **Kampus:** UNU Yogyakarta  
 > **Mahasiswa:** Faiz Abdurrachman  
-> **NIM:** 2023012345  
+> **NIM:** 241111021  
 > **Tanggal:** 30 Juni 2026  
 
 ---
@@ -37,9 +36,9 @@ Lingkungan kampus dengan mobilitas tinggi menciptakan insiden kehilangan barang 
 | 5 | Tidak ada standar pelaporan | Format tidak konsisten |
 | 6 | Mahasiswa tidak sempat buka aplikasi | Butuh jalur laporan via petugas (walk-in) |
 
-### 1.3 Solusi: Cari.In
+### 1.3 Solusi: Cariin
 
-**Cari.In** adalah aplikasi **Lost & Found** berbasis mobile untuk mahasiswa UNU Yogyakarta. Platform terpusat yang menyelesaikan seluruh masalah di atas melalui:
+**Cariin** adalah aplikasi **Lost & Found** berbasis mobile untuk mahasiswa UNU Yogyakarta. Platform terpusat yang menyelesaikan seluruh masalah di atas melalui:
 
 1. **Domain Email Kampus** — verifikasi identitas via `@student.unu-jogja.ac.id`
 2. **Admin Moderation** — setiap laporan direview sebelum tayang

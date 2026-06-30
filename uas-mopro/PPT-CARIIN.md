@@ -1,16 +1,15 @@
 # 🎯 Slide 1 — Judul
-## Cari.In — Campus Lost & Found
+## Cariin — Campus Lost & Found
 ### "Cariin barangmu di kampus"
 
 | Label | Detail |
 |-------|--------|
 | **Mata Kuliah** | Mobile Programming |
-| **Dosen** | Yana Hendriana |
-| **Semester** | 4 (Genap 2025/2026) |
+| **Semester** | 4 |
 | **Nama** | Faiz Abdurrachman |
-| **NIM** | 2023012321 |
+| **NIM** | 241111021 |
 
-> **[SPEAKER]** Cari.In adalah aplikasi lost & found untuk mahasiswa UNU Yogyakarta. Aplikasi ini membantu mahasiswa melaporkan dan mencari barang hilang/temuan di lingkungan kampus.
+> **[SPEAKER]** Cariin adalah aplikasi lost & found untuk mahasiswa UNU Yogyakarta. Aplikasi ini membantu mahasiswa melaporkan dan mencari barang hilang/temuan di lingkungan kampus.
 
 ---
 
@@ -56,7 +55,7 @@ Nyaman pakai email kampus?   Ya: 82%     Tidak: 18%
 ---
 
 # 💡 Slide 4 — Unique Value Proposition
-## Apa yang Bikin Cari.In Berbeda?
+## Apa yang Bikin Cariin Berbeda?
 
 | # | UVP | Penjelasan |
 |---|-----|------------|
@@ -67,7 +66,7 @@ Nyaman pakai email kampus?   Ya: 82%     Tidak: 18%
 | 5 | 🔴🟢 **Diferensiasi UI** | Lost = Orange, Found = Emerald — visual intuitif |
 | 6 | 📝 **Admin Walk-in** | Satpam bisa input laporan atas nama mahasiswa |
 
-> **[SPEAKER]** Enam UVP ini membedakan Cari.In dari solusi yang ada. Domain email memastikan hanya mahasiswa terverifikasi, admin moderation mencegah spam, dan chat in-app melindungi privasi.
+> **[SPEAKER]** Enam UVP ini membedakan Cariin dari solusi yang ada. Domain email memastikan hanya mahasiswa terverifikasi, admin moderation mencegah spam, dan chat in-app melindungi privasi.
 
 ---
 
@@ -365,7 +364,7 @@ Supabase (Auth + Postgres + Storage + Realtime)
 React Navigation v7 + Zustand v5 + NativeWind v4
 ```
 
-> **[SPEAKER]** Cari.In berhasil mengimplementasikan seluruh requirement mata kuliah Mobile Programming. Aplikasi siap digunakan dan bisa dikembangkan lebih lanjut.
+> **[SPEAKER]** Cariin berhasil mengimplementasikan seluruh requirement mata kuliah Mobile Programming. Aplikasi siap digunakan dan bisa dikembangkan lebih lanjut.
 
 ---
 
@@ -374,7 +373,7 @@ React Navigation v7 + Zustand v5 + NativeWind v4
 ## Terima Kasih
 
 ```
-Cari.In — "Cariin barangmu di kampus."
+Cariin — "Cariin barangmu di kampus."
 
 Demo: Expo Go / APK Android
 Repo: github.com/faiz/cariin
