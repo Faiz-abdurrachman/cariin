@@ -1,0 +1,34 @@
+- application [ref=f1e2]:
+  - generic:
+    - generic [ref=f1e4]:
+      - generic [ref=f1e7]: 
+      - heading "Cari.In" [level=1] [ref=f1e8]
+      - paragraph [ref=f1e9]: Campus Lost & Found Platform.
+      - generic [ref=f1e10]:
+        - generic [ref=f1e11]:
+          - generic [ref=f1e12]: 
+          - text: UNU Yogyakarta
+        - generic [ref=f1e13]:
+          - generic [ref=f1e14]: 
+          - text: Mobile Programming
+        - generic [ref=f1e15]:
+          - generic [ref=f1e16]: 
+          - text: Faiz Abdurrachman
+    - generic:
+      - generic:
+        - heading [level=3]: The Problem
+        - heading [level=2]:
+          - text: Realitas di
+          - mark: Lapangan
+        - paragraph: Mahasiswa kehilangan barang. Grup WhatsApp menjadi sarana utama, namun menimbulkan berbagai masalah operasional dan privasi.
+    - generic:
+      - generic:
+        - heading [level=3]: Market Validation
+        - heading [level=2]:
+          - text: Survei
+          - mark: 39 Mahasiswa
+    - text:                                  
+  - complementary:
+    - button "next slide" [ref=f1e20] [cursor=pointer]
+  - text: Speaker notes
+  - generic [ref=f1e23]: Cari.In Campus Lost & Found Platform. UNU Yogyakarta Mobile Programming Faiz Abdurrachman

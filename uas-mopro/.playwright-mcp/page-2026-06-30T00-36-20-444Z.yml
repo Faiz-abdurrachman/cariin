@@ -1,0 +1,32 @@
+- application [ref=e2]:
+  - generic:
+    - generic [ref=e3]:
+      - generic [ref=e5]: 
+      - heading "Cari.In" [level=1] [ref=e6]
+      - heading "Campus Lost & Found Platform" [level=2] [ref=e7]
+      - paragraph [ref=e9]: "\"Cariin barangmu di kampus\""
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]: 
+          - text: Mobile Programming
+        - generic [ref=e13]:
+          - generic [ref=e14]: 
+          - text: Semester 4
+        - generic [ref=e15]:
+          - generic [ref=e16]: 
+          - text: Faiz Abdurrachman
+        - generic [ref=e17]:
+          - generic [ref=e18]: 
+          - text: UNU Yogyakarta
+    - generic:
+      - heading [level=3]: The Problem
+      - heading [level=2]: Masalah di Lapangan
+      - paragraph: Mengapa mahasiswa butuh platform khusus untuk barang hilang & temuan?
+    - generic:
+      - heading [level=3]: Market Validation
+      - heading [level=2]: Data Survei 39 Mahasiswa
+    - text:                                     
+  - complementary:
+    - button "next slide" [ref=e22] [cursor=pointer]
+  - text: Speaker notes
+  - generic [ref=e25]: Cari .In Campus Lost & Found Platform "Cariin barangmu di kampus" Mobile Programming Semester 4 Faiz Abdurrachman UNU Yogyakarta

@@ -1,0 +1,40 @@
+- application [ref=f3e2]:
+  - generic:
+    - generic [ref=f3e4]:
+      - generic [ref=f3e5]: Tugas Mobile Programming
+      - heading "Cari.In" [level=1] [ref=f3e6]
+      - paragraph [ref=f3e7]:
+        - text: Sistem "Hilang & Temu" kampus
+        - text: yang seharusnya ada dari dulu.
+      - generic [ref=f3e8]:
+        - generic [ref=f3e9]: Faiz Abdurrachman
+        - generic [ref=f3e10]: •
+        - generic [ref=f3e11]: UNU Yogyakarta
+        - generic [ref=f3e12]: •
+        - generic [ref=f3e13]: Semester 4
+    - generic:
+      - generic:
+        - generic: Realitas saat ini
+        - heading [level=2]: Grup WhatsApp itu untuk ngobrol.
+        - heading [level=2]: Bukan untuk nyari kunci motor yang hilang.
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading [level=2]: "Kalau pakai WA:"
+            - list:
+              - listitem:
+                - generic: 
+                - text: Info ketumpuk chat lain.
+              - listitem:
+                - generic: 
+                - text: Privasi (nomor HP) terekspos.
+              - listitem:
+                - generic: 
+                - text: Rawan orang ngaku-ngaku (klaim palsu).
+          - generic:
+            - heading [level=3]: Masa depan kok masih manual?
+            - paragraph: Mahasiswa butuh kepastian. Kehilangan barang bikin panik, sistem yang berantakan bikin makin stres.
+    - text: 
+  - text: Speaker notes
+  - generic [ref=f3e18]: Tugas Mobile Programming Cari.In Sistem "Hilang & Temu" kampus yang seharusnya ada dari dulu. Faiz Abdurrachman • UNU Yogyakarta • Semester 4

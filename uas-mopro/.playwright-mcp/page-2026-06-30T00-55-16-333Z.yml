@@ -1,0 +1,111 @@
+- generic [active] [ref=f4e1]:
+  - navigation [ref=f4e2]:
+    - generic [ref=f4e3]: Cari.In
+    - generic [ref=f4e4]: Mobile Programming
+  - generic [ref=f4e12]:
+    - generic [ref=f4e14] [cursor=pointer]: 
+    - generic [ref=f4e16] [cursor=pointer]: 
+  - generic [ref=f4e17]:
+    - generic [ref=f4e19]:
+      - heading "Platform Inovasi Kampus" [level=3] [ref=f4e20]
+      - heading "Sistem Lost & Found Terintegrasi." [level=1] [ref=f4e21]
+      - paragraph [ref=f4e22]: Solusi digital modern untuk mengatasi masalah kehilangan barang di lingkungan Universitas Nahdlatul Ulama Yogyakarta.
+      - generic [ref=f4e23]:
+        - generic [ref=f4e24]:
+          - generic [ref=f4e25]: 
+          - text: Faiz Abdurrachman
+        - generic [ref=f4e26]:
+          - generic [ref=f4e27]: 
+          - text: "NIM: 2023012321"
+        - generic [ref=f4e28]:
+          - generic [ref=f4e29]: 
+          - text: Semester 4
+    - generic [ref=f4e31]:
+      - generic [ref=f4e32]:
+        - heading "Market Validation" [level=3] [ref=f4e33]
+        - heading "Survei 39 Mahasiswa UNU" [level=2] [ref=f4e34]
+        - paragraph [ref=f4e35]: Data menunjukkan bahwa kehilangan barang adalah masalah nyata dan sistem WhatsApp grup saat ini tidak efektif (Informasi tertumpuk, pencarian sulit, dan privasi terekspos).
+        - generic [ref=f4e36]:
+          - generic [ref=f4e37]:
+            - generic [ref=f4e38]: 67%
+            - generic [ref=f4e39]: Mencari via Satpam
+          - generic [ref=f4e40]:
+            - generic [ref=f4e41]: 82%
+            - generic [ref=f4e42]: Nyaman Email Kampus
+      - generic [ref=f4e43]:
+        - heading "Proporsi Pengalaman Kehilangan Barang" [level=4] [ref=f4e45]
+        - heading "Top Barang Paling Sering Hilang" [level=4] [ref=f4e49]
+    - generic [ref=f4e52]:
+      - generic [ref=f4e53]:
+        - heading "Unique Value Proposition" [level=3] [ref=f4e54]
+        - heading "Solusi yang Kami Tawarkan" [level=2] [ref=f4e55]
+      - generic [ref=f4e56]:
+        - generic [ref=f4e57]:
+          - generic [ref=f4e59]: 
+          - heading "Keamanan Identitas" [level=4] [ref=f4e60]
+          - paragraph [ref=f4e61]: Registrasi terkunci hanya untuk email @student.unu-jogja.ac.id. Memastikan tidak ada klaim palsu dari pihak luar.
+        - generic [ref=f4e62]:
+          - generic [ref=f4e64]: 
+          - heading "Privasi Terjaga" [level=4] [ref=f4e65]
+          - paragraph [ref=f4e66]: Fitur In-App Chat Realtime. Mahasiswa bisa berkomunikasi langsung tanpa mengekspos nomor WhatsApp pribadi.
+        - generic [ref=f4e67]:
+          - generic [ref=f4e69]: 
+          - heading "Admin Moderation" [level=4] [ref=f4e70]
+          - paragraph [ref=f4e71]: Setiap laporan difilter oleh admin kampus. Dilengkapi fitur Walk-in Report untuk pelaporan fisik di pos satpam.
+    - generic [ref=f4e73]:
+      - generic [ref=f4e74]:
+        - generic [ref=f4e75]: // Supabase Realtime WebSocket
+        - generic [ref=f4e76]: "User A: Kirim Pesan"
+        - generic [ref=f4e77]: ↓ (INSERT into messages)
+        - generic [ref=f4e78]: "Database: Trigger Notification"
+        - generic [ref=f4e79]: ↓ (postgres_changes channel)
+        - generic [ref=f4e80]: "User B: Terima Instan (No Refresh)"
+        - separator [ref=f4e81]
+        - generic [ref=f4e82]: // Keamanan Row Level Security (RLS)
+        - generic [ref=f4e83]:
+          - text: "Policy: Mahasiswa HANYA dapat melihat"
+          - text: laporan publik atau miliknya sendiri.
+      - generic [ref=f4e84]:
+        - heading "Arsitektur Teknologi" [level=3] [ref=f4e85]
+        - heading "Realtime & Aman" [level=2] [ref=f4e86]
+        - paragraph [ref=f4e87]: Menggunakan arsitektur modern Serverless untuk memastikan performa tinggi dan keamanan data.
+        - list [ref=f4e88]:
+          - listitem [ref=f4e89]:
+            - generic [ref=f4e91]: 
+            - generic [ref=f4e92]: "Frontend: React Native 0.81, Expo SDK 54, Zustand"
+          - listitem [ref=f4e93]:
+            - generic [ref=f4e95]: 
+            - generic [ref=f4e96]: "Backend: Supabase (PostgreSQL, Auth, Storage)"
+    - generic [ref=f4e97]:
+      - generic [ref=f4e98]:
+        - heading "Production Ready" [level=3] [ref=f4e99]
+        - heading "Capaian Aplikasi" [level=2] [ref=f4e100]
+      - generic [ref=f4e101]:
+        - heading "Implementasi Fitur & Screen" [level=4] [ref=f4e103]
+        - generic [ref=f4e106]:
+          - generic [ref=f4e107]: 
+          - generic [ref=f4e108]: 76MB
+          - generic [ref=f4e109]: APK Production Size
+          - generic [ref=f4e110]:
+            - generic [ref=f4e111]: ✓ expo-doctor 18/18 passed
+            - generic [ref=f4e112]: ✓ 0 TypeScript Errors
+        - generic [ref=f4e113]:
+          - generic [ref=f4e114]:
+            - generic [ref=f4e115]:
+              - generic [ref=f4e116]: Role Mahasiswa
+              - generic [ref=f4e117]: 11 Fitur
+            - paragraph [ref=f4e118]: Feed, Filter, Detail, Chat, Notifikasi, Edit Laporan.
+          - separator [ref=f4e119]
+          - generic [ref=f4e120]:
+            - generic [ref=f4e121]:
+              - generic [ref=f4e122]: Role Admin
+              - generic [ref=f4e123]: 6 Fitur
+            - paragraph [ref=f4e124]: Dashboard, Review (Approve/Reject), Walk-in Report.
+    - generic [ref=f4e126]:
+      - generic [ref=f4e128]: 
+      - heading "Terima Kasih" [level=1] [ref=f4e129]
+      - paragraph [ref=f4e130]: Aplikasi Cari.In siap digunakan.
+      - link " github.com/faiz/cariin" [ref=f4e132] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=f4e133]: 
+        - text: github.com/faiz/cariin
