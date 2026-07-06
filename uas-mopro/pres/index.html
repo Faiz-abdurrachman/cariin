@@ -411,6 +411,16 @@
                         <h4 style="margin-bottom: 8px;">Backend (BaaS)</h4>
                         <p style="color: var(--teal); font-weight: 500;">Supabase Auth • PostgresDB • Storage • Realtime</p>
                     </div>
+                    <div class="card" style="padding: 24px; margin-top: 16px; display: flex; gap: 16px;">
+                        <div style="flex: 1; text-align: center; padding: 12px; background: #F0FDFA; border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--teal);">SecureStore</div>
+                            <div style="font-size: 0.85rem; color: var(--slate-500);">Token JWT terenkripsi</div>
+                        </div>
+                        <div style="flex: 1; text-align: center; padding: 12px; background: #EFF6FF; border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">AsyncStorage</div>
+                            <div style="font-size: 0.85rem; color: var(--slate-500);">Feed cache offline</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="code-box">
@@ -468,14 +478,16 @@
             <div class="card code-box" style="margin: 0 auto; max-width: 900px; display: flex; gap: 40px; font-size: 1rem;">
                 <div style="flex: 1;">
                     <div style="color: #60A5FA; margin-bottom: 10px;">// Mahasiswa (Bottom Tabs)</div>
-                    <div>├── 🏠 Home → Detail | ChatRoom</div>
-                    <div>├── 💬 Pesan → Inbox | Notifikasi</div>
+                    <div>├── 🏠 Home → Detail | ChatRoom | UserProfile</div>
+                    <div>├── 💬 Pesan → Inbox | ChatRoom | Notifikasi</div>
                     <div>├── <span style="color: var(--emerald);">➕ Buat (FAB Modal)</span></div>
                     <div>├── 📄 Laporanku → Edit | Detail</div>
-                    <div>└── 👤 Profil → Settings | Help</div>
+                    <div>└── 👤 Profil → Settings | Help | UserProfile</div>
                 </div>
                 <div style="flex: 1;">
-                    <div style="color: #FBBF24; margin-bottom: 10px;">// Admin (Bottom Tabs)</div>
+                    <div style="color: #FBBF24; margin-bottom: 10px;">// Admin (Drawer + Bottom Tab)</div>
+                    <div style="color: #94A3B8;">☰ Drawer: Beranda · Tentang · Keluar</div>
+                    <div style="height: 12px;"></div>
                     <div>├── 📊 Dashboard → Review</div>
                     <div>├── 📋 Semua Laporan</div>
                     <div>├── <span style="color: var(--emerald);">➕ Buat (Walk-in Report)</span></div>
@@ -483,7 +495,7 @@
                     <div>└── 👤 Profil → Logout</div>
                 </div>
             </div>
-            <p style="text-align: center; margin-top: 24px;">Navigasi dua role terpisah dengan <b>FAB (Floating Action Button)</b> yang *raised* di tengah untuk kemudahan pelaporan.</p>
+            <p style="text-align: center; margin-top: 24px;">Tiga pola navigasi sesuai requirement dosen: <b>Stack</b> (auth) + <b>Tab</b> (mahasiswa) + <b>Drawer</b> (admin) dengan FAB *raised* di tengah.</p>
         </section>
 
         <!-- Slide 9: Fitur Role -->
@@ -685,7 +697,7 @@
                 labels: ['Screens UI', 'Fitur Mhs', 'Fitur Admin', 'Security Layer'],
                 datasets: [{
                     label: 'Total',
-                    data: [26, 11, 6, 4],
+                    data: [30, 11, 6, 4],
                     backgroundColor: ['#2563EB', '#0D9488', '#EA580C', '#64748B'],
                     borderRadius: 8
                 }]
