@@ -43,11 +43,11 @@ Untuk teknologinya, kami menggunakan **React Native** dengan **TypeScript**. Ken
 Untuk backend, daripada pusing mengurus server dari nol, kami menggunakan layanan **Supabase**. Keunggulannya, Supabase memakai database relasional **PostgreSQL**, yang sangat cocok untuk memetakan desain *Class* dan Objek kami ke dalam tabel database yang terhubung satu sama lain. Supabase juga menyediakan Autentikasi yang bisa kami kunci hanya untuk email domain kampus kita."
 
 ### Slide 8: Implementasi OOP (Pilar Utama PBO)
-"Karena ini mata kuliah PBO, kami menerapkan 4 pilar utamanya:
-1. **Inheritance**: Kami punya Class dasar `User`. Class `Admin` dan `Mahasiswa` mewarisi sifat `User`, tapi `Admin` ditambahkan *method* khusus seperti `approveLaporan()`.
-2. **Encapsulation**: Atribut krusial seperti Token Login kami buat *private*. Komponen UI tidak bisa menembus data ini sembarangan, harus lewat jalan resmi yaitu *getter* dan *setter*.
-3. **Polymorphism**: *Method* `submit()` kami buat dinamis. Jika yang di-submit adalah Laporan Temuan, perilakunya berbeda: sistem akan mewajibkan mahasiswa mengisi 'Titik Penitipan Barang' ke Satpam.
-4. **Abstraction**: Kami menggunakan *Interface* agar UI aplikasi tidak tahu-menahu soal bahasa *query database* di balik layar, cukup tahu cara menekan tombol dan data pun muncul."
+"Karena ini mata kuliah PBO, kami menerapkan 4 pilar utamanya, dan semuanya bisa dibuka langsung di folder `src/models/`:
+1. **Inheritance**: Kami punya class dasar abstrak `User`. Class `Mahasiswa` dan `Admin` sama-sama `extends User`, tapi `Admin` ditambah method khusus yaitu `approveReport()` dan `rejectReport()` yang tidak dimiliki mahasiswa.
+2. **Encapsulation**: Atribut seperti `_id` dan `_name` kami buat `private`, jadi tidak bisa disentuh sembarangan dari luar — harus lewat jalan resmi yaitu *getter*, dan *setter* `name` kami beri validasi agar tidak boleh kosong.
+3. **Polymorphism**: Method `validate()` kami buat dinamis. Untuk `FoundReport` (barang temuan), sistem mewajibkan mengisi 'Titik Penitipan'; sedangkan `LostReport` tidak. Method sama, perilaku berbeda. Contoh lain, `canModerate()` mengembalikan nilai berbeda untuk Admin dan Mahasiswa.
+4. **Abstraction**: Class `User` dan `ReportModel` kami buat `abstract` sehingga tidak bisa di-instansiasi langsung — hanya jadi blueprint. Selain itu, *service layer* menyembunyikan detail query database dari UI."
 
 ### Slide 9: Pembagian Tugas & Penutup
 *(Sebutkan nama asli anggota kelompok dan perannya sesuai di slide baru)*

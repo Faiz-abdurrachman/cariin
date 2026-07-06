@@ -291,7 +291,7 @@ export default function AdminCreateFoundScreen() {
           <FieldLabel>Nama Pelapor</FieldLabel>
           <Input value={reporterName} onChangeText={setReporterName} placeholder="Nama lengkap pelapor" leftIcon="user" />
           <FieldLabel>NIM Pelapor</FieldLabel>
-          <Input value={reporterNim} onChangeText={setReporterNim} placeholder="Cth: 22-TI-001" />
+          <Input value={reporterNim} onChangeText={setReporterNim} placeholder="Cth: 241111021" />
           <FieldLabel>Fakultas Pelapor</FieldLabel>
           <Input value={reporterFaculty} onChangeText={setReporterFaculty} placeholder="Cth: Teknik" />
         </ScrollView>

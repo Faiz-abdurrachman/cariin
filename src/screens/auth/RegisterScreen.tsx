@@ -1,6 +1,6 @@
-// RegisterScreen — form daftar mahasiswa baru. Domain email kampus DIVALIDASI
-// di sini (gate UVP #1). Setelah signUp + insert profile sukses, AuthContext
-// onAuthStateChange auto-route ke MainNavigator.
+// RegisterScreen — form daftar mahasiswa baru.
+// Opsi A: user isi NIM → email auto-generate (nim@student.unu-jogja.ac.id).
+// Field email read-only biar gak perlu diketik manual & gak ada typo.
 
 import { useState } from 'react';
 import {
@@ -12,7 +12,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { type StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,25 +20,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AuthInput from '@/components/AuthInput';
 import FacultyPicker from '@/components/FacultyPicker';
 import PrimaryButton from '@/components/PrimaryButton';
+import ProgramPicker from '@/components/ProgramPicker';
 import { useAuth } from '@/context/AuthContext';
 import type { AuthStackParamList } from '@/navigation/types';
+import { ALLOWED_DOMAIN, isValidNim, isValidPassword, NIM_ERROR, PASSWORD_ERROR } from '@/utils/validators';
 import { COLORS } from '@/utils/constants';
-import {
-  EMAIL_DOMAIN_ERROR,
-  isValidCampusEmail,
-  isValidNim,
-  isValidPassword,
-  NIM_ERROR,
-  PASSWORD_ERROR,
-} from '@/utils/validators';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'Register'>;
 
 interface FormErrors {
   name?: string;
   nim?: string;
-  email?: string;
   faculty?: string;
+  prodi?: string;
   password?: string;
 }
 
@@ -50,19 +44,29 @@ export default function RegisterScreen() {
   const [nim, setNim] = useState('');
   const [email, setEmail] = useState('');
   const [faculty, setFaculty] = useState<string | null>(null);
-  const [department, setDepartment] = useState('');
+  const [prodi, setProdi] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+
+  // Saat user ngetik NIM, email auto-generate
+  const handleNimChange = (text: string) => {
+    setNim(text);
+    const trimmed = text.trim();
+    if (trimmed.length > 0 && /^\d+$/.test(trimmed)) {
+      setEmail(`${trimmed}@${ALLOWED_DOMAIN}`);
+    } else {
+      setEmail('');
+    }
+  };
 
   function validate(): boolean {
     const next: FormErrors = {};
     if (!name.trim()) next.name = 'Nama wajib diisi.';
     if (!nim.trim()) next.nim = 'NIM wajib diisi.';
     else if (!isValidNim(nim)) next.nim = NIM_ERROR;
-    if (!email.trim()) next.email = 'Email wajib diisi.';
-    else if (!isValidCampusEmail(email)) next.email = EMAIL_DOMAIN_ERROR;
     if (!faculty) next.faculty = 'Pilih fakultas.';
+    if (!prodi) next.prodi = 'Pilih prodi.';
     if (!isValidPassword(password)) next.password = PASSWORD_ERROR;
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -78,10 +82,8 @@ export default function RegisterScreen() {
         email,
         password,
         faculty: faculty ?? undefined,
-        department: department.trim() || undefined,
+        department: prodi ?? undefined,
       });
-      // signUp Supabase otomatis bikin session kalau email confirmation OFF.
-      // Kalau ON, session null dan onAuthStateChange tidak fire — kasih info.
       Alert.alert(
         'Pendaftaran berhasil',
         'Akun Anda telah dibuat. Jika ada email konfirmasi, silakan cek inbox.',
@@ -93,6 +95,8 @@ export default function RegisterScreen() {
       setLoading(false);
     }
   }
+
+  const hasEmail = email.length > 0;
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
@@ -143,7 +147,7 @@ export default function RegisterScreen() {
               Buat Akun
             </Text>
             <Text style={{ fontSize: 14, color: COLORS.textMuted }}>
-              Daftar dengan email kampus kamu.
+              Masukkan NIM, data lainnya otomatis.
             </Text>
           </View>
 
@@ -160,39 +164,62 @@ export default function RegisterScreen() {
             <AuthInput
               label="NIM"
               value={nim}
-              onChangeText={setNim}
-              placeholder="22-TI-001"
+              onChangeText={handleNimChange}
+              placeholder="241111021"
               keyboardType="numeric"
               autoCapitalize="none"
               error={errors.nim}
             />
-            <AuthInput
-              label="Email Kampus"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="nama@student.unu-jogja.ac.id"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              error={errors.email}
-            />
+
+            {/* Email auto-generate — read-only display */}
+            <View style={{ rowGap: 6 }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#18181B' }}>Email Kampus</Text>
+              <View
+                style={{
+                  backgroundColor: '#F1F5F9',
+                  borderColor: COLORS.border,
+                  borderWidth: 1,
+                  borderRadius: 16,
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <Feather name={hasEmail ? 'check-circle' : 'mail'} size={16} color={hasEmail ? COLORS.found : COLORS.textMuted} />
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 14,
+                    color: hasEmail ? COLORS.primary : COLORS.textMuted,
+                    fontStyle: hasEmail ? 'normal' : 'italic',
+                  }}
+                  numberOfLines={1}
+                >
+                  {hasEmail ? email : 'Otomatis dari NIM'}
+                </Text>
+              </View>
+            </View>
 
             <View style={{ flexDirection: 'row', columnGap: 12 }}>
               <View style={{ flex: 1 }}>
                 <FacultyPicker
                   label="Fakultas"
                   value={faculty}
-                  onChange={setFaculty}
+                  onChange={(f) => {
+                    setFaculty(f);
+                    setProdi(null);
+                  }}
                   error={errors.faculty}
                 />
               </View>
               <View style={{ flex: 1 }}>
-                <AuthInput
-                  label="Jurusan"
-                  value={department}
-                  onChangeText={setDepartment}
-                  placeholder="Cth: Informatika"
-                  autoCapitalize="words"
+                <ProgramPicker
+                  faculty={faculty}
+                  value={prodi}
+                  onChange={setProdi}
+                  error={errors.prodi}
                 />
               </View>
             </View>

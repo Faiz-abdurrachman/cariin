@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { type StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,8 +13,8 @@ import AuthInput from '@/components/AuthInput';
 import PrimaryButton from '@/components/PrimaryButton';
 import { useAuth } from '@/context/AuthContext';
 import type { AuthStackParamList } from '@/navigation/types';
+import { ALLOWED_DOMAIN, isValidPassword, PASSWORD_ERROR } from '@/utils/validators';
 import { COLORS } from '@/utils/constants';
-import { isValidPassword, PASSWORD_ERROR } from '@/utils/validators';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'Login'>;
 type Route = RouteProp<AuthStackParamList, 'Login'>;
@@ -26,18 +26,27 @@ export default function LoginScreen() {
   const isAdmin = !!route.params?.isAdmin;
   const variant = isAdmin ? 'admin' : 'default';
 
-  const [email, setEmail] = useState('');
+  const [emailInput, setEmailInput] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | undefined>();
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
+  // Kalau input adalah angka 6-15 digit (NIM), construct email lengkap.
+  // Kalau bukan (admin atau email manual), pakai apa yang diketik.
+  const isNim = !isAdmin && /^\d{6,15}$/.test(emailInput.trim());
+  const actualEmail = isNim ? `${emailInput.trim()}@${ALLOWED_DOMAIN}` : emailInput.trim();
+
+  const handleEmailChange = (text: string) => {
+    setEmailInput(text);
+  };
+
   function validate(): boolean {
     let valid = true;
-    if (!email.trim()) {
+    if (!actualEmail) {
       setEmailError('Email wajib diisi.');
       valid = false;
-    } else if (!email.includes('@')) {
+    } else if (!actualEmail.includes('@')) {
       setEmailError('Format email tidak valid.');
       valid = false;
     } else {
@@ -56,7 +65,7 @@ export default function LoginScreen() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await loginWithEmail(email, password);
+      await loginWithEmail(actualEmail, password);
       // Sukses → AuthContext.onAuthStateChange fire → RootNavigator branching
       // otomatis ke MainNavigator/AdminNavigator. Tidak perlu manual navigate.
     } catch (err) {
@@ -153,23 +162,39 @@ export default function LoginScreen() {
             <Text style={{ fontSize: 14, color: COLORS.textMuted }}>
               {isAdmin
                 ? 'Masuk menggunakan kredensial administrator Anda.'
-                : 'Masuk dengan email kampus Anda.'}
+                : 'Masukkan NIM, email otomatis terisi.'}
             </Text>
           </View>
 
           {/* Form */}
           <View style={{ rowGap: 20 }}>
             <AuthInput
-              label={isAdmin ? 'ID Admin / Email' : 'Email Kampus'}
+              label={isAdmin ? 'ID Admin / Email' : 'NIM / Email'}
               variant={variant}
-              value={email}
-              onChangeText={setEmail}
-              placeholder={isAdmin ? 'admin@cariin.app' : 'nim@student.unu-jogja.ac.id'}
-              keyboardType="email-address"
+              value={emailInput}
+              onChangeText={handleEmailChange}
+              placeholder={isAdmin ? 'admin@cariin.app' : '241111021'}
+              keyboardType={isAdmin ? 'email-address' : 'default'}
               autoCapitalize="none"
-              autoComplete="email"
+              autoComplete={isAdmin ? 'email' : 'off'}
               error={emailError}
             />
+            {/* Info auto-generate email (mahasiswa only) */}
+            {!isAdmin && isNim ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  paddingHorizontal: 4,
+                }}
+              >
+                <Feather name="check-circle" size={12} color={COLORS.found} />
+                <Text style={{ fontSize: 11, color: COLORS.found, fontWeight: '500' }} numberOfLines={1}>
+                  {actualEmail}
+                </Text>
+              </View>
+            ) : null}
             <AuthInput
               label={isAdmin ? 'Kata Sandi Akses' : 'Kata Sandi'}
               variant={variant}

@@ -6,6 +6,7 @@ import type { Session, User } from '@supabase/supabase-js';
 
 import { supabase } from '@/services/supabase';
 import * as authService from '@/services/auth.service';
+import { createUserModel, type User as UserModel } from '@/models';
 import type { UserRole } from '@/utils/constants';
 
 export interface UserProfile {
@@ -24,6 +25,7 @@ export interface UserProfile {
 interface AuthContextValue {
   user: User | null;
   userProfile: UserProfile | null;
+  currentUser: UserModel | null;
   role: UserRole | null;
   session: Session | null;
   isLoading: boolean;
@@ -116,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user: session?.user ?? null,
       userProfile,
+      currentUser: userProfile ? createUserModel(userProfile) : null,
       role: userProfile?.role ?? null,
       session,
       isLoading,

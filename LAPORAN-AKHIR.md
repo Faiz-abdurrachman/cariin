@@ -431,7 +431,7 @@ eas build --platform android --profile production
 | Aspek | Status |
 |-------|--------|
 | 26 screen dari UI_AUDIT.md | **25 complete**, 1 placeholder (ConfirmModal — tidak terpakai) |
-| 3 navigator wajib dosen (Stack + Tab + Drawer) | ✅ Stack + Bottom Tab (mahasiswa) + Bottom Tab (admin) |
+| 3 navigator wajib dosen (Stack + Tab + Drawer) | ✅ Stack (auth) + Bottom Tab (mahasiswa & admin) + Drawer (admin) |
 | Context API + Zustand | ✅ 2 Context + 2 Zustand stores |
 | Supabase Auth + Postgres + Realtime + Storage | ✅ Semua aktif |
 | CRUD laporan | ✅ Create, Read, Update, Delete |

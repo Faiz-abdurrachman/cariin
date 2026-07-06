@@ -2,7 +2,7 @@
 
 > Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
 >
-> **Last updated:** 2026-06-29 | **Branch:** `main` | **Local ahead origin:** FASE 4.5 + bug fixes belum commit + belum push.
+> **Last updated:** 2026-07-06 | **Branch:** `main` | **Local ahead origin:** FASE 4.5 + bug fixes + Drawer admin + SecureStore JWT belum commit + belum push.
 
 ---
 
@@ -61,7 +61,7 @@
 | Role | Email | Password | UUID (auth.users.id) |
 |------|-------|----------|----------------------|
 | admin | `admin@cariin.app` | `admin123` | `c80aa818-4803-42f0-9265-5bb52cc81e19` |
-| mahasiswa | `faiz@student.unu-jogja.ac.id` | `faiz` | `14719036-99a4-4b8d-9bf0-8dce43cee0e0` |
+| mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` | `14719036-99a4-4b8d-9bf0-8dce43cee0e0` |
 
 ---
 
@@ -78,6 +78,8 @@
 | `feedStore` searchTimer module-level mutable | ✅ Fixed FASE 6 | Pindah ke closure zustand create. |
 | `isValidPassword(null)` TypeError crash | ✅ Fixed FASE 6 | Guard `if (!password) return false`. |
 | AuthContext `loadInitial()` no try/catch → stuck splash | ✅ Fixed FASE 6 | Try/catch/finally di loadInitial. |
+| Admin pakai Bottom Tab, requirement dosen minta Drawer | ✅ Fixed | `AdminNavigator` jadi Drawer membungkus `AdminTabs` (Beranda + Tentang + Keluar). Hamburger ☰ di header Dashboard. |
+| JWT disimpan di AsyncStorage (requirement: SecureStorage) | ✅ Fixed | `supabase.ts` pakai SecureStore adapter (chunked, workaround limit 2KB). AsyncStorage dipindah ke `feedStore` persist (cache offline). |
 
 ---
 

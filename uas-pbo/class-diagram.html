@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Diagram — Cari.In</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+  <style>
+    body {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      font-family: sans-serif;
+    }
+    .diagram {
+      margin-bottom: 60px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    h2 {
+      color: #134E4A;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .note {
+      font-size: 13px;
+      color: #64748B;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="diagram">
+  <h2>1. Hierarki User</h2>
+  <p class="note">abstract class User → Mahasiswa &amp; Admin (Inheritance + Polymorphism)</p>
+  <pre class="mermaid">
+    classDiagram
+      class User {
+        &lt;&lt;abstract&gt;&gt;
+        -string _id
+        -string _name
+        -string _email
+        -string _nim
+        -string _faculty
+        -string _avatarUrl
+        +get id() string
+        +get name() string
+        +set name(value) void
+        +get initial() string
+        +role()* UserRole
+        +getRoleLabel()* string
+        +canModerate()* boolean
+      }
+      class Mahasiswa {
+        +role() UserRole
+        +getRoleLabel() string
+        +canModerate() boolean
+        +canPublishDirectly() boolean
+      }
+      class Admin {
+        +role() UserRole
+        +getRoleLabel() string
+        +canModerate() boolean
+        +canPublishDirectly() boolean
+        +approveReport(reportId, note) Promise
+        +rejectReport(reportId, reason) Promise
+      }
+      User &lt;|-- Mahasiswa : extends
+      User &lt;|-- Admin : extends
+  </pre>
+</div>
+
+<div class="diagram">
+  <h2>2. Hierarki Report</h2>
+  <p class="note">abstract class ReportModel → LostReport &amp; FoundReport (Polymorphism pada validate())</p>
+  <pre class="mermaid">
+    classDiagram
+      class ReportModel {
+        &lt;&lt;abstract&gt;&gt;
+        #string _title
+        #CategoryId _category
+        #string _location
+        #string _description
+        +get title() string
+        +get category() CategoryId
+        +get location() string
+        +type()* ReportType
+        +getTypeLabel()* string
+        +validate()* string
+      }
+      class LostReport {
+        +type() ReportType
+        +getTypeLabel() string
+        +validate() string
+      }
+      class FoundReport {
+        -string _custodyPoint
+        +get custodyPoint() string
+        +type() ReportType
+        +getTypeLabel() string
+        +validate() string
+      }
+      ReportModel &lt;|-- LostReport : extends
+      ReportModel &lt;|-- FoundReport : extends
+  </pre>
+</div>
+
+</body>
+</html>

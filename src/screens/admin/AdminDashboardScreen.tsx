@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
@@ -95,13 +95,37 @@ export default function AdminDashboardScreen() {
       <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.admin }}>
         <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <View>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
-                Admin Panel
-              </Text>
-              <Text style={{ fontSize: 12, color: '#C7D2FE', marginTop: 2 }}>
-                Selamat datang, {userProfile?.name ?? 'Admin'}
-              </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+              <Pressable
+                onPress={() => nav.dispatch(DrawerActions.openDrawer())}
+                accessibilityRole="button"
+                accessibilityLabel="Buka menu"
+                hitSlop={8}
+              >
+                {({ pressed }) => (
+                  <View
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 999,
+                      backgroundColor: 'rgba(255,255,255,0.15)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: pressed ? 0.7 : 1,
+                    }}
+                  >
+                    <Feather name="menu" size={18} color="#FFFFFF" />
+                  </View>
+                )}
+              </Pressable>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
+                  Admin Panel
+                </Text>
+                <Text style={{ fontSize: 12, color: '#C7D2FE', marginTop: 2 }} numberOfLines={1}>
+                  Selamat datang, {userProfile?.name ?? 'Admin'}
+                </Text>
+              </View>
             </View>
             <Pressable
               onPress={() => {
@@ -115,8 +139,8 @@ export default function AdminDashboardScreen() {
               {({ pressed }) => (
                 <View
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     borderRadius: 999,
                     backgroundColor: 'rgba(255,255,255,0.15)',
                     alignItems: 'center',

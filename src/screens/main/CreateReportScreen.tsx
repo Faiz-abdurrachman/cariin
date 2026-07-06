@@ -21,6 +21,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
+import { createReportModel } from '@/models';
 import type { CreateModalParamList, RootStackParamList } from '@/navigation/types';
 import { createReport } from '@/services/report.service';
 import {
@@ -101,10 +102,17 @@ export default function CreateReportScreen() {
   const onSubmit = async () => {
     if (!title.trim()) return Alert.alert('Validasi', 'Nama barang wajib diisi.');
     if (!category) return Alert.alert('Validasi', 'Pilih kategori barang.');
-    if (!location.trim()) return Alert.alert('Validasi', 'Lokasi wajib diisi.');
-    if (type === 'found' && !custodyPoint.trim()) {
-      return Alert.alert('Validasi', 'Titik penitipan wajib diisi untuk barang temuan.');
-    }
+    // Validasi domain lewat model OOP — polymorphism: LostReport & FoundReport
+    // punya aturan validate() berbeda (Found wajib titik penitipan).
+    const reportModel = createReportModel(type, {
+      title: title.trim(),
+      category,
+      location: location.trim(),
+      description: description.trim() || null,
+      custodyPoint: custodyPoint.trim(),
+    });
+    const domainError = reportModel.validate();
+    if (domainError) return Alert.alert('Validasi', domainError);
     if (!photo) return Alert.alert('Validasi', 'Foto barang wajib diunggah.');
     if (!user) return Alert.alert('Error', 'Sesi tidak valid. Silakan login ulang.');
 

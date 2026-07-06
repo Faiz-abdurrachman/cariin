@@ -104,15 +104,39 @@ export const CATEGORIES: readonly Category[] = [
 ] as const;
 
 export const FACULTIES: readonly string[] = [
-  'Teknik',
-  'Ekonomi',
-  'Hukum',
-  'FISIP',
-  'FMIPA',
-  'Kedokteran',
-  'Pertanian',
+  'FIH - Fakultas Industri Halal',
+  'FTI - Fakultas Teknologi Informasi',
+  'FE - Fakultas Ekonomi',
+  'FIP - Fakultas Ilmu Pendidikan',
+  'FDI - Fakultas Dirasah Islamiyah',
   'Lainnya',
 ] as const;
+
+// Mapping fakultas → daftar program studi (prodi)
+export const FACULTY_PROGRAMS: Record<string, readonly string[]> = {
+  'FIH - Fakultas Industri Halal': [
+    'S1 Farmasi',
+    'S1 Agribisnis',
+    'S1 Teknologi Hasil Pertanian',
+  ],
+  'FTI - Fakultas Teknologi Informasi': [
+    'S1 Informatika',
+    'S1 Teknik Elektro',
+    'S1 Teknik Komputer',
+  ],
+  'FE - Fakultas Ekonomi': [
+    'S1 Manajemen',
+    'S1 Akuntansi',
+  ],
+  'FIP - Fakultas Ilmu Pendidikan': [
+    'S1 Pendidikan Guru Sekolah Dasar (PGSD)',
+    'S1 Pendidikan Bahasa Inggris',
+  ],
+  'FDI - Fakultas Dirasah Islamiyah': [
+    'S1 Studi Islam Interdisipliner',
+  ],
+  'Lainnya': [],
+} as const;
 
 export type ReportStatus = 'pending' | 'approved' | 'rejected' | 'resolved';
 export type ReportType = 'lost' | 'found';

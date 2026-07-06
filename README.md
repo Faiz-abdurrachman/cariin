@@ -24,7 +24,6 @@ Aplikasi **lost & found** untuk lingkungan kampus UNU Yogyakarta. Mahasiswa bisa
 
 ### Mahasiswa
 - ✅ Register/login dengan email kampus (`@student.unu-jogja.ac.id`)
-- ✅ Login via Google OAuth
 - ✅ Feed laporan publik (filter kategori, tipe, search)
 - ✅ Detail laporan (foto, lokasi, status, kontak pelapor)
 - ✅ Buat laporan Lost / Found (unggah foto, pilih kategori)
@@ -94,7 +93,7 @@ EXPO_PUBLIC_APP_ENV=development
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | `admin@cariin.app` | `admin123` |
-| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faiz` |
+| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` |
 
 ---
 

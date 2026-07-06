@@ -147,19 +147,19 @@ Ini adalah requirement dari PDF dosen yang HARUS ada di project:
 
 | Kategori | Requirement | Implementasi di Cari.In |
 |----------|-------------|------------------------|
-| **UI/UX** | React Native + Flexbox, min. 5 screens | 26 screens ✅ |
-| **UI/UX** | React Compiler + Suspense | Expo SDK 51 sudah include ✅ |
+| **UI/UX** | React Native + Flexbox, min. 5 screens | ~30 screens ✅ |
+| **UI/UX** | React Compiler + Suspense | Expo SDK 54 sudah include ✅ |
 | **Navigation** | Stack Navigator | AuthNavigator ✅ |
-| **Navigation** | Tab Navigator | MainNavigator (Bottom Tab) ✅ |
-| **Navigation** | Drawer Navigator | AdminNavigator ✅ |
-| **State** | Context API / Zustand / Redux | AuthContext + Zustand ✅ |
-| **Networking** | REST APIs via Axios atau Fetch | Axios + Supabase REST (PostgREST) ✅ |
+| **Navigation** | Tab Navigator | MainNavigator + AdminTabs (Bottom Tab) ✅ |
+| **Navigation** | Drawer Navigator | AdminNavigator (Drawer membungkus AdminTabs) ✅ |
+| **State** | Context API / Zustand / Redux | AuthContext + NotifContext + Zustand ✅ |
+| **Networking** | REST APIs via Axios atau Fetch | Fetch via Supabase JS (PostgREST) ✅ |
 | **Auth** | JWT Authentication | Supabase Auth (JWT-based) ✅ |
-| **Auth** | Google Authentication | Supabase OAuth (Google provider via web flow) ✅ |
-| **Database** | Realtime Database CRUD | Supabase Postgres + Realtime subscription ✅ |
-| **Storage** | AsyncStorage (offline persistence) | Cache laporan ✅ |
-| **Storage** | SecureStorage (JWT/token) | expo-secure-store ✅ |
+| **Storage** | AsyncStorage (offline persistence) | feedStore persist (cache laporan) ✅ |
+| **Storage** | SecureStorage (JWT/token) | expo-secure-store (SecureStore adapter) ✅ |
 | **Build** | Expo EAS Build → APK | Untuk submission ✅ |
+
+> **Catatan koreksi (vs PDF asli dosen):** "Google Authentication" dan "Realtime Database" TIDAK ada di PDF requirement (`REQUIREMENT-DOSEN.md`). Auth yang diminta hanya **JWT**. Realtime chat tetap diimplementasi sebagai fitur tambahan, bukan kewajiban.
 
 ### Submission Requirements
 

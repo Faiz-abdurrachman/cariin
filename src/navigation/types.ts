@@ -92,19 +92,19 @@ export type AdminChatStackParamList = {
   ChatRoom: { conversationId: string; reportId: string };
 };
 
-export type AdminDrawerParamList = {
-  DashboardDrawer: NavigatorScreenParams<AdminDashboardStackParamList>;
-  AllReports: undefined;
-  CreateDrawer: NavigatorScreenParams<AdminCreateStackParamList>;
-  ChatDrawer: NavigatorScreenParams<AdminChatStackParamList>;
-};
-
 export type AdminTabParamList = {
   DashboardTab: NavigatorScreenParams<AdminDashboardStackParamList>;
   ReportsTab: undefined;
   CreateTab: undefined;
   ChatTab: NavigatorScreenParams<AdminChatStackParamList>;
   AdminProfileTab: undefined;
+};
+
+// Drawer membungkus AdminTabs — admin punya BOTH Drawer (menu geser kiri) DAN
+// Bottom Tab di dalamnya. Memenuhi requirement dosen "Stack, Tab, and Drawer".
+export type AdminDrawerParamList = {
+  AdminTabs: NavigatorScreenParams<AdminTabParamList>;
+  AdminAbout: undefined;
 };
 
 // Augmentasi global untuk type-safe useNavigation di RootStack scope (mahasiswa flow).

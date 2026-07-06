@@ -34,7 +34,7 @@ Kegiatan kedua berfokus pada perancangan arsitektur data dan sistem secara menye
 2. Arsitektur & Penerapan OOP: Merancang three-layer architecture (Presentation Layer, Service Layer, dan Data Layer menggunakan Supabase). Penerapan 4 pilar OOP menjadi fondasi desain:  
    1. Inheritance: Class User sebagai superclass diwariskan ke subclass Mahasiswa dan Admin.  
    2. Encapsulation: Komponen UI tidak pernah menyentuh database secara langsung; semua operasi dibungkus melalui method service.  
-   3. Polymorphism: Method submit() berperilaku berbeda (laporan Found mewajibkan field custody_point, sedangkan Lost tidak).  
+   3. Polymorphism: Method validate() pada model laporan berperilaku berbeda (FoundReport mewajibkan field custody_point/titik penitipan, sedangkan LostReport tidak). Diimplementasi sebagai class LostReport & FoundReport yang meng-override method validate() dari abstract class ReportModel di src/models/Report.ts.  
    4. Abstraction: UI hanya memanggil method deklaratif dari interface service tanpa perlu mengetahui mekanisme query di belakangnya.  
 3. Keamanan Data: Dirancang 17 Row Level Security (RLS) policies dan tiga database trigger otomatis.
 
@@ -55,7 +55,7 @@ Kegiatan ketiga berfokus pada perancangan antarmuka visual dan pembuatan prototy
 Kegiatan keempat berfokus pada implementasi aplikasi mobile menggunakan React Native dan integrasi dengan backend Supabase.
 
 1. Setup Environment: Menginisialisasi project React Native dengan Expo SDK 54, mengonfigurasi TypeScript strict mode, menginstall NativeWind v4 untuk styling, dan menyiapkan Supabase client. Arsitektur project disusun modular: screen, navigation, components, services, context, store, dan utils.  
-2. Autentikasi & Navigasi: Mengimplementasikan autentikasi menggunakan Supabase Auth dengan validasi domain email kampus (@student.unu-jogja.ac.id). Navigasi menggunakan React Navigation v7 dengan tiga jenis navigator: Stack Navigator untuk auth flow, Bottom Tab Navigator untuk mahasiswa, dan Tab Navigator untuk admin. Sistem role-based routing memisahkan akses mahasiswa dan admin secara otomatis.  
+2. Autentikasi & Navigasi: Mengimplementasikan autentikasi menggunakan Supabase Auth dengan validasi domain email kampus (@student.unu-jogja.ac.id). Navigasi menggunakan React Navigation v7 dengan tiga jenis navigator: Stack Navigator untuk auth flow, Bottom Tab Navigator untuk mahasiswa, dan Drawer Navigator (membungkus Bottom Tab) untuk admin. Sistem role-based routing memisahkan akses mahasiswa dan admin secara otomatis.  
 3. Fitur Core Mahasiswa:
    a. Home Feed: Menampilkan laporan publik dengan status approved, dilengkapi filter kategori (8 kategori) dan tipe (Lost/Found), serta search bar dengan debounce 300ms. State management menggunakan Zustand store.
    b. Detail Laporan: Menampilkan foto, badge status, badge kategori, lokasi, deskripsi, dan informasi pelapor. Tombol Chat untuk memulai percakapan dengan pemilik laporan.
@@ -98,7 +98,7 @@ Kegiatan keenam berfokus pada implementasi dashboard admin untuk moderasi lapora
    b. Review Screen: Detail laporan dengan foto hero, badge status, badge kategori, informasi pelapor, lokasi, deskripsi, dan catatan admin. Bottom action bar dengan tombol Tolak (outline merah) dan Setujui (solid hijau). Reject wajib input alasan via modal. Tombol "Chat Pemilik" untuk komunikasi langsung dengan pelapor.
    c. All Reports Screen: Daftar semua laporan dengan filter status (Semua/Pending/Aktif/Ditolak/Selesai) dan search bar.
    d. Walk-in Report: Form admin untuk membuat laporan atas nama mahasiswa yang lapor ke satpam. Field tambahan: nama pelapor, NIM, fakultas. Laporan langsung approved dengan badge "Via Admin".
-   e. Admin Tabs: Bottom tab navigator 5 tab (Dashboard, Laporan, Buat, Pesan, Profil) dengan FAB center button raised untuk akses cepat.
+   e. Admin Navigasi: Drawer Navigator (menu geser kiri: Beranda, Tentang Cari.In, Keluar) yang membungkus Bottom Tab 5 tab (Dashboard, Laporan, Buat, Pesan, Profil) dengan FAB center button raised untuk akses cepat.
 2. Design System Final:
    a. Calm Campus Color Palette: Setelah riset neuropsikologi, primary color diganti dari almost-black (#18181B) menjadi biru (#2563EB) yang terbukti menurunkan detak jantung dan membangun trust. Lost menggunakan orange soft (#F97316) untuk urgensi tanpa panic trigger. Found menggunakan emerald (#059669) untuk relief. Admin menggunakan teal sage (#0D9488). Background menggunakan soft blue (#EFF6FF) untuk mengurangi sensory overload.
    b. Icon Migration: Seluruh emoji diganti dengan MaterialCommunityIcons (laptop, wallet-outline, key, watch, tshirt-crew, book-open-page-variant-outline, dots-horizontal) untuk tampilan profesional.
@@ -111,7 +111,7 @@ Kegiatan keenam berfokus pada implementasi dashboard admin untuk moderasi lapora
    b. Abstraction: Admin screens menggunakan service function (approveReport, rejectReport, createAdminReport) tanpa mengetahui bahwa di belakangnya ada RPC security definer yang mem-bypass RLS.
    c. Inheritance: Profil admin mewarisi struktur User yang sama dengan mahasiswa — menggunakan AuthContext yang sama, NotifContext yang sama. Yang membedakan hanya role='admin' yang mengarahkan ke AdminNavigator.
 
-*Gambar 6: Dashboard Admin & Finalisasi — screenshot Admin Dashboard dengan stat cards dan list pending, Admin Review screen dengan tombol approve/reject, Admin Tabs bottom navigator dengan FAB raised, code snippet RPC update_report_status, screenshot color palette Calm Campus, APK build result.*
+*Gambar 6: Dashboard Admin & Finalisasi — screenshot Admin Dashboard dengan stat cards dan list pending, Admin Review screen dengan tombol approve/reject, Admin Drawer (menu geser) + Bottom Tab dengan FAB raised, code snippet RPC update_report_status, screenshot color palette Calm Campus, APK build result.*
 
 Kontribusi Anggota:
 

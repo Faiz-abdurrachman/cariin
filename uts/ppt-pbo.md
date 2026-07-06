@@ -78,26 +78,31 @@ Format di bawah ini disusun *strict* mengikuti template 7 poin yang diinstruksik
 
 ## SLIDE 6: Platform & Teknologi (Poin 6)
 **Visual di Slide:**
-- Logo: Mobile App (React Native), TypeScript, Supabase.
+- Logo: React Native (Expo SDK 54), TypeScript, Supabase.
+- Ikon: Navigasi Stack + Tab + Drawer · SecureStore (kunci).
 
 **Script Penjelasan Lisan:**
 > "Untuk pembangunannya, kami merencanakannya seperti ini:
-> - **^& Tools:** React Native dan Supabase (untuk Database).
-> - **Alasan:** Kenapa Mobile? Karena masalah barang hilang (di kantin/parkiran) adalah hal yang *on-the-go*. Dengan HP, mahasiswa bisa langsung foto barang dan lapor di TKP tanpa perlu buka laptop. Kami menggunakan TypeScript karena sangat mendukung penerapan PBO/OOP (Object-Oriented Programming)."
+> - **Tools:** React Native (Expo) untuk aplikasi, TypeScript sebagai bahasa, dan Supabase untuk database & autentikasi.
+> - **Alasan Mobile:** Masalah barang hilang bersifat *on-the-go* — mahasiswa bisa langsung foto barang dan lapor di TKP tanpa buka laptop.
+> - **Alasan TypeScript:** Bahasa ini mendukung penuh konsep **PBO/OOP** — class, inheritance, abstract, dan access modifier (private/protected) — sehingga model objek kami bisa ditulis secara ketat.
+> - **Navigasi:** Kami memakai tiga pola — Stack (alur login), Bottom Tab (mahasiswa & admin), dan Drawer (menu geser admin). Token login (JWT) disimpan aman terenkripsi lewat SecureStore."
 
 ---
 
 ## SLIDE 7: Implementasi OOP (PENTING UNTUK MATKUL INI)
 **Visual di Slide:**
-- **Diagram Kelas (Class Diagram) Sederhana:**
-  - Class Induk: `User`
-  - Class Anak: `Mahasiswa` dan `Admin` (Inheritance)
+- **Class Diagram** (dari `uas-pbo/class-diagram.md`):
+  - Class Induk abstrak: `User` → anak `Mahasiswa` & `Admin` (Inheritance)
+  - Class Induk abstrak: `ReportModel` → anak `LostReport` & `FoundReport`
+- Catatan kecil: "Kode nyata di folder `src/models/`"
 
 **Script Penjelasan Lisan:**
-> "Bagaimana penerapan OOP-nya?
-> - **Encapsulation:** Data user dan laporan dibungkus dalam class khusus dimana variabelnya *private* dan diakses lewat *method getter/setter*.
-> - **Inheritance (Pewarisan):** Kami memiliki class induk `User`. Lalu ada class `Mahasiswa` dan `Admin` yang mewarisi class `User`, namun `Admin` ditambahkan *method* khusus yaitu `approveReport()`.
-> - **Polymorphism:** Metode `submitReport()` pada laporan barang hilang (Lost) dan barang ditemukan (Found) bekerja sedikit berbeda (Found butuh lokasi titik penitipan)."
+> "Karena ini mata kuliah PBO, kami menerapkan 4 pilar utamanya, dan semuanya ada wujud kodenya di folder `src/models/`:
+> 1. **Abstraction:** Kami punya `abstract class User` dan `abstract class ReportModel` yang tidak bisa di-instansiasi langsung — hanya jadi blueprint.
+> 2. **Encapsulation:** Field seperti `_id` dan `_name` kami buat `private`, hanya bisa diakses lewat *getter*, dan *setter* `name` punya validasi (tidak boleh kosong).
+> 3. **Inheritance:** Class `Mahasiswa` dan `Admin` sama-sama `extends User`. Tapi `Admin` menambah method khusus yaitu `approveReport()` dan `rejectReport()`.
+> 4. **Polymorphism:** Method `canModerate()` mengembalikan `false` untuk Mahasiswa dan `true` untuk Admin. Begitu juga `validate()` — untuk `FoundReport` wajib mengisi titik penitipan, sedangkan `LostReport` tidak. Dan ini benar-benar dipakai di aplikasi, bukan sekadar teori."
 
 ---
 
