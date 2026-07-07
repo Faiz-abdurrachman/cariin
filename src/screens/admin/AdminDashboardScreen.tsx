@@ -2,8 +2,10 @@ import { Feather } from '@expo/vector-icons';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
@@ -12,7 +14,7 @@ import { useNotif } from '@/context/NotifContext';
 import type { AdminDashboardStackParamList } from '@/navigation/types';
 import { getAdminStats, listReports, type Report } from '@/services/report.service';
 import { COLORS, type ReportStatus } from '@/utils/constants';
-import { formatRelativeTime, categoryLabel } from '@/utils/formatters';
+import { categoryLabel, formatRelativeTime } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<AdminDashboardStackParamList, 'AdminDashboard'>;
 type TabFilter = 'pending' | 'approved' | 'resolved';
@@ -92,127 +94,149 @@ export default function AdminDashboardScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.adminLight }}>
-      <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.admin }}>
-        <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-              <Pressable
-                onPress={() => nav.dispatch(DrawerActions.openDrawer())}
-                accessibilityRole="button"
-                accessibilityLabel="Buka menu"
-                hitSlop={8}
-              >
-                {({ pressed }) => (
-                  <View
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 999,
-                      backgroundColor: 'rgba(255,255,255,0.15)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: pressed ? 0.7 : 1,
-                    }}
-                  >
-                    <Feather name="menu" size={18} color="#FFFFFF" />
-                  </View>
-                )}
-              </Pressable>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
-                  Admin Panel
-                </Text>
-                <Text style={{ fontSize: 12, color: '#C7D2FE', marginTop: 2 }} numberOfLines={1}>
-                  Selamat datang, {userProfile?.name ?? 'Admin'}
-                </Text>
-              </View>
-            </View>
-            <Pressable
-              onPress={() => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const parent: any = nav.getParent();
-                parent?.navigate('ChatTab', { screen: 'Inbox' });
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={`Notifikasi, ${unread} belum dibaca`}
-            >
-              {({ pressed }) => (
-                <View
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 999,
-                    backgroundColor: 'rgba(255,255,255,0.15)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: pressed ? 0.7 : 1,
-                  }}
-                >
-                  <Feather name="bell" size={18} color="#FFFFFF" />
-                  {unread > 0 ? (
-                    <View
-                      style={{
-                        position: 'absolute',
-                        top: 4,
-                        right: 4,
-                        minWidth: 16,
-                        height: 16,
-                        borderRadius: 999,
-                        backgroundColor: '#EF4444',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        paddingHorizontal: 4,
-                        borderWidth: 1.5,
-                        borderColor: COLORS.admin,
-                      }}
-                    >
-                      <Text style={{ color: '#FFFFFF', fontSize: 9, fontWeight: '800' }}>
-                        {unread > 9 ? '9+' : unread}
-                      </Text>
-                    </View>
-                  ) : null}
-                </View>
-              )}
-            </Pressable>
-          </View>
+      <View
+        style={{
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 350,
+          height: 350,
+          borderRadius: 999,
+          backgroundColor: COLORS.admin,
+          opacity: 0.16,
+          transform: [{ scale: 1.35 }],
+        }}
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -50,
+          left: -50,
+          width: 300,
+          height: 300,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.08,
+          transform: [{ scale: 1.2 }],
+        }}
+        pointerEvents="none"
+      />
 
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={55}
+          tint="light"
+          style={{
+            marginHorizontal: 16,
+            marginTop: 2,
+            marginBottom: 10,
+            borderRadius: 24,
+            overflow: 'hidden',
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.72)',
+            padding: 16,
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: COLORS.adminText, letterSpacing: 0.8 }}>
+                ADMIN PANEL
+              </Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: COLORS.adminText, marginTop: 2 }}>
+                Selamat datang
+              </Text>
+              <Text style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 3, lineHeight: 18 }}>
+                {userProfile?.name ?? 'Admin'} mengawasi laporan dan review status.
+              </Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <IconButton
+                icon="menu"
+                onPress={() => nav.dispatch(DrawerActions.openDrawer())}
+                label="Buka menu"
+              />
+              <IconButton
+                icon="bell"
+                onPress={() => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const parent: any = nav.getParent();
+                  parent?.navigate('ChatTab', { screen: 'Inbox' });
+                }}
+                label={`Notifikasi, ${unread} belum dibaca`}
+                badge={unread}
+              />
+            </View>
+          </View>
+        </BlurView>
+
+        <View style={{ paddingHorizontal: 16, gap: 10 }}>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <StatCard value={stats?.pending ?? '-'} label="Pending" color="#FBBF24" />
-            <StatCard value={stats?.approved ?? '-'} label="Disetujui" color="#34D399" />
-            <StatCard value={stats?.rejected ?? '-'} label="Ditolak" color="#F87171" />
-            <StatCard value={stats?.total ?? '-'} label="Total" color="#A5B4FC" />
+            <StatCard value={stats?.pending ?? '-'} label="Pending" color={COLORS.pending} />
+            <StatCard value={stats?.approved ?? '-'} label="Disetujui" color={COLORS.approved} />
+            <StatCard value={stats?.rejected ?? '-'} label="Ditolak" color={COLORS.rejected} />
+            <StatCard value={stats?.total ?? '-'} label="Total" color={COLORS.admin} />
           </View>
 
           <Pressable
-              onPress={() => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const parent: any = nav.getParent();
-                parent?.navigate('CreateTab', { screen: 'AdminCreateLost' });
-              }}
+            onPress={() => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const parent: any = nav.getParent();
+              parent?.navigate('CreateTab', { screen: 'AdminCreateLost' });
+            }}
             accessibilityRole="button"
             accessibilityLabel="Buat laporan admin baru"
           >
             {({ pressed }) => (
-              <View
+              <BlurView
+                intensity={45}
+                tint="light"
                 style={{
-                  marginTop: 14,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
+                  borderRadius: 22,
+                  overflow: 'hidden',
+                  backgroundColor: 'rgba(255,255,255,0.42)',
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(255,255,255,0.72)',
                   paddingVertical: 12,
-                  borderRadius: 14,
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(199,210,254,0.3)',
-                  opacity: pressed ? 0.7 : 1,
+                  alignItems: 'center',
+                  opacity: pressed ? 0.86 : 1,
                 }}
               >
-                <Feather name="plus" size={16} color="#C7D2FE" />
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#C7D2FE' }}>
-                  Buat Laporan Admin
-                </Text>
-              </View>
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFillObject}
+                  pointerEvents="none"
+                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 12,
+                      backgroundColor: COLORS.admin,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Feather name="plus" size={16} color="#FFFFFF" />
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '900', color: COLORS.adminText }}>
+                    Buat Laporan Admin
+                  </Text>
+                </View>
+              </BlurView>
             )}
           </Pressable>
         </View>
@@ -221,82 +245,85 @@ export default function AdminDashboardScreen() {
       <FlatList
         data={reports}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Card
-            report={item}
-            onPress={() => nav.navigate('AdminReview', { reportId: item.id })}
-          />
-        )}
-        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-        contentContainerStyle={{ paddingBottom: 32, flexGrow: 1 }}
+        renderItem={({ item }) => <Card report={item} onPress={() => nav.navigate('AdminReview', { reportId: item.id })} />}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 132, flexGrow: 1 }}
         ListHeaderComponent={
-          <View style={{ paddingTop: 14, paddingBottom: 4 }}>
-            <View
+          <View style={{ paddingBottom: 6 }}>
+            <BlurView
+              intensity={50}
+              tint="light"
               style={{
-                flexDirection: 'row',
-                backgroundColor: '#E0E7FF',
+                marginBottom: 10,
+                borderRadius: 22,
+                overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255,0.38)',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.72)',
                 padding: 4,
-                borderRadius: 14,
-                marginHorizontal: 20,
-                marginBottom: 8,
               }}
             >
-              {TAB_CONFIG.map((tab) => {
-                const activeTabValue = activeTab === tab.value;
-                const count =
-                  tab.value === 'pending' ? stats?.pending
-                  : tab.value === 'approved' ? stats?.approved
-                  : stats?.resolved;
-                return (
-                  <Pressable
-                    key={tab.value}
-                    onPress={() => void loadTab(tab.value)}
-                    style={{ flex: 1 }}
-                    accessibilityRole="button"
-                  >
-                    {({ pressed }) => (
-                      <View
-                        style={{
-                          paddingVertical: 9,
-                          borderRadius: 11,
-                          backgroundColor: activeTabValue ? '#FFFFFF' : 'transparent',
-                          alignItems: 'center',
-                          opacity: pressed ? 0.85 : 1,
-                          shadowColor: activeTabValue ? '#000' : 'transparent',
-                          shadowOpacity: activeTabValue ? 0.05 : 0,
-                          shadowRadius: 4,
-                          elevation: activeTabValue ? 1 : 0,
-                        }}
-                      >
-                        <Text
+              <LinearGradient
+                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
+              <View style={{ flexDirection: 'row', gap: 4 }}>
+                {TAB_CONFIG.map((tab) => {
+                  const activeTabValue = activeTab === tab.value;
+                  const count =
+                    tab.value === 'pending' ? stats?.pending
+                    : tab.value === 'approved' ? stats?.approved
+                    : stats?.resolved;
+                  return (
+                    <Pressable
+                      key={tab.value}
+                      onPress={() => void loadTab(tab.value)}
+                      style={{ flex: 1 }}
+                      accessibilityRole="button"
+                    >
+                      {({ pressed }) => (
+                        <View
                           style={{
-                            fontSize: 12,
-                            fontWeight: activeTabValue ? '700' : '600',
-                            color: activeTabValue ? COLORS.adminText : '#6366F1',
+                            paddingVertical: 10,
+                            borderRadius: 16,
+                            backgroundColor: activeTabValue ? COLORS.admin : 'transparent',
+                            alignItems: 'center',
+                            opacity: pressed ? 0.86 : 1,
                           }}
                         >
-                          {tab.label}
-                          {count !== undefined ? (
-                            <Text style={{ color: activeTabValue ? '#6366F1' : '#A5B4FC' }}>
-                              {' '}({count})
-                            </Text>
-                          ) : null}
-                        </Text>
-                      </View>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              fontWeight: '800',
+                              color: activeTabValue ? '#FFFFFF' : COLORS.adminText,
+                            }}
+                          >
+                            {tab.label}
+                            {count !== undefined ? (
+                              <Text style={{ color: activeTabValue ? '#E0F2FE' : COLORS.textMuted }}>
+                                {' '}({count})
+                              </Text>
+                            ) : null}
+                          </Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </BlurView>
 
             <Text
               style={{
                 fontSize: 11,
-                fontWeight: '800',
+                fontWeight: '900',
                 color: COLORS.adminText,
                 letterSpacing: 0.8,
-                paddingHorizontal: 20,
-                paddingVertical: 6,
+                paddingHorizontal: 4,
+                paddingVertical: 4,
               }}
             >
               {activeTab === 'pending' ? 'MENUNGGU REVIEW' : activeTab === 'approved' ? 'LAPORAN AKTIF' : 'LAPORAN SELESAI'}
@@ -314,60 +341,133 @@ export default function AdminDashboardScreen() {
             <EmptyState icon="check-circle" title="Tidak ada laporan" subtitle={`Tidak ada laporan dengan status ${activeTab}.`} />
           )
         }
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.admin} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.admin} />}
       />
     </View>
   );
 }
 
+function IconButton({
+  icon,
+  onPress,
+  label,
+  badge,
+}: {
+  icon: keyof typeof Feather.glyphMap;
+  onPress: () => void;
+  label: string;
+  badge?: number;
+}) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
+      {({ pressed }) => (
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 14,
+            backgroundColor: 'rgba(255,255,255,0.58)',
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.82)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.78 : 1,
+          }}
+        >
+          <Feather name={icon} size={18} color={COLORS.adminText} />
+          {badge && badge > 0 ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                minWidth: 16,
+                height: 16,
+                borderRadius: 999,
+                backgroundColor: '#EF4444',
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 4,
+                borderWidth: 1.5,
+                borderColor: COLORS.adminLight,
+              }}
+            >
+              <Text style={{ color: '#FFFFFF', fontSize: 9, fontWeight: '900' }}>
+                {badge > 9 ? '9+' : badge}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
 function StatCard({ value, label, color }: { value: string | number; label: string; color: string }) {
   return (
-    <View
+    <BlurView
+      intensity={40}
+      tint="light"
       style={{
         flex: 1,
-        backgroundColor: 'rgba(255,255,255,0.12)',
-        borderRadius: 14,
+        borderRadius: 16,
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.42)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.72)',
         padding: 12,
         alignItems: 'center',
       }}
     >
-      <Text style={{ fontSize: 20, fontWeight: '700', color }}>{value}</Text>
-      <Text style={{ fontSize: 10, color: '#A5B4FC', fontWeight: '600', marginTop: 2 }}>
+      <LinearGradient
+        colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
+      />
+      <Text style={{ fontSize: 20, fontWeight: '900', color }}>{value}</Text>
+      <Text style={{ fontSize: 10, color: COLORS.textMuted, fontWeight: '800', marginTop: 2 }}>
         {label}
       </Text>
-    </View>
+    </BlurView>
   );
 }
 
 function Card({ report, onPress }: { report: Report; onPress: () => void }) {
-  const reporterName = report.created_by_admin
-    ? report.reporter_name ?? 'Admin'
-    : report.reporter?.name ?? 'Pengguna';
+  const reporterName = report.created_by_admin ? report.reporter_name ?? 'Admin' : report.reporter?.name ?? 'Pengguna';
   const typeLabel = report.type === 'lost' ? 'Hilang' : 'Ditemukan';
 
   return (
     <Pressable onPress={onPress} accessibilityRole="button">
       {({ pressed }) => (
-        <View
+        <BlurView
+          intensity={45}
+          tint="light"
           style={{
-            marginHorizontal: 20,
-            backgroundColor: COLORS.surface,
-            borderWidth: 1,
-            borderColor: COLORS.adminBorder,
-            borderRadius: 20,
-            padding: 14,
-            opacity: pressed ? 0.85 : 1,
+            marginHorizontal: 2,
+            borderRadius: 22,
+            overflow: 'hidden',
+            backgroundColor: 'rgba(255,255,255,0.46)',
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.72)',
+            opacity: pressed ? 0.88 : 1,
           }}
         >
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
+          <View style={{ padding: 14, flexDirection: 'row', gap: 12 }}>
             <View
               style={{
                 width: 68,
                 height: 68,
-                borderRadius: 14,
-                backgroundColor: COLORS.background,
+                borderRadius: 16,
+                backgroundColor: COLORS.adminLight,
                 overflow: 'hidden',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -379,7 +479,7 @@ function Card({ report, onPress }: { report: Report; onPress: () => void }) {
                 <Feather name="image" size={22} color={COLORS.textMuted} />
               )}
             </View>
-            <View style={{ flex: 1, justifyContent: 'center', gap: 3 }}>
+            <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <View
                   style={{
@@ -393,23 +493,21 @@ function Card({ report, onPress }: { report: Report; onPress: () => void }) {
                       : COLORS.rejected,
                   }}
                 />
-                <Text style={{ fontSize: 10, fontWeight: '700', color: COLORS.textMuted }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: COLORS.textMuted }}>
                   {report.status === 'pending' ? 'Pending' : report.status === 'approved' ? 'Aktif' : report.status === 'resolved' ? 'Selesai' : 'Ditolak'}
                 </Text>
                 <Text style={{ fontSize: 10, color: COLORS.textMuted }}>• {typeLabel}</Text>
               </View>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.adminText }} numberOfLines={1}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: COLORS.adminText }} numberOfLines={1}>
                 {report.title}
               </Text>
-              <Text style={{ fontSize: 11, color: COLORS.textMuted }}>
-                {reporterName} • {categoryLabel(report.category)} {formatRelativeTime(report.created_at)}
+              <Text style={{ fontSize: 11, color: COLORS.textMuted }} numberOfLines={1}>
+                {reporterName} • {categoryLabel(report.category)} • {formatRelativeTime(report.created_at)}
               </Text>
             </View>
-            <View style={{ justifyContent: 'center' }}>
-              <Feather name="chevron-right" size={16} color={COLORS.textMuted} />
-            </View>
+            <Feather name="chevron-right" size={16} color={COLORS.textMuted} style={{ alignSelf: 'center' }} />
           </View>
-        </View>
+        </BlurView>
       )}
     </Pressable>
   );

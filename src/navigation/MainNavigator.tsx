@@ -10,10 +10,10 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator, type StackNavigationProp } from '@react-navigation/stack';
 
-import FabButton from '@/components/FabButton';
+import LiquidTabBar from '@/components/LiquidTabBar';
 import ChatRoomScreen from '@/screens/chat/ChatRoomScreen';
 import InboxScreen from '@/screens/chat/InboxScreen';
 import NotificationsScreen from '@/screens/chat/NotificationsScreen';
@@ -102,69 +102,73 @@ function MainTabs() {
 
   return (
     <Tab.Navigator
+      tabBar={(props) => <LiquidTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textMuted,
-        tabBarStyle: { backgroundColor: COLORS.surface, borderTopColor: COLORS.border },
       }}
     >
       <Tab.Screen
         name="HomeTab"
         component={HomeNavigator}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" color={color} size={size} />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeFeed';
+          const display = ['DetailLost', 'DetailFound', 'ChatRoom', 'UserProfile'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" color={color} size={size} />
+            ),
+          };
         }}
       />
       <Tab.Screen
         name="ChatTab"
         component={ChatNavigator}
-        options={{
-          tabBarLabel: 'Pesan',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubble-outline" color={color} size={size} />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'Inbox';
+          const display = ['ChatRoom', 'UserProfile', 'Notifications'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            tabBarLabel: 'Pesan',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="chatbubble-outline" color={color} size={size} />
+            ),
+          };
         }}
       />
       <Tab.Screen
         name="CreateTab"
         component={CreateTabPlaceholder}
-        options={{
-          tabBarLabel: '',
-          tabBarButton: (props) => (
-            <FabButton
-              containerStyle={props.style}
-              onPress={() => rootNav.navigate('CreateModal', { screen: 'CreateLost' })}
-            />
-          ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-          },
-        }}
       />
       <Tab.Screen
         name="MyPostsTab"
         component={MyPostsNavigator}
-        options={{
-          tabBarLabel: 'Laporanku',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text-outline" color={color} size={size} />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'MyPosts';
+          const display = ['EditPost', 'DetailLost', 'DetailFound'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            tabBarLabel: 'Laporanku',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="document-text-outline" color={color} size={size} />
+            ),
+          };
         }}
       />
       <Tab.Screen
         name="ProfileTab"
         component={ProfileNavigator}
-        options={{
-          tabBarLabel: 'Profil',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" color={color} size={size} />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile';
+          const display = ['Settings', 'Help', 'UserProfile'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            tabBarLabel: 'Profil',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person-outline" color={color} size={size} />
+            ),
+          };
         }}
       />
     </Tab.Navigator>

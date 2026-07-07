@@ -18,8 +18,11 @@ import {
   Text,
   TextInput,
   View,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import type { MyPostsStackParamList } from '@/navigation/types';
 import {
@@ -126,33 +129,46 @@ export default function EditPostScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.surface }}>
+      {/* Background Blobs for Glass Refraction */}
+      <View style={{ position: 'absolute', top: -100, right: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: COLORS.primary, opacity: 0.16, transform: [{ scale: 1.45 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', bottom: -50, left: -100, width: 350, height: 350, borderRadius: 999, backgroundColor: COLORS.found, opacity: 0.12, transform: [{ scale: 1.15 }] }} pointerEvents="none" />
+
+      <SafeAreaView edges={['top']} style={{ backgroundColor: 'transparent' }}>
         <View
           style={{
-            height: 56,
+            height: 60,
             paddingHorizontal: 16,
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: COLORS.surface,
+            backgroundColor: 'rgba(255,255,255,0.38)',
             borderBottomWidth: 1,
-            borderBottomColor: COLORS.border,
+            borderBottomColor: 'rgba(255,255,255,0.72)',
+            borderRadius: 24,
+            marginHorizontal: 16,
+            marginTop: 2,
+            overflow: 'hidden',
           }}
         >
+          <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
           <Pressable onPress={() => nav.goBack()} accessibilityRole="button">
             {({ pressed }) => (
-              <View
+              <BlurView
+                intensity={40}
+                tint="light"
                 style={{
                   width: 36,
                   height: 36,
-                  borderRadius: 999,
-                  backgroundColor: '#F4F4F5',
+                  borderRadius: 14,
+                  backgroundColor: 'rgba(255,255,255,0.58)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.82)',
                   alignItems: 'center',
                   justifyContent: 'center',
                   opacity: pressed ? 0.7 : 1,
                 }}
               >
                 <Feather name="arrow-left" size={18} color={COLORS.primary} />
-              </View>
+              </BlurView>
             )}
           </Pressable>
           <Text
@@ -174,7 +190,7 @@ export default function EditPostScreen() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
           style={{ flex: 1 }}
@@ -192,15 +208,19 @@ export default function EditPostScreen() {
               marginBottom: 20,
             }}
           >
-            <View
+            <BlurView
+              intensity={40}
+              tint="light"
               style={{
                 width: 80,
                 height: 80,
                 borderRadius: 16,
-                backgroundColor: '#F4F4F5',
+                backgroundColor: 'rgba(255,255,255,0.5)',
                 overflow: 'hidden',
                 alignItems: 'center',
                 justifyContent: 'center',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.78)',
               }}
             >
               {report.photo_url ? (
@@ -212,7 +232,7 @@ export default function EditPostScreen() {
               ) : (
                 <Feather name="image" size={24} color={COLORS.textMuted} />
               )}
-            </View>
+            </BlurView>
             <Text style={{ fontSize: 12, color: COLORS.textMuted, flex: 1 }}>
               Foto tidak bisa diubah di sini. Hapus laporan dan buat ulang kalau
               perlu ganti foto.
@@ -260,36 +280,40 @@ export default function EditPostScreen() {
             paddingHorizontal: 16,
             paddingTop: 12,
             paddingBottom: 12 + insets.bottom,
-            backgroundColor: COLORS.surface,
-            borderTopWidth: 1,
-            borderTopColor: COLORS.border,
+            backgroundColor: 'transparent',
           }}
         >
           <Pressable onPress={onSubmit} disabled={submitting} accessibilityRole="button">
             {({ pressed }) => (
-              <View
+              <BlurView
+                intensity={80}
+                tint="light"
                 style={{
                   paddingVertical: 16,
-                  backgroundColor: COLORS.primary,
-                  borderRadius: 16,
+                  backgroundColor: submitting ? 'rgba(37, 99, 235, 0.55)' : 'rgba(37, 99, 235, 0.92)',
+                  borderRadius: 24,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(255,255,255,0.62)',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: submitting ? 0.6 : pressed ? 0.85 : 1,
+                  opacity: pressed ? 0.85 : 1,
                   shadowColor: COLORS.primary,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 8,
-                  shadowOffset: { width: 0, height: 4 },
-                  elevation: 4,
+                  shadowOpacity: 0.22,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 6 },
+                  elevation: 5,
+                  overflow: 'hidden',
                 }}
               >
+                <LinearGradient colors={['rgba(255,255,255,0.34)', 'rgba(255,255,255,0.08)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
                 {submitting ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800' }}>
                     Simpan Perubahan
                   </Text>
                 )}
-              </View>
+              </BlurView>
             )}
           </Pressable>
         </View>
@@ -327,21 +351,25 @@ function Input({
   leftIcon?: keyof typeof Feather.glyphMap;
 }) {
   return (
-    <View
+    <BlurView
+      intensity={60}
+      tint="light"
       style={{
         flexDirection: 'row',
         alignItems: multiline ? 'flex-start' : 'center',
-        backgroundColor: COLORS.surface,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 16,
-        paddingHorizontal: 14,
-        paddingVertical: multiline ? 14 : 12,
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        paddingVertical: multiline ? 16 : 14,
         marginBottom: 20,
-        gap: 10,
-        minHeight: multiline ? 100 : 48,
+        gap: 12,
+        minHeight: multiline ? 120 : 54,
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.42)',
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.76)',
       }}
     >
+      <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
       {leftIcon ? (
         <Feather
           name={leftIcon}
@@ -361,8 +389,9 @@ function Input({
           color: COLORS.primary,
           paddingVertical: 0,
           minHeight: multiline ? 80 : undefined,
+          fontWeight: '600',
         }}
       />
-    </View>
+    </BlurView>
   );
 }

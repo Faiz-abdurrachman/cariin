@@ -3,6 +3,7 @@
 
 import { Feather } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import StatusBadge from './StatusBadge';
 import ViaAdminBadge from './ViaAdminBadge';
@@ -25,21 +26,35 @@ export default function ReportCard({ report, onPress, showStatus = false }: Prop
   return (
     <Pressable onPress={onPress} accessibilityRole="button">
       {({ pressed }) => (
-        <View
+        <View style={{
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+          shadowOffset: { width: 0, height: 10 },
+          elevation: 5,
+          opacity: pressed ? 0.85 : 1,
+        }}>
+        <BlurView
+          intensity={50}
+          tint="light"
           style={{
-            backgroundColor: COLORS.surface,
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
             borderRadius: 24,
             overflow: 'hidden',
-            borderWidth: 1,
-            borderColor: COLORS.border,
-            shadowColor: COLORS.primary,
-            shadowOpacity: 0.05,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 1,
-            opacity: pressed ? 0.85 : 1,
+            borderTopWidth: 1.5,
+            borderLeftWidth: 1.5,
+            borderBottomWidth: 1,
+            borderRightWidth: 1,
+            borderTopColor: 'rgba(255,255,255,0.9)',
+            borderLeftColor: 'rgba(255,255,255,0.7)',
+            borderBottomColor: 'rgba(0,0,0,0.05)',
+            borderRightColor: 'rgba(0,0,0,0.05)',
           }}
         >
+          {/* Inner diagonal reflection */}
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none' }}>
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', backgroundColor: 'rgba(255,255,255,0.2)' }} />
+          </View>
           {/* Foto + badge type + via admin */}
           <View style={{ height: 200, backgroundColor: '#F4F4F5' }}>
             {report.photo_url ? (
@@ -68,15 +83,26 @@ export default function ReportCard({ report, onPress, showStatus = false }: Prop
                 gap: 6,
               }}
             >
-              <View
+              <BlurView
+                intensity={60}
+                tint="light"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.92)',
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
+                  backgroundColor: 'rgba(255,255,255,0.5)',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
                   borderRadius: 999,
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 6,
+                  overflow: 'hidden',
+                  borderTopWidth: 1,
+                  borderLeftWidth: 1,
+                  borderTopColor: 'rgba(255,255,255,0.9)',
+                  borderLeftColor: 'rgba(255,255,255,0.7)',
+                  borderBottomWidth: 1,
+                  borderRightWidth: 1,
+                  borderBottomColor: 'rgba(0,0,0,0.05)',
+                  borderRightColor: 'rgba(0,0,0,0.05)',
                 }}
               >
                 <View
@@ -90,7 +116,7 @@ export default function ReportCard({ report, onPress, showStatus = false }: Prop
                 <Text style={{ fontSize: 11, fontWeight: '700', color: COLORS.primary }}>
                   {typeLabel}
                 </Text>
-              </View>
+              </BlurView>
               {report.created_by_admin ? <ViaAdminBadge /> : null}
             </View>
             {showStatus ? (
@@ -168,6 +194,7 @@ export default function ReportCard({ report, onPress, showStatus = false }: Prop
               </Text>
             </View>
           </View>
+        </BlurView>
         </View>
       )}
     </Pressable>

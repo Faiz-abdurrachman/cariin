@@ -1,5 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { CATEGORIES, COLORS, type CategoryId } from '@/utils/constants';
 
@@ -50,32 +52,88 @@ function Chip({
       {({ pressed }) => (
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-            backgroundColor: active ? COLORS.primary : '#FFFFFF',
-            borderWidth: active ? 0 : 1,
-            borderColor: COLORS.border,
-            paddingHorizontal: 16,
-            paddingVertical: 9,
             borderRadius: 999,
-            opacity: pressed ? 0.7 : 1,
+            opacity: pressed ? 0.8 : 1,
+            transform: [{ scale: pressed ? 0.97 : 1 }],
           }}
         >
-          <MaterialCommunityIcons
-            name={icon as keyof typeof MaterialCommunityIcons.glyphMap}
-            size={16}
-            color={active ? '#FFFFFF' : COLORS.textMuted}
-          />
-          <Text
+          <BlurView
+            intensity={50}
+            tint="light"
             style={{
-              fontSize: 13,
-              fontWeight: '600',
-              color: active ? '#FFFFFF' : COLORS.textMuted,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: active ? 'rgba(37,99,235,0.92)' : 'rgba(255,255,255,0.42)',
+              borderWidth: 1.5,
+              borderColor: active ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.75)',
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+              borderRadius: 999,
+              overflow: 'hidden',
+              shadowColor: '#000',
+              shadowOpacity: 0.06,
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 4 },
+              elevation: 2,
             }}
           >
-            {label}
-          </Text>
+            {active && (
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  { backgroundColor: COLORS.primary, opacity: 0.22 }
+                ]}
+                pointerEvents="none"
+              />
+            )}
+
+            <LinearGradient
+              colors={['rgba(255,255,255,0.84)', 'rgba(255,255,255,0.18)', 'transparent']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+              pointerEvents="none"
+            />
+
+            {active && (
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  {
+                    borderTopWidth: 1.5,
+                    borderTopColor: 'rgba(255,255,255,0.38)',
+                    borderRadius: 999,
+                  }
+                ]}
+                pointerEvents="none"
+              />
+            )}
+
+            <MaterialCommunityIcons
+              name={icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              size={16}
+              color={active ? '#FFFFFF' : COLORS.textMuted}
+              style={
+                active
+                  ? {
+                      textShadowColor: 'rgba(0,0,0,0.1)',
+                      textShadowRadius: 2,
+                      textShadowOffset: { width: 0, height: 1 },
+                    }
+                  : undefined
+              }
+            />
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: active ? '700' : '600',
+                color: active ? '#FFFFFF' : COLORS.textMuted,
+              }}
+            >
+              {label}
+            </Text>
+          </BlurView>
         </View>
       )}
     </Pressable>

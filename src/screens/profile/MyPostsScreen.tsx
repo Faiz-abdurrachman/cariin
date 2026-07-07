@@ -1,5 +1,5 @@
 // Laporanku — daftar laporan milik user (semua status). Bisa Edit, Hapus,
-// atau Tandai Selesai. Referensi visual: cariin-web/my-posts.html.
+// atau Tandai Selesai.
 
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -13,8 +13,11 @@ import {
   RefreshControl,
   Text,
   View,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
@@ -122,72 +125,118 @@ export default function MyPostsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }} edges={['top']}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <View
         style={{
-          height: 56,
-          paddingHorizontal: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: COLORS.surface,
-          borderBottomWidth: 1,
-          borderBottomColor: COLORS.border,
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 350,
+          height: 350,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.15,
+          transform: [{ scale: 1.35 }],
         }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: '700', color: COLORS.primary }}>
-          Laporanku
-        </Text>
-      </View>
-
-      <FlatList
-        data={reports}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <PostCard
-            report={item}
-            onPressDetail={() =>
-              nav.navigate(
-                item.type === 'lost' ? 'DetailLost' : 'DetailFound',
-                { reportId: item.id },
-              )
-            }
-            onEdit={() => nav.navigate('EditPost', { reportId: item.id })}
-            onDelete={() => onDelete(item)}
-            onMarkResolved={() => onMarkResolved(item)}
-          />
-        )}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-        contentContainerStyle={{
-          padding: 20,
-          paddingBottom: 32,
-          flexGrow: 1,
-        }}
-        ListEmptyComponent={
-          loading ? (
-            <LoadingSkeleton count={3} />
-          ) : error ? (
-            <EmptyState
-              icon="alert-triangle"
-              title="Gagal memuat"
-              subtitle={error}
-            />
-          ) : (
-            <EmptyState
-              icon="folder"
-              title="Belum ada laporan"
-              subtitle="Buat laporan pertama lewat tombol + di tab bar."
-            />
-          )
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-          />
-        }
+        pointerEvents="none"
       />
-    </SafeAreaView>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -50,
+          left: -50,
+          width: 300,
+          height: 300,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.14,
+          transform: [{ scale: 1.2 }],
+        }}
+        pointerEvents="none"
+      />
+
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }} edges={['top']}>
+        <BlurView
+          intensity={60}
+          tint="light"
+          style={{
+            marginHorizontal: 16,
+            marginTop: 2,
+            marginBottom: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            borderRadius: 24,
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.76)',
+            overflow: 'hidden',
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
+          <Text style={{ fontSize: 20, fontWeight: '900', color: COLORS.primary }}>
+            Laporanku
+          </Text>
+          <Text style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>
+            Semua laporan milikmu ada di sini, lengkap dengan status dan aksi cepat.
+          </Text>
+        </BlurView>
+
+        <FlatList
+          data={reports}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <PostCard
+              report={item}
+              onPressDetail={() =>
+                nav.navigate(item.type === 'lost' ? 'DetailLost' : 'DetailFound', {
+                  reportId: item.id,
+                })
+              }
+              onEdit={() => nav.navigate('EditPost', { reportId: item.id })}
+              onDelete={() => onDelete(item)}
+              onMarkResolved={() => onMarkResolved(item)}
+            />
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 6,
+            paddingBottom: 132,
+            flexGrow: 1,
+          }}
+          ListEmptyComponent={
+            loading ? (
+              <LoadingSkeleton count={3} />
+            ) : error ? (
+              <EmptyState
+                icon="alert-triangle"
+                title="Gagal memuat"
+                subtitle={error}
+              />
+            ) : (
+              <EmptyState
+                icon="folder"
+                title="Belum ada laporan"
+                subtitle="Buat laporan pertama lewat tombol + di tab bar."
+              />
+            )
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+            />
+          }
+        />
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -211,15 +260,30 @@ function PostCard({
   const typeLabel = report.type === 'lost' ? 'Hilang' : 'Ditemukan';
 
   return (
-    <View
+    <BlurView
+      intensity={50}
+      tint="light"
       style={{
-        backgroundColor: COLORS.surface,
-        borderRadius: 24,
-        borderWidth: 1,
-        borderColor: '#F4F4F5',
+        borderRadius: 28,
         overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.42)',
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.76)',
+        shadowColor: '#000',
+        shadowOpacity: 0.08,
+        shadowRadius: 18,
+        shadowOffset: { width: 0, height: 10 },
+        elevation: 4,
       }}
     >
+      <LinearGradient
+        colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
+      />
+
       <Pressable onPress={onPressDetail} accessibilityRole="button">
         {({ pressed }) => (
           <View
@@ -227,14 +291,14 @@ function PostCard({
               padding: 14,
               flexDirection: 'row',
               gap: 14,
-              opacity: pressed ? 0.85 : 1,
+              opacity: pressed ? 0.9 : 1,
             }}
           >
             <View
               style={{
-                width: 88,
-                height: 88,
-                borderRadius: 16,
+                width: 92,
+                height: 92,
+                borderRadius: 18,
                 backgroundColor: '#F4F4F5',
                 overflow: 'hidden',
                 alignItems: 'center',
@@ -244,33 +308,35 @@ function PostCard({
               {report.photo_url ? (
                 <Image
                   source={{ uri: report.photo_url }}
-                  style={{ width: 88, height: 88 }}
+                  style={{ width: 92, height: 92 }}
                   resizeMode="cover"
                 />
               ) : (
                 <Feather name="image" size={28} color={COLORS.textMuted} />
               )}
             </View>
-            <View style={{ flex: 1, justifyContent: 'center', gap: 6 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+
+            <View style={{ flex: 1, justifyContent: 'center', gap: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <StatusBadge status={report.status} />
                 <Text
                   style={{
                     fontSize: 10,
-                    fontWeight: '700',
+                    fontWeight: '800',
                     color: COLORS.textMuted,
                     letterSpacing: 0.5,
+                    textTransform: 'uppercase',
                   }}
                 >
-                  • {typeLabel}
+                  {typeLabel}
                 </Text>
               </View>
               <Text
                 style={{
-                  fontSize: 14,
-                  fontWeight: '700',
+                  fontSize: 15,
+                  fontWeight: '800',
                   color: COLORS.primary,
-                  lineHeight: 19,
+                  lineHeight: 20,
                 }}
                 numberOfLines={2}
               >
@@ -284,17 +350,16 @@ function PostCard({
         )}
       </Pressable>
 
-      {/* Action row */}
       {canEdit || canMarkResolved || report.status !== 'resolved' ? (
         <View
           style={{
             borderTopWidth: 1,
-            borderTopColor: '#F4F4F5',
+            borderTopColor: 'rgba(255,255,255,0.74)',
             paddingHorizontal: 14,
-            paddingVertical: 10,
-            backgroundColor: '#FAFAFA',
+            paddingVertical: 12,
             flexDirection: 'row',
             gap: 8,
+            backgroundColor: 'rgba(255,255,255,0.3)',
           }}
         >
           {canMarkResolved ? (
@@ -321,7 +386,7 @@ function PostCard({
           />
         </View>
       ) : null}
-    </View>
+    </BlurView>
   );
 }
 
@@ -338,8 +403,8 @@ function ActionButton({
 }) {
   const colors = {
     primary: { bg: COLORS.primary, text: '#FFFFFF', border: COLORS.primary },
-    secondary: { bg: COLORS.surface, text: COLORS.primary, border: COLORS.border },
-    danger: { bg: COLORS.surface, text: COLORS.lost, border: COLORS.border },
+    secondary: { bg: 'rgba(255,255,255,0.54)', text: COLORS.primary, border: 'rgba(255,255,255,0.82)' },
+    danger: { bg: 'rgba(255,255,255,0.54)', text: COLORS.lost, border: 'rgba(255,255,255,0.82)' },
   }[variant];
 
   return (
@@ -347,17 +412,17 @@ function ActionButton({
       {({ pressed }) => (
         <View
           style={{
-            paddingHorizontal: 16,
-            paddingVertical: 9,
-            borderRadius: 12,
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            borderRadius: 14,
             backgroundColor: colors.bg,
             borderWidth: 1,
             borderColor: colors.border,
             alignItems: 'center',
-            opacity: pressed ? 0.85 : 1,
+            opacity: pressed ? 0.82 : 1,
           }}
         >
-          <Text style={{ color: colors.text, fontSize: 12, fontWeight: '700' }}>
+          <Text style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>
             {label}
           </Text>
         </View>

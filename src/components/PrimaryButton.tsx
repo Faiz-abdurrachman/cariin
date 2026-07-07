@@ -1,7 +1,6 @@
-// Tombol primary full-width — variant default (zinc-950) untuk mahasiswa,
-// variant admin (indigo-600) untuk admin login & admin actions.
-
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 import { COLORS } from '@/utils/constants';
 
@@ -33,24 +32,54 @@ export default function PrimaryButton({
       {({ pressed }) => (
         <View
           style={{
-            backgroundColor: bg,
-            paddingVertical: 16,
-            borderRadius: 16,
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: isDisabled ? 0.6 : pressed ? 0.85 : 1,
+            borderRadius: 18,
+            opacity: isDisabled ? 0.6 : 1,
+            transform: [{ scale: pressed ? 0.98 : 1 }],
             shadowColor: bg,
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 14,
+            shadowOffset: { width: 0, height: 8 },
             elevation: 4,
           }}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '600' }}>{label}</Text>
-          )}
+          <BlurView
+            intensity={35}
+            tint="light"
+            style={{
+              backgroundColor: bg,
+              borderRadius: 18,
+              overflow: 'hidden',
+              minHeight: 52,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: 14,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.24)',
+            }}
+          >
+            <LinearGradient
+              colors={['rgba(255,255,255,0.34)', 'rgba(255,255,255,0.1)', 'transparent']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+              pointerEvents="none"
+            />
+
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 15,
+                  fontWeight: '800',
+                  letterSpacing: 0.4,
+                }}
+              >
+                {label}
+              </Text>
+            )}
+          </BlurView>
         </View>
       )}
     </Pressable>

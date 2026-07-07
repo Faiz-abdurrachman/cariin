@@ -2,7 +2,9 @@ import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import EmptyState from '@/components/EmptyState';
@@ -97,128 +99,207 @@ export default function NotificationsScreen() {
   const hasUnread = notifs.some((n) => !n.is_read);
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <View
         style={{
-          height: 56,
-          paddingHorizontal: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: COLORS.surface,
-          borderBottomWidth: 1,
-          borderBottomColor: COLORS.border,
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 350,
+          height: 350,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.15,
+          transform: [{ scale: 1.4 }],
         }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: '700', color: COLORS.primary }}>
-          Notifikasi
-        </Text>
-        {hasUnread ? (
-          <Pressable
-            onPress={markAll}
-            accessibilityRole="button"
-            accessibilityLabel="Tandai semua sudah dibaca"
-          >
-            {({ pressed }) => (
-              <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: '600',
-                  color: COLORS.primary,
-                  opacity: pressed ? 0.6 : 1,
-                }}
-              >
-                Tandai semua
-              </Text>
-            )}
-          </Pressable>
-        ) : null}
-      </View>
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -50,
+          left: -50,
+          width: 300,
+          height: 300,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.14,
+          transform: [{ scale: 1.15 }],
+        }}
+        pointerEvents="none"
+      />
 
-      <FlatList
-        data={notifs}
-        renderItem={({ item }) => (
-          <Pressable onPress={() => void onPress(item)} accessibilityRole="button">
-            {({ pressed }) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  padding: 16,
-                  gap: 12,
-                  backgroundColor: pressed
-                    ? '#FAFAFA'
-                    : item.is_read
-                      ? COLORS.surface
-                      : '#F0F0FF',
-                  borderBottomWidth: 1,
-                  borderBottomColor: COLORS.border,
-                }}
-              >
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={60}
+          tint="light"
+          style={{
+            marginHorizontal: 16,
+            marginTop: 2,
+            marginBottom: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderRadius: 24,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.76)',
+            overflow: 'hidden',
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
+          <View style={{ flex: 1, paddingRight: 12 }}>
+            <Text style={{ fontSize: 20, fontWeight: '900', color: COLORS.primary }}>
+              Notifikasi
+            </Text>
+            <Text style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>
+              Update status laporan dan pesan baru masuk di sini.
+            </Text>
+          </View>
+          {hasUnread ? (
+            <Pressable
+              onPress={markAll}
+              accessibilityRole="button"
+              accessibilityLabel="Tandai semua sudah dibaca"
+            >
+              {({ pressed }) => (
                 <View
                   style={{
-                    width: 40,
-                    height: 40,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
                     borderRadius: 999,
-                    backgroundColor: NOTIF_COLORS[item.type] + '15',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(37,99,235,0.14)',
+                    opacity: pressed ? 0.72 : 1,
                   }}
                 >
-                  <Feather
-                    name={NOTIF_ICONS[item.type]}
-                    size={18}
-                    color={NOTIF_COLORS[item.type]}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
                   <Text
                     style={{
-                      fontSize: 14,
-                      fontWeight: item.is_read ? '600' : '700',
+                      fontSize: 12,
+                      fontWeight: '800',
                       color: COLORS.primary,
-                      marginBottom: 2,
                     }}
                   >
-                    {item.title}
-                  </Text>
-                  <Text style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 18 }}>
-                    {item.body}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 4 }}>
-                    {formatRelativeTime(item.created_at)}
+                    Tandai semua
                   </Text>
                 </View>
-                {!item.is_read ? (
-                  <View
+              )}
+            </Pressable>
+          ) : null}
+        </BlurView>
+
+        <FlatList
+          data={notifs}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => void onPress(item)} accessibilityRole="button">
+              {({ pressed }) => (
+                <View
+                  style={{
+                    marginHorizontal: 16,
+                    marginBottom: 10,
+                    opacity: pressed ? 0.92 : 1,
+                  }}
+                >
+                  <BlurView
+                    intensity={50}
+                    tint="light"
                     style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: 999,
-                      backgroundColor: COLORS.primary,
-                      marginTop: 6,
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      padding: 14,
+                      gap: 12,
+                      backgroundColor: item.is_read ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.58)',
+                      borderRadius: 22,
+                      borderWidth: 1.5,
+                      borderColor: item.is_read ? 'rgba(255,255,255,0.72)' : 'rgba(37,99,235,0.12)',
+                      overflow: 'hidden',
                     }}
-                  />
-                ) : null}
-              </View>
-            )}
-          </Pressable>
-        )}
-        keyExtractor={(item) => item.id}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ListEmptyComponent={
-          loading ? null : (
-            <EmptyState
-              icon="bell"
-              title="Belum ada notifikasi"
-              subtitle="Notifikasi akan muncul saat laporan kamu di-review atau ada pesan baru."
-            />
-          )
-        }
-        contentContainerStyle={notifs.length === 0 ? { flexGrow: 1 } : undefined}
-      />
-    </SafeAreaView>
+                  >
+                    <LinearGradient
+                      colors={['rgba(255,255,255,0.86)', 'rgba(255,255,255,0.18)', 'transparent']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={StyleSheet.absoluteFillObject}
+                      pointerEvents="none"
+                    />
+                    <View
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: 14,
+                        backgroundColor: NOTIF_COLORS[item.type] + '15',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Feather
+                        name={NOTIF_ICONS[item.type]}
+                        size={18}
+                        color={NOTIF_COLORS[item.type]}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: item.is_read ? '700' : '800',
+                          color: COLORS.primary,
+                          marginBottom: 2,
+                        }}
+                      >
+                        {item.title}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 18 }}>
+                        {item.body}
+                      </Text>
+                      <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 6 }}>
+                        {formatRelativeTime(item.created_at)}
+                      </Text>
+                    </View>
+                    {!item.is_read ? (
+                      <View
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 999,
+                          backgroundColor: COLORS.primary,
+                          marginTop: 6,
+                        }}
+                      />
+                    ) : null}
+                  </BlurView>
+                </View>
+              )}
+            </Pressable>
+          )}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            loading ? null : (
+              <EmptyState
+                icon="bell"
+                title="Belum ada notifikasi"
+                subtitle="Notifikasi akan muncul saat laporan kamu di-review atau ada pesan baru."
+              />
+            )
+          }
+          contentContainerStyle={{
+            paddingBottom: 132,
+            paddingTop: 2,
+          }}
+        />
+      </SafeAreaView>
+    </View>
   );
 }

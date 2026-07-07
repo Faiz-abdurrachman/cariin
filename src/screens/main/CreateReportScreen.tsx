@@ -1,6 +1,4 @@
 // Form create laporan — dipakai oleh route CreateLost & CreateFound.
-// Type di-derive dari route name. Field custody_point hanya muncul untuk Found.
-// Referensi visual: cariin-web/create.html + create-found.html.
 
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
@@ -17,8 +15,11 @@ import {
   Text,
   TextInput,
   View,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAuth } from '@/context/AuthContext';
 import { createReportModel } from '@/models';
@@ -58,15 +59,11 @@ export default function CreateReportScreen() {
     nav.replace(target === 'lost' ? 'CreateLost' : 'CreateFound');
   };
 
-  // Tombol back di header: harus dismiss modal (CreateModal di RootStack).
-  // CreateLost adalah first screen di stack lokal, jadi nav.goBack() di sini
-  // no-op. Pakai parent navigator (RootStack) goBack untuk pop CreateModal.
   const closeModal = () => {
     const root = nav.getParent<StackNavigationProp<RootStackParamList>>();
     if (root && root.canGoBack()) {
       root.goBack();
     } else if (root) {
-      // Fallback: navigate eksplisit ke MainTabs.
       root.navigate('MainTabs', { screen: 'HomeTab', params: { screen: 'HomeFeed' } });
     }
   };
@@ -102,8 +99,7 @@ export default function CreateReportScreen() {
   const onSubmit = async () => {
     if (!title.trim()) return Alert.alert('Validasi', 'Nama barang wajib diisi.');
     if (!category) return Alert.alert('Validasi', 'Pilih kategori barang.');
-    // Validasi domain lewat model OOP — polymorphism: LostReport & FoundReport
-    // punya aturan validate() berbeda (Found wajib titik penitipan).
+
     const reportModel = createReportModel(type, {
       title: title.trim(),
       category,
@@ -131,347 +127,393 @@ export default function CreateReportScreen() {
       void refreshFeed();
       nav.replace('Success', { reportId: report.id, type });
     } catch (e) {
-      Alert.alert(
-        'Gagal mengirim laporan',
-        e instanceof Error ? e.message : 'Coba lagi sebentar.',
-      );
+      Alert.alert('Gagal mengirim laporan', e instanceof Error ? e.message : 'Coba lagi sebentar.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const typeMeta = {
+    lost: {
+      title: 'Laporan Kehilangan',
+      subtitle: 'Isi detail barang yang hilang agar mudah dikenali.',
+      accent: COLORS.lost,
+    },
+    found: {
+      title: 'Laporan Temuan',
+      subtitle: 'Catat barang temuan dan titik penitipan dengan jelas.',
+      accent: COLORS.found,
+    },
+  }[type];
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.surface }}>
-        <View
+      <View style={{ position: 'absolute', top: -100, left: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: COLORS.primary, opacity: 0.16, transform: [{ scale: 1.45 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', top: 280, right: -100, width: 400, height: 400, borderRadius: 999, backgroundColor: COLORS.admin, opacity: 0.12, transform: [{ scale: 1.15 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', bottom: -50, left: 50, width: 300, height: 300, borderRadius: 999, backgroundColor: COLORS.found, opacity: 0.16, transform: [{ scale: 1.75 }] }} pointerEvents="none" />
+
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={60}
+          tint="light"
           style={{
-            height: 56,
+            marginHorizontal: 16,
+            marginTop: 2,
+            height: 60,
             paddingHorizontal: 16,
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: COLORS.surface,
-            borderBottomWidth: 1,
-            borderBottomColor: COLORS.border,
+            justifyContent: 'space-between',
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderRadius: 24,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.76)',
+            overflow: 'hidden',
           }}
         >
+          <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
           <Pressable onPress={closeModal} accessibilityRole="button">
             {({ pressed }) => (
               <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 999,
-                  backgroundColor: '#F4F4F5',
+                  width: 38,
+                  height: 38,
+                  borderRadius: 14,
+                  backgroundColor: 'rgba(255,255,255,0.58)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.82)',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: pressed ? 0.7 : 1,
+                  opacity: pressed ? 0.72 : 1,
                 }}
               >
                 <Feather name="arrow-left" size={18} color={COLORS.primary} />
               </View>
             )}
           </Pressable>
-          <Text
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              textAlign: 'center',
-              fontSize: 16,
-              fontWeight: '700',
-              color: COLORS.primary,
-            }}
-          >
-            Buat Laporan
-          </Text>
-        </View>
-      </SafeAreaView>
-
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Type toggle */}
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#E4E4E7',
-              padding: 4,
-              borderRadius: 16,
-              marginBottom: 24,
-              gap: 4,
-            }}
-          >
-            {(['lost', 'found'] as ReportType[]).map((t) => {
-              const active = type === t;
-              const label = t === 'lost' ? 'Kehilangan' : 'Menemukan';
-              return (
-                <Pressable
-                  key={t}
-                  onPress={() => switchType(t)}
-                  accessibilityRole="button"
-                  style={{ flex: 1 }}
-                >
-                  {({ pressed }) => (
-                    <View
-                      style={{
-                        paddingVertical: 11,
-                        borderRadius: 12,
-                        backgroundColor: active ? COLORS.surface : 'transparent',
-                        alignItems: 'center',
-                        shadowColor: active ? '#000' : 'transparent',
-                        shadowOpacity: active ? 0.06 : 0,
-                        shadowRadius: 4,
-                        shadowOffset: { width: 0, height: 1 },
-                        elevation: active ? 1 : 0,
-                        opacity: pressed ? 0.85 : 1,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          fontWeight: '700',
-                          color: active ? COLORS.primary : COLORS.textMuted,
-                        }}
-                      >
-                        {label}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
+          <View style={{ flex: 1, alignItems: 'center', paddingHorizontal: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: COLORS.primary }} numberOfLines={1}>
+              Buat Laporan
+            </Text>
+            <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }} numberOfLines={1}>
+              {typeMeta.title}
+            </Text>
           </View>
+          <View style={{ width: 38 }} />
+        </BlurView>
 
-          {/* Photo upload — pakai pola Pressable children-as-function (style
-              function-form sering bermasalah di RN versi ini, lihat CLAUDE.md). */}
-          <FieldLabel required>Foto Barang</FieldLabel>
-          <Pressable onPress={onPickPhoto} accessibilityRole="button">
-            {({ pressed }) =>
-              photo ? (
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 32 + insets.bottom }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <BlurView
+              intensity={60}
+              tint="light"
+              style={{
+                borderRadius: 30,
+                overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255,0.42)',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.76)',
+                padding: 18,
+                marginBottom: 16,
+              }}
+            >
+              <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <View
                   style={{
-                    height: 200,
-                    borderRadius: 24,
-                    overflow: 'hidden',
-                    backgroundColor: '#F4F4F5',
-                    opacity: pressed ? 0.85 : 1,
-                    marginBottom: 24,
-                  }}
-                >
-                  <Image
-                    source={{ uri: photo.uri }}
-                    style={{ width: '100%', height: 200 }}
-                    resizeMode="cover"
-                  />
-                  <View
-                    style={{
-                      position: 'absolute',
-                      bottom: 10,
-                      right: 10,
-                      backgroundColor: 'rgba(0,0,0,0.65)',
-                      paddingHorizontal: 12,
-                      paddingVertical: 7,
-                      borderRadius: 12,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6,
-                    }}
-                  >
-                    <Feather name="edit-2" size={12} color="#FFFFFF" />
-                    <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}>
-                      Ganti Foto
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    height: 180,
-                    borderRadius: 24,
-                    backgroundColor: COLORS.surface,
-                    borderWidth: 2,
-                    borderStyle: 'dashed',
-                    borderColor: COLORS.border,
+                    width: 54,
+                    height: 54,
+                    borderRadius: 18,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    opacity: pressed ? 0.85 : 1,
-                    marginBottom: 24,
+                    backgroundColor: 'rgba(255,255,255,0.62)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.82)',
                   }}
                 >
-                  <View
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 999,
-                      backgroundColor: '#F4F4F5',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: 12,
-                    }}
-                  >
-                    <Feather name="image" size={22} color={COLORS.textMuted} />
-                  </View>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: COLORS.textMuted }}>
-                    Ketuk untuk tambah foto
+                  <MaterialCommunityIcons
+                    name={type === 'lost' ? 'bag-suitcase-outline' : 'package-variant-closed'}
+                    size={28}
+                    color={typeMeta.accent}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 20, fontWeight: '900', color: COLORS.primary }}>
+                    {typeMeta.title}
+                  </Text>
+                  <Text style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 19, marginTop: 3 }}>
+                    {typeMeta.subtitle}
                   </Text>
                 </View>
-              )
-            }
-          </Pressable>
+              </View>
 
-          {/* Nama Barang */}
-          <FieldLabel required>Nama Barang</FieldLabel>
-          <Input
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Cth: Dompet hitam, Kunci motor"
-          />
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {(['lost', 'found'] as ReportType[]).map((t) => {
+                  const active = type === t;
+                  return (
+                    <Pressable
+                      key={t}
+                      onPress={() => switchType(t)}
+                      accessibilityRole="button"
+                      style={{ flex: 1 }}
+                    >
+                      {({ pressed }) => (
+                        <View
+                          style={{
+                            paddingVertical: 11,
+                            borderRadius: 16,
+                            alignItems: 'center',
+                            backgroundColor: active ? typeMeta.accent : 'rgba(255,255,255,0.52)',
+                            borderWidth: 1,
+                            borderColor: active ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.78)',
+                            opacity: pressed ? 0.85 : 1,
+                          }}
+                        >
+                          <Text style={{ fontSize: 13, fontWeight: '800', color: active ? '#FFFFFF' : COLORS.primary }}>
+                            {t === 'lost' ? 'Kehilangan' : 'Menemukan'}
+                          </Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </BlurView>
 
-          {/* Kategori */}
-          <FieldLabel required>Kategori</FieldLabel>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginHorizontal: -4,
-              marginBottom: 20,
-            }}
-          >
-            {CATEGORIES.map((c) => {
-              const active = category === c.id;
-              return (
-                <Pressable
-                  key={c.id}
-                  onPress={() => setCategory(c.id)}
-                  style={{ width: '25%', padding: 4 }}
-                >
-                  {({ pressed }) => (
-                    <View
+            <FieldLabel required>Foto Barang</FieldLabel>
+            <Pressable onPress={onPickPhoto} accessibilityRole="button">
+              {({ pressed }) =>
+                photo ? (
+                  <View style={{ marginBottom: 20, opacity: pressed ? 0.88 : 1 }}>
+                    <BlurView
+                      intensity={50}
+                      tint="light"
                       style={{
-                        borderRadius: 16,
-                        aspectRatio: 1,
-                        backgroundColor: active ? COLORS.primary : COLORS.surface,
-                        borderWidth: 1,
-                        borderColor: active ? COLORS.primary : COLORS.border,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        opacity: pressed ? 0.85 : 1,
+                        height: 210,
+                        borderRadius: 28,
+                        overflow: 'hidden',
+                        backgroundColor: 'rgba(255,255,255,0.42)',
+                        borderWidth: 1.5,
+                        borderColor: 'rgba(255,255,255,0.76)',
                       }}
                     >
-                      <MaterialCommunityIcons
-                        name={c.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                        size={22}
-                        color={active ? '#FFFFFF' : COLORS.textMuted}
-                        style={{ marginBottom: 4 }}
-                      />
-                      <Text
+                      <Image source={{ uri: photo.uri }} style={{ width: '100%', height: 210 }} resizeMode="cover" />
+                      <View
                         style={{
-                          fontSize: 10,
-                          fontWeight: '700',
-                          color: active ? '#FFFFFF' : COLORS.primary,
-                          textAlign: 'center',
-                          paddingHorizontal: 2,
+                          position: 'absolute',
+                          bottom: 12,
+                          right: 12,
+                          backgroundColor: 'rgba(0,0,0,0.58)',
+                          paddingHorizontal: 12,
+                          paddingVertical: 7,
+                          borderRadius: 12,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 6,
                         }}
-                        numberOfLines={2}
                       >
-                        {c.label}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-
-          {/* Lokasi */}
-          <FieldLabel required>Lokasi</FieldLabel>
-          <Input
-            value={location}
-            onChangeText={setLocation}
-            placeholder={
-              type === 'lost' ? 'Tempat terakhir terlihat...' : 'Tempat ditemukan...'
-            }
-            leftIcon="map-pin"
-          />
-
-          {/* Custody point — Found only */}
-          {type === 'found' ? (
-            <>
-              <FieldLabel required>Titik Penitipan</FieldLabel>
-              <Input
-                value={custodyPoint}
-                onChangeText={setCustodyPoint}
-                placeholder="Cth: Resepsionis FT, Pos satpam pusat..."
-                leftIcon="archive"
-              />
-            </>
-          ) : null}
-
-          {/* Deskripsi */}
-          <FieldLabel>Deskripsi Detail</FieldLabel>
-          <Input
-            value={description}
-            onChangeText={setDescription}
-            placeholder={
-              type === 'lost'
-                ? 'Ciri-ciri khusus, isi dompet, warna, dll...'
-                : 'Kondisi barang, ciri khas, kapan ditemukan...'
-            }
-            multiline
-            numberOfLines={4}
-          />
-        </ScrollView>
-
-        {/* Bottom submit bar — pakai plain View + manual safe-area inset agar
-            posisinya stabil di dalam KeyboardAvoidingView (nested SafeAreaView
-            sering konflik bikin tombol hilang). */}
-        <View
-          style={{
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: 12 + insets.bottom,
-            backgroundColor: COLORS.surface,
-            borderTopWidth: 1,
-            borderTopColor: COLORS.border,
-          }}
-        >
-          <Pressable onPress={onSubmit} disabled={submitting} accessibilityRole="button">
-            {({ pressed }) => (
-              <View
-                style={{
-                  paddingVertical: 16,
-                  backgroundColor: COLORS.primary,
-                  borderRadius: 16,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: submitting ? 0.6 : pressed ? 0.85 : 1,
-                  shadowColor: COLORS.primary,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 8,
-                  shadowOffset: { width: 0, height: 4 },
-                  elevation: 4,
-                }}
-              >
-                {submitting ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                        <Feather name="edit-2" size={12} color="#FFFFFF" />
+                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>
+                          Ganti Foto
+                        </Text>
+                      </View>
+                    </BlurView>
+                  </View>
                 ) : (
-                  <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
-                    Kirim Laporan
-                  </Text>
-                )}
-              </View>
-            )}
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+                  <BlurView
+                    intensity={50}
+                    tint="light"
+                    style={{
+                      height: 190,
+                      borderRadius: 28,
+                      backgroundColor: 'rgba(255,255,255,0.42)',
+                      borderWidth: 2,
+                      borderStyle: 'dashed',
+                      borderColor: 'rgba(255,255,255,0.78)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: pressed ? 0.86 : 1,
+                      marginBottom: 20,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+                    <View
+                      style={{
+                        width: 54,
+                        height: 54,
+                        borderRadius: 18,
+                        backgroundColor: 'rgba(255,255,255,0.62)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 12,
+                      }}
+                    >
+                      <Feather name="image" size={22} color={COLORS.primary} />
+                    </View>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: COLORS.primary }}>
+                      Ketuk untuk tambah foto
+                    </Text>
+                    <Text style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 4 }}>
+                      Kamera atau galeri
+                    </Text>
+                  </BlurView>
+                )
+              }
+            </Pressable>
+
+            <FieldLabel required>Nama Barang</FieldLabel>
+            <Input value={title} onChangeText={setTitle} placeholder="Cth: Dompet hitam, Kunci motor" />
+
+            <FieldLabel required>Kategori</FieldLabel>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                marginHorizontal: -4,
+                marginBottom: 20,
+              }}
+            >
+              {CATEGORIES.map((c) => {
+                const active = category === c.id;
+                return (
+                  <Pressable
+                    key={c.id}
+                    onPress={() => setCategory(c.id)}
+                    style={{ width: '25%', padding: 4 }}
+                  >
+                    {({ pressed }) => (
+                      <BlurView
+                        intensity={50}
+                        tint="light"
+                        style={{
+                          borderRadius: 18,
+                          aspectRatio: 1,
+                          backgroundColor: active ? COLORS.primary : 'rgba(255,255,255,0.42)',
+                          borderWidth: 1.5,
+                          borderColor: active ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.76)',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: pressed ? 0.88 : 1,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <LinearGradient colors={['rgba(255,255,255,0.86)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+                        <MaterialCommunityIcons
+                          name={c.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                          size={22}
+                          color={active ? '#FFFFFF' : COLORS.textMuted}
+                          style={{ marginBottom: 4 }}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            fontWeight: '800',
+                            color: active ? '#FFFFFF' : COLORS.primary,
+                            textAlign: 'center',
+                            paddingHorizontal: 2,
+                          }}
+                          numberOfLines={2}
+                        >
+                          {c.label}
+                        </Text>
+                      </BlurView>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <FieldLabel required>Lokasi</FieldLabel>
+            <Input
+              value={location}
+              onChangeText={setLocation}
+              placeholder={type === 'lost' ? 'Tempat terakhir terlihat...' : 'Tempat ditemukan...'}
+              leftIcon="map-pin"
+            />
+
+            {type === 'found' ? (
+              <>
+                <FieldLabel required>Titik Penitipan</FieldLabel>
+                <Input
+                  value={custodyPoint}
+                  onChangeText={setCustodyPoint}
+                  placeholder="Cth: Resepsionis FT, Pos satpam pusat..."
+                  leftIcon="archive"
+                />
+              </>
+            ) : null}
+
+            <FieldLabel>Deskripsi Detail</FieldLabel>
+            <Input
+              value={description}
+              onChangeText={setDescription}
+              placeholder={type === 'lost' ? 'Ciri-ciri khusus, isi dompet, warna, dll...' : 'Kondisi barang, ciri khas, kapan ditemukan...'}
+              multiline
+              numberOfLines={4}
+            />
+          </ScrollView>
+
+          <BlurView
+            intensity={65}
+            tint="light"
+            style={{
+              paddingHorizontal: 16,
+              paddingTop: 14,
+              paddingBottom: 12 + insets.bottom,
+              backgroundColor: 'rgba(255,255,255,0.42)',
+              borderTopWidth: 1.5,
+              borderTopColor: 'rgba(255,255,255,0.76)',
+            }}
+          >
+            <Pressable onPress={onSubmit} disabled={submitting} accessibilityRole="button">
+              {({ pressed }) => (
+                <View
+                  style={{
+                    borderRadius: 18,
+                    opacity: submitting ? 0.7 : pressed ? 0.9 : 1,
+                    shadowColor: typeMeta.accent,
+                    shadowOpacity: 0.22,
+                    shadowRadius: 12,
+                    shadowOffset: { width: 0, height: 6 },
+                    elevation: 4,
+                  }}
+                >
+                  <BlurView
+                    intensity={50}
+                    tint="light"
+                    style={{
+                      paddingVertical: 16,
+                      borderRadius: 18,
+                      overflow: 'hidden',
+                      backgroundColor: typeMeta.accent,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.22)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <LinearGradient colors={['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.08)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+                    {submitting ? (
+                      <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                      <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '900' }}>
+                        Kirim Laporan
+                      </Text>
+                    )}
+                  </BlurView>
+                </View>
+              )}
+            </Pressable>
+          </BlurView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </View>
   );
 }
@@ -487,7 +529,7 @@ function FieldLabel({
     <Text
       style={{
         fontSize: 13,
-        fontWeight: '700',
+        fontWeight: '800',
         color: COLORS.primary,
         marginBottom: 8,
       }}
@@ -505,21 +547,31 @@ function Input({
   leftIcon?: keyof typeof Feather.glyphMap;
 }) {
   return (
-    <View
+    <BlurView
+      intensity={55}
+      tint="light"
       style={{
         flexDirection: 'row',
         alignItems: multiline ? 'flex-start' : 'center',
-        backgroundColor: COLORS.surface,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.42)',
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.76)',
+        borderRadius: 20,
         paddingHorizontal: 14,
         paddingVertical: multiline ? 14 : 12,
         marginBottom: 20,
         gap: 10,
-        minHeight: multiline ? 100 : 48,
+        minHeight: multiline ? 104 : 50,
+        overflow: 'hidden',
       }}
     >
+      <LinearGradient
+        colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
+      />
       {leftIcon ? (
         <Feather
           name={leftIcon}
@@ -539,8 +591,9 @@ function Input({
           color: COLORS.primary,
           paddingVertical: 0,
           minHeight: multiline ? 80 : undefined,
+          fontWeight: '600',
         }}
       />
-    </View>
+    </BlurView>
   );
 }

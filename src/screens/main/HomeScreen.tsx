@@ -1,5 +1,4 @@
 // HomeScreen — feed laporan publik dengan search, filter type, dan kategori.
-// Referensi visual: cariin-web/home.html.
 
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -13,8 +12,11 @@ import {
   Text,
   TextInput,
   View,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import CategoryGrid from '@/components/CategoryGrid';
 import EmptyState from '@/components/EmptyState';
@@ -55,143 +57,204 @@ export default function HomeScreen() {
   })();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }} edges={['top']}>
-      <FlatList
-        data={reports}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={{ paddingHorizontal: 20 }}>
-            <ReportCard
-              report={item}
-              onPress={() =>
-                nav.navigate(item.type === 'lost' ? 'DetailLost' : 'DetailFound', {
-                  reportId: item.id,
-                })
-              }
-            />
-          </View>
-        )}
-        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-        contentContainerStyle={{ paddingBottom: 32 }}
-        ListHeaderComponent={
-          <View style={{ paddingBottom: 8 }}>
-            {/* Header */}
-            <View
-              style={{
-                paddingHorizontal: 20,
-                paddingTop: 8,
-                paddingBottom: 12,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                backgroundColor: COLORS.background,
-              }}
-            >
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{ fontSize: 12, color: COLORS.textMuted, fontWeight: '500' }}
-                  numberOfLines={1}
-                >
-                  {greeting},
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '700',
-                    color: COLORS.primary,
-                    marginTop: 2,
-                  }}
-                  numberOfLines={1}
-                >
-                  {userProfile?.name ?? 'Mahasiswa'}
-                </Text>
-              </View>
-              <Pressable
-                onPress={() => nav.getParent()?.navigate('ChatTab', { screen: 'Notifications' })}
-                accessibilityRole="button"
-                accessibilityLabel="Notifikasi"
-              >
-                {({ pressed }) => (
-                  <View
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 999,
-                      backgroundColor: COLORS.surface,
-                      borderWidth: 1,
-                      borderColor: COLORS.border,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: pressed ? 0.7 : 1,
-                    }}
-                  >
-                    {userProfile?.avatar_url ? (
-                      <Image
-                        source={{ uri: userProfile.avatar_url }}
-                        style={{ width: 44, height: 44, borderRadius: 999 }}
-                      />
-                    ) : (
-                      <Feather name="bell" size={20} color={COLORS.primary} />
-                    )}
-                    {unread > 0 ? (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          top: -2,
-                          right: -2,
-                          minWidth: 18,
-                          height: 18,
-                          borderRadius: 999,
-                          backgroundColor: '#EF4444',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          paddingHorizontal: 4,
-                          borderWidth: 1.5,
-                          borderColor: COLORS.surface,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: '#FFFFFF',
-                            fontSize: 10,
-                            fontWeight: '800',
-                          }}
-                        >
-                          {unread > 99 ? '99+' : unread}
-                        </Text>
-                      </View>
-                    ) : null}
-                  </View>
-                )}
-              </Pressable>
-            </View>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <View
+        style={{
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 360,
+          height: 360,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.18,
+          transform: [{ scale: 1.35 }],
+        }}
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -60,
+          left: -60,
+          width: 320,
+          height: 320,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.14,
+          transform: [{ scale: 1.2 }],
+        }}
+        pointerEvents="none"
+      />
 
-            {/* Search */}
-            <View style={{ paddingHorizontal: 20, marginTop: 4 }}>
-              <View
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'transparent' }} edges={['top']}>
+        <FlatList
+          data={reports}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={{ paddingHorizontal: 20 }}>
+              <ReportCard
+                report={item}
+                onPress={() =>
+                  nav.navigate(item.type === 'lost' ? 'DetailLost' : 'DetailFound', {
+                    reportId: item.id,
+                  })
+                }
+              />
+            </View>
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+          contentContainerStyle={{ paddingBottom: 132 }}
+          ListHeaderComponent={
+            <View style={{ paddingBottom: 10 }}>
+              <BlurView
+                intensity={60}
+                tint="light"
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: COLORS.surface,
-                  borderRadius: 16,
-                  borderWidth: 1,
-                  borderColor: COLORS.border,
-                  paddingHorizontal: 14,
-                  height: 48,
-                  gap: 8,
+                  marginHorizontal: 16,
+                  marginTop: 2,
+                  borderRadius: 32,
+                  overflow: 'hidden',
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(255,255,255,0.76)',
+                  backgroundColor: 'rgba(255,255,255,0.42)',
+                  padding: 18,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.08,
+                  shadowRadius: 18,
+                  shadowOffset: { width: 0, height: 10 },
+                  elevation: 4,
                 }}
               >
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFillObject}
+                  pointerEvents="none"
+                />
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 12, color: COLORS.textMuted, fontWeight: '600' }} numberOfLines={1}>
+                      {greeting},
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: '900',
+                        color: COLORS.primary,
+                        marginTop: 2,
+                        letterSpacing: -0.4,
+                      }}
+                      numberOfLines={1}
+                    >
+                      {userProfile?.name ?? 'Mahasiswa'}
+                    </Text>
+                    <Text style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 4, lineHeight: 19 }}>
+                      Temukan barang yang hilang atau bantu kembalikan barang yang ditemukan.
+                    </Text>
+                  </View>
+
+                  <Pressable
+                    onPress={() => nav.getParent()?.navigate('ChatTab', { screen: 'Notifications' })}
+                    accessibilityRole="button"
+                    accessibilityLabel="Notifikasi"
+                  >
+                    {({ pressed }) => (
+                      <View
+                        style={{
+                          width: 46,
+                          height: 46,
+                          borderRadius: 16,
+                          backgroundColor: 'rgba(255,255,255,0.58)',
+                          borderWidth: 1,
+                          borderColor: 'rgba(255,255,255,0.8)',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: pressed ? 0.72 : 1,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {userProfile?.avatar_url ? (
+                          <Image
+                            source={{ uri: userProfile.avatar_url }}
+                            style={{ width: 46, height: 46, borderRadius: 16 }}
+                          />
+                        ) : (
+                          <Feather name="bell" size={20} color={COLORS.primary} />
+                        )}
+                        {unread > 0 ? (
+                          <View
+                            style={{
+                              position: 'absolute',
+                              top: -2,
+                              right: -2,
+                              minWidth: 18,
+                              height: 18,
+                              borderRadius: 999,
+                              backgroundColor: '#EF4444',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              paddingHorizontal: 4,
+                              borderWidth: 1.5,
+                              borderColor: COLORS.surface,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: '#FFFFFF',
+                                fontSize: 10,
+                                fontWeight: '800',
+                              }}
+                            >
+                              {unread > 99 ? '99+' : unread}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    )}
+                  </Pressable>
+                </View>
+              </BlurView>
+
+              <BlurView
+                intensity={55}
+                tint="light"
+                style={{
+                  marginHorizontal: 16,
+                  marginTop: 14,
+                  borderRadius: 22,
+                  overflow: 'hidden',
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(255,255,255,0.76)',
+                  backgroundColor: 'rgba(255,255,255,0.42)',
+                  paddingHorizontal: 14,
+                  height: 54,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.86)', 'rgba(255,255,255,0.16)', 'transparent']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFillObject}
+                  pointerEvents="none"
+                />
                 <Feather name="search" size={18} color={COLORS.textMuted} />
                 <TextInput
                   value={filter.search}
                   onChangeText={(t) => setFilter({ search: t })}
-                  placeholder="Cari barang hilang..."
+                  placeholder="Cari barang, lokasi, atau kata kunci..."
                   placeholderTextColor={COLORS.textMuted}
                   style={{
                     flex: 1,
                     fontSize: 14,
                     color: COLORS.primary,
                     paddingVertical: 0,
+                    fontWeight: '600',
                   }}
                   returnKeyType="search"
                 />
@@ -212,86 +275,84 @@ export default function HomeScreen() {
                     )}
                   </Pressable>
                 ) : null}
+              </BlurView>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: 8,
+                  paddingHorizontal: 20,
+                  marginTop: 14,
+                }}
+              >
+                {TYPE_FILTERS.map((f) => {
+                  const active = filter.type === f.value;
+                  return (
+                    <Pressable
+                      key={f.value}
+                      onPress={() => setFilter({ type: f.value })}
+                      accessibilityRole="button"
+                    >
+                      {({ pressed }) => (
+                        <Text
+                          style={{
+                            backgroundColor: active ? COLORS.primary : 'rgba(255,255,255,0.72)',
+                            color: active ? '#FFFFFF' : COLORS.textMuted,
+                            borderWidth: active ? 0 : 1,
+                            borderColor: 'rgba(255,255,255,0.8)',
+                            paddingHorizontal: 18,
+                            paddingVertical: 10,
+                            borderRadius: 999,
+                            fontSize: 13,
+                            fontWeight: '700',
+                            opacity: pressed ? 0.78 : 1,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {f.label}
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <View style={{ marginTop: 14, marginBottom: 16 }}>
+                <CategoryGrid
+                  selected={filter.category ?? null}
+                  onSelect={(id) => setFilter({ category: id })}
+                />
               </View>
             </View>
-
-            {/* Type filter chips */}
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 8,
-                paddingHorizontal: 20,
-                marginTop: 16,
-              }}
-            >
-              {TYPE_FILTERS.map((f) => {
-                const active = filter.type === f.value;
-                return (
-                  <Pressable
-                    key={f.value}
-                    onPress={() => setFilter({ type: f.value })}
-                    accessibilityRole="button"
-                  >
-                    {({ pressed }) => (
-                      <Text
-                        style={{
-                          backgroundColor: active ? COLORS.primary : COLORS.surface,
-                          color: active ? '#FFFFFF' : COLORS.textMuted,
-                          borderWidth: active ? 0 : 1,
-                          borderColor: COLORS.border,
-                          paddingHorizontal: 18,
-                          paddingVertical: 9,
-                          borderRadius: 999,
-                          fontSize: 13,
-                          fontWeight: '600',
-                          opacity: pressed ? 0.7 : 1,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {f.label}
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {/* Categories */}
-            <View style={{ marginTop: 14, marginBottom: 16 }}>
-              <CategoryGrid
-                selected={filter.category ?? null}
-                onSelect={(id) => setFilter({ category: id })}
+          }
+          ListEmptyComponent={
+            loading ? (
+              <View style={{ paddingHorizontal: 20 }}>
+                <LoadingSkeleton count={3} />
+              </View>
+            ) : error ? (
+              <EmptyState
+                icon="alert-triangle"
+                title="Gagal memuat laporan"
+                subtitle={error}
               />
-            </View>
-          </View>
-        }
-        ListEmptyComponent={
-          loading ? (
-            <View style={{ paddingHorizontal: 20 }}>
-              <LoadingSkeleton count={3} />
-            </View>
-          ) : error ? (
-            <EmptyState
-              icon="alert-triangle"
-              title="Gagal memuat laporan"
-              subtitle={error}
+            ) : (
+              <EmptyState
+                icon="inbox"
+                title="Belum ada laporan"
+                subtitle="Tarik ke bawah untuk refresh, atau coba ubah filter."
+              />
+            )
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              tintColor={COLORS.primary}
             />
-          ) : (
-            <EmptyState
-              icon="inbox"
-              title="Belum ada laporan"
-              subtitle="Tarik ke bawah untuk refresh, atau coba ubah filter."
-            />
-          )
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refresh}
-            tintColor={COLORS.primary}
-          />
-        }
-      />
-    </SafeAreaView>
+          }
+        />
+      </SafeAreaView>
+    </View>
   );
 }

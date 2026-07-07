@@ -10,8 +10,11 @@ import {
   Text,
   TextInput,
   View,
+  StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import ChatBubble from '@/components/ChatBubble';
 import { useAuth } from '@/context/AuthContext';
@@ -28,6 +31,7 @@ export default function ChatRoomScreen() {
   const route = useRoute<Route>();
   const { conversationId } = route.params;
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const {
     messages,
     loadingMessages,
@@ -81,186 +85,263 @@ export default function ChatRoomScreen() {
   }, [text, conversationId, sendMessage, fetchConversations]);
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <View
         style={{
-          height: 56,
-          paddingHorizontal: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: COLORS.surface,
-          borderBottomWidth: 1,
-          borderBottomColor: COLORS.border,
+          position: 'absolute',
+          top: -60,
+          right: -60,
+          width: 360,
+          height: 360,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.12,
+          transform: [{ scale: 1.25 }],
         }}
-      >
-        <Pressable
-          onPress={() => nav.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel="Kembali"
-          hitSlop={8}
-        >
-          {({ pressed }) => (
-            <Feather
-              name="arrow-left"
-              size={22}
-              color={COLORS.primary}
-              style={{ opacity: pressed ? 0.6 : 1 }}
-            />
-          )}
-        </Pressable>
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -80,
+          left: -80,
+          width: 320,
+          height: 320,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.12,
+          transform: [{ scale: 1.15 }],
+        }}
+        pointerEvents="none"
+      />
 
-        {otherUser ? (
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={60}
+          tint="light"
+          style={{
+            marginHorizontal: 16,
+            marginTop: 2,
+            marginBottom: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderRadius: 24,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.78)',
+            overflow: 'hidden',
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
           <Pressable
-            onPress={() => nav.navigate('UserProfile', { userId: otherUser.id })}
-            style={{ flex: 1, marginLeft: 14 }}
+            onPress={() => nav.goBack()}
             accessibilityRole="button"
+            accessibilityLabel="Kembali"
+            hitSlop={8}
           >
             {({ pressed }) => (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <View
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 999,
-                    backgroundColor: '#F4F4F5',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Feather name="user" size={18} color={COLORS.textMuted} />
-                </View>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: COLORS.primary,
-                    opacity: pressed ? 0.7 : 1,
-                  }}
-                  numberOfLines={1}
-                >
-                  {otherUser.name}
-                </Text>
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 14,
+                  backgroundColor: 'rgba(255,255,255,0.62)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.82)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.7 : 1,
+                }}
+              >
+                <Feather name="arrow-left" size={20} color={COLORS.primary} />
               </View>
             )}
           </Pressable>
-        ) : (
-          <Text
-            style={{
-              flex: 1,
-              marginLeft: 14,
-              fontSize: 16,
-              fontWeight: '700',
-              color: COLORS.primary,
-            }}
-            numberOfLines={1}
-          >
-            Chat
-          </Text>
-        )}
-      </View>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      >
-        <FlatList
-          ref={flatListRef}
-          data={msgs}
-          renderItem={({ item, index }) => {
-            const isMine = item.sender_id === user?.id;
-            const prev = index > 0 ? msgs[index - 1] : null;
-            const showTime = !prev || prev.sender_id !== item.sender_id;
-            return <ChatBubble message={item} isMine={isMine} showTime={showTime} />;
-          }}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingVertical: 12,
-            flexGrow: 1,
-            justifyContent: 'flex-end',
-          }}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
-          ListEmptyComponent={
-            loadingMessages ? null : (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingHorizontal: 40,
-                }}
-              >
-                <Feather name="message-circle" size={48} color={COLORS.border} />
-                <Text
-                  style={{
-                    marginTop: 12,
-                    fontSize: 14,
-                    color: COLORS.textMuted,
-                    textAlign: 'center',
-                  }}
-                >
-                  Kirim pesan pertama untuk memulai percakapan.
-                </Text>
-              </View>
-            )
-          }
-        />
-
-        <SafeAreaView edges={['bottom']}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderTopWidth: 1,
-              borderTopColor: COLORS.border,
-              backgroundColor: COLORS.surface,
-              gap: 8,
-            }}
-          >
-            <TextInput
-              value={text}
-              onChangeText={setText}
-              placeholder="Ketik pesan..."
-              placeholderTextColor={COLORS.textMuted}
-              multiline
-              style={{
-                flex: 1,
-                fontSize: 14,
-                paddingHorizontal: 14,
-                paddingVertical: 10,
-                backgroundColor: '#F4F4F5',
-                borderRadius: 24,
-                color: COLORS.primary,
-                maxHeight: 100,
-              }}
-            />
+          {otherUser ? (
             <Pressable
-              onPress={handleSend}
-              disabled={!text.trim()}
+              onPress={() => nav.navigate('UserProfile', { userId: otherUser.id })}
+              style={{ flex: 1, marginLeft: 14 }}
               accessibilityRole="button"
-              accessibilityLabel="Kirim pesan"
             >
               {({ pressed }) => (
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 999,
-                    backgroundColor: text.trim() ? COLORS.primary : '#D4D4D8',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: pressed ? 0.8 : 1,
-                  }}
-                >
-                  <Feather name="send" size={16} color="#FFFFFF" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 14,
+                      backgroundColor: 'rgba(255,255,255,0.62)',
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.82)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Feather name="user" size={18} color={COLORS.textMuted} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '900',
+                        color: COLORS.primary,
+                        opacity: pressed ? 0.78 : 1,
+                      }}
+                      numberOfLines={1}
+                    >
+                      {otherUser.name}
+                    </Text>
+                    <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }} numberOfLines={1}>
+                      Ketuk untuk lihat profil
+                    </Text>
+                  </View>
                 </View>
               )}
             </Pressable>
+          ) : (
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: COLORS.primary }} numberOfLines={1}>
+                Chat
+              </Text>
+              <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }} numberOfLines={1}>
+                Percakapan aktif
+              </Text>
+            </View>
+          )}
+        </BlurView>
+
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 8 : 0}
+        >
+          <FlatList
+            ref={flatListRef}
+            data={msgs}
+            renderItem={({ item, index }) => {
+              const isMine = item.sender_id === user?.id;
+              const prev = index > 0 ? msgs[index - 1] : null;
+              const showTime = !prev || prev.sender_id !== item.sender_id;
+              return <ChatBubble message={item} isMine={isMine} showTime={showTime} />;
+            }}
+            keyExtractor={(item) => item.id}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{
+              paddingTop: 8,
+              paddingBottom: 16,
+              flexGrow: 1,
+              justifyContent: 'flex-end',
+            }}
+            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+            ListEmptyComponent={
+              loadingMessages ? null : (
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 40,
+                  }}
+                >
+                  <Feather name="message-circle" size={48} color={COLORS.border} />
+                  <Text
+                    style={{
+                      marginTop: 12,
+                      fontSize: 14,
+                      color: COLORS.textMuted,
+                      textAlign: 'center',
+                    }}
+                  >
+                    Kirim pesan pertama untuk memulai percakapan.
+                  </Text>
+                </View>
+              )
+            }
+          />
+
+          <View style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 8) }}>
+            <BlurView
+              intensity={60}
+              tint="light"
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                borderRadius: 28,
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.8)',
+                backgroundColor: 'rgba(255,255,255,0.44)',
+                overflow: 'hidden',
+              }}
+            >
+              <LinearGradient
+                colors={['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.18)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
+              <View style={{ flex: 1, paddingRight: 10 }}>
+                <TextInput
+                  value={text}
+                  onChangeText={setText}
+                  placeholder="Ketik pesan..."
+                  placeholderTextColor={COLORS.textMuted}
+                  multiline
+                  style={{
+                    minHeight: 42,
+                    maxHeight: 110,
+                    fontSize: 14,
+                    paddingHorizontal: 12,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    color: COLORS.primary,
+                    fontWeight: '600',
+                    textAlignVertical: 'top',
+                    backgroundColor: 'rgba(255,255,255,0.58)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.74)',
+                    borderRadius: 18,
+                  }}
+                />
+              </View>
+              <Pressable
+                onPress={handleSend}
+                disabled={!text.trim()}
+                accessibilityRole="button"
+                accessibilityLabel="Kirim pesan"
+              >
+                {({ pressed }) => (
+                  <View
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 16,
+                      backgroundColor: text.trim() ? COLORS.primary : '#D4D4D8',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: pressed ? 0.82 : 1,
+                    }}
+                  >
+                    <Feather name="send" size={16} color="#FFFFFF" />
+                  </View>
+                )}
+              </Pressable>
+            </BlurView>
           </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }

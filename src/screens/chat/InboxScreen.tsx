@@ -2,7 +2,9 @@ import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import EmptyState from '@/components/EmptyState';
@@ -50,66 +52,77 @@ export default function InboxScreen() {
         accessibilityRole="button"
       >
         {({ pressed }) => (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 16,
-              gap: 14,
-              backgroundColor: pressed ? '#FAFAFA' : COLORS.surface,
-              borderBottomWidth: 1,
-              borderBottomColor: COLORS.border,
-            }}
-          >
-            <View
+          <View style={{ marginHorizontal: 16, marginBottom: 10, opacity: pressed ? 0.92 : 1 }}>
+            <BlurView
+              intensity={50}
+              tint="light"
               style={{
-                width: 52,
-                height: 52,
-                borderRadius: 999,
-                backgroundColor: '#F4F4F5',
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
+                padding: 14,
+                gap: 14,
+                backgroundColor: 'rgba(255,255,255,0.44)',
+                borderRadius: 22,
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.76)',
                 overflow: 'hidden',
               }}
             >
-              {otherAvatar ? (
-                <Image
-                  source={{ uri: otherAvatar }}
-                  style={{ width: 52, height: 52 }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Feather name="user" size={24} color={COLORS.textMuted} />
-              )}
-            </View>
-            <View style={{ flex: 1 }}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  width: 54,
+                  height: 54,
+                  borderRadius: 18,
+                  backgroundColor: '#F4F4F5',
                   alignItems: 'center',
-                  marginBottom: 4,
+                  justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
               >
-                <Text
-                  style={{ fontSize: 15, fontWeight: '700', color: COLORS.primary }}
-                  numberOfLines={1}
-                >
-                  {otherName}
-                </Text>
-                {item.last_at ? (
-                  <Text style={{ fontSize: 11, color: COLORS.textMuted }}>
-                    {formatRelativeTime(item.last_at)}
-                  </Text>
-                ) : null}
+                {otherAvatar ? (
+                  <Image
+                    source={{ uri: otherAvatar }}
+                    style={{ width: 54, height: 54 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Feather name="user" size={24} color={COLORS.textMuted} />
+                )}
               </View>
-              <Text
-                style={{ fontSize: 13, color: COLORS.textMuted }}
-                numberOfLines={1}
-              >
-                {item.last_message ?? 'Belum ada pesan'}
-              </Text>
-            </View>
+
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 4,
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 15, fontWeight: '800', color: COLORS.primary }}
+                    numberOfLines={1}
+                  >
+                    {otherName}
+                  </Text>
+                  {item.last_at ? (
+                    <Text style={{ fontSize: 11, color: COLORS.textMuted }}>
+                      {formatRelativeTime(item.last_at)}
+                    </Text>
+                  ) : null}
+                </View>
+                <Text style={{ fontSize: 13, color: COLORS.textMuted }} numberOfLines={1}>
+                  {item.last_message ?? 'Belum ada pesan'}
+                </Text>
+              </View>
+            </BlurView>
           </View>
         )}
       </Pressable>
@@ -117,43 +130,95 @@ export default function InboxScreen() {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <View
         style={{
-          height: 56,
-          paddingHorizontal: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: COLORS.surface,
-          borderBottomWidth: 1,
-          borderBottomColor: COLORS.border,
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 350,
+          height: 350,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.15,
+          transform: [{ scale: 1.35 }],
         }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: '700', color: COLORS.primary }}>
-          Pesan
-        </Text>
-      </View>
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -50,
+          left: -50,
+          width: 300,
+          height: 300,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.14,
+          transform: [{ scale: 1.2 }],
+        }}
+        pointerEvents="none"
+      />
 
-      {loadingConversations ? (
-        <LoadingSkeleton count={4} />
-      ) : (
-        <FlatList
-          data={conversations}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={
-            <EmptyState
-              icon="message-circle"
-              title="Belum ada percakapan"
-              subtitle="Chat tersedia setelah kamu menghubungi pelapor atau penemu dari Detail laporan."
-            />
-          }
-          contentContainerStyle={conversations.length === 0 ? { flexGrow: 1 } : undefined}
-        />
-      )}
-    </SafeAreaView>
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={60}
+          tint="light"
+          style={{
+            marginHorizontal: 16,
+            marginTop: 2,
+            marginBottom: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            borderRadius: 24,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.76)',
+            overflow: 'hidden',
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+            pointerEvents="none"
+          />
+          <Text style={{ fontSize: 20, fontWeight: '900', color: COLORS.primary }}>
+            Pesan
+          </Text>
+          <Text style={{ fontSize: 12, color: COLORS.textMuted, marginLeft: 10 }}>
+            Percakapan aktif dan riwayat chat.
+          </Text>
+        </BlurView>
+
+        {loadingConversations ? (
+          <LoadingSkeleton count={4} />
+        ) : (
+          <FlatList
+            data={conversations}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            ListEmptyComponent={
+              <EmptyState
+                icon="message-circle"
+                title="Belum ada percakapan"
+                subtitle="Chat tersedia setelah kamu menghubungi pelapor atau penemu dari Detail laporan."
+              />
+            }
+            contentContainerStyle={{
+              paddingTop: 4,
+              paddingBottom: 132,
+              flexGrow: conversations.length === 0 ? 1 : undefined,
+            }}
+          />
+        )}
+      </SafeAreaView>
+    </View>
   );
 }

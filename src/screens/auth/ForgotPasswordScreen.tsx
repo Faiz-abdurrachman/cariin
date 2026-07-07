@@ -66,7 +66,7 @@ export default function ForgotPasswordScreen() {
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {/* Header back */}
         <View style={{ height: 56, justifyContent: 'center', paddingHorizontal: 16 }}>

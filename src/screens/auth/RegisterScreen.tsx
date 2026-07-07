@@ -1,6 +1,4 @@
 // RegisterScreen — form daftar mahasiswa baru.
-// Opsi A: user isi NIM → email auto-generate (nim@student.unu-jogja.ac.id).
-// Field email read-only biar gak perlu diketik manual & gak ada typo.
 
 import { useState } from 'react';
 import {
@@ -9,13 +7,17 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  StatusBar,
   Text,
   View,
+  StyleSheet,
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { type StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import AuthInput from '@/components/AuthInput';
 import FacultyPicker from '@/components/FacultyPicker';
@@ -49,7 +51,6 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
-  // Saat user ngetik NIM, email auto-generate
   const handleNimChange = (text: string) => {
     setNim(text);
     const trimmed = text.trim();
@@ -99,164 +100,287 @@ export default function RegisterScreen() {
   const hasEmail = email.length > 0;
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: COLORS.surface }}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* Header back */}
-        <View style={{ height: 56, justifyContent: 'center', paddingHorizontal: 16 }}>
-          <Pressable
-            onPress={() => navigation.goBack()}
-            accessibilityRole="button"
-            accessibilityLabel="Kembali"
-          >
-            {({ pressed }) => (
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: COLORS.background,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: pressed ? 0.7 : 1,
-                }}
-              >
-                <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
-              </View>
-            )}
-          </Pressable>
-        </View>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 32, paddingBottom: 32 }}
-          keyboardShouldPersistTaps="handled"
+      <View
+        style={{
+          position: 'absolute',
+          top: -50,
+          right: -60,
+          width: 360,
+          height: 360,
+          borderRadius: 999,
+          backgroundColor: COLORS.primary,
+          opacity: 0.14,
+          transform: [{ scale: 1.28 }],
+        }}
+        pointerEvents="none"
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -80,
+          left: -80,
+          width: 320,
+          height: 320,
+          borderRadius: 999,
+          backgroundColor: COLORS.found,
+          opacity: 0.12,
+          transform: [{ scale: 1.16 }],
+        }}
+        pointerEvents="none"
+      />
+
+      <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          {/* Heading */}
-          <View style={{ marginBottom: 24 }}>
-            <Text
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: 'center',
+              paddingHorizontal: 20,
+              paddingVertical: 20,
+            }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Pressable
+              onPress={() => navigation.goBack()}
+              accessibilityRole="button"
+              accessibilityLabel="Kembali"
+              style={{ alignSelf: 'flex-start', marginBottom: 16 }}
+            >
+              {({ pressed }) => (
+                <View
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255,255,255,0.6)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.8)',
+                    opacity: pressed ? 0.72 : 1,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.06,
+                    shadowRadius: 10,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 2,
+                  }}
+                >
+                  <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+                </View>
+              )}
+            </Pressable>
+
+            <BlurView
+              intensity={60}
+              tint="light"
               style={{
-                fontSize: 24,
-                fontWeight: '700',
-                letterSpacing: -0.4,
-                color: COLORS.primary,
-                marginBottom: 8,
+                borderRadius: 32,
+                overflow: 'hidden',
+                borderWidth: 1.5,
+                borderColor: 'rgba(255,255,255,0.78)',
+                backgroundColor: 'rgba(255,255,255,0.42)',
+                padding: 24,
+                shadowColor: '#000',
+                shadowOpacity: 0.1,
+                shadowRadius: 22,
+                shadowOffset: { width: 0, height: 12 },
+                elevation: 6,
               }}
             >
-              Buat Akun
-            </Text>
-            <Text style={{ fontSize: 14, color: COLORS.textMuted }}>
-              Masukkan NIM, data lainnya otomatis.
-            </Text>
-          </View>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.2)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
 
-          {/* Form */}
-          <View style={{ rowGap: 16 }}>
-            <AuthInput
-              label="Nama Lengkap"
-              value={name}
-              onChangeText={setName}
-              placeholder="Sesuai KTM"
-              autoCapitalize="words"
-              error={errors.name}
-            />
-            <AuthInput
-              label="NIM"
-              value={nim}
-              onChangeText={handleNimChange}
-              placeholder="241111021"
-              keyboardType="numeric"
-              autoCapitalize="none"
-              error={errors.nim}
-            />
+              <View style={{ alignItems: 'center', marginBottom: 24 }}>
+                <View
+                  style={{
+                    width: 84,
+                    height: 84,
+                    borderRadius: 28,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255,255,255,0.58)',
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,255,255,0.9)',
+                    marginBottom: 18,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.06,
+                    shadowRadius: 12,
+                    shadowOffset: { width: 0, height: 6 },
+                    elevation: 2,
+                  }}
+                >
+                  <LinearGradient
+                    colors={[COLORS.primary, '#60A5FA']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 18,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Ionicons name="create" size={28} color="#FFFFFF" />
+                  </LinearGradient>
+                </View>
 
-            {/* Email auto-generate — read-only display */}
-            <View style={{ rowGap: 6 }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#18181B' }}>Email Kampus</Text>
-              <View
-                style={{
-                  backgroundColor: '#F1F5F9',
-                  borderColor: COLORS.border,
-                  borderWidth: 1,
-                  borderRadius: 16,
-                  paddingHorizontal: 16,
-                  paddingVertical: 14,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Feather name={hasEmail ? 'check-circle' : 'mail'} size={16} color={hasEmail ? COLORS.found : COLORS.textMuted} />
+                <Text style={{ fontSize: 26, fontWeight: '900', color: COLORS.primary, letterSpacing: -0.5, marginBottom: 8 }}>
+                  Buat akun mahasiswa
+                </Text>
                 <Text
                   style={{
-                    flex: 1,
                     fontSize: 14,
-                    color: hasEmail ? COLORS.primary : COLORS.textMuted,
-                    fontStyle: hasEmail ? 'normal' : 'italic',
+                    lineHeight: 22,
+                    color: COLORS.textMuted,
+                    textAlign: 'center',
+                    maxWidth: 300,
                   }}
-                  numberOfLines={1}
                 >
-                  {hasEmail ? email : 'Otomatis dari NIM'}
+                  Isi NIM, lalu email kampus akan dibuat otomatis. Data lain tinggal dilengkapi.
                 </Text>
               </View>
-            </View>
 
-            <View style={{ flexDirection: 'row', columnGap: 12 }}>
-              <View style={{ flex: 1 }}>
-                <FacultyPicker
-                  label="Fakultas"
-                  value={faculty}
-                  onChange={(f) => {
-                    setFaculty(f);
-                    setProdi(null);
+              <View style={{ gap: 16 }}>
+                <AuthInput
+                  label="Nama Lengkap"
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="Sesuai KTM"
+                  autoCapitalize="words"
+                  error={errors.name}
+                />
+
+                <AuthInput
+                  label="NIM"
+                  value={nim}
+                  onChangeText={handleNimChange}
+                  placeholder="241111021"
+                  keyboardType="numeric"
+                  autoCapitalize="none"
+                  error={errors.nim}
+                />
+
+                <BlurView
+                  intensity={50}
+                  tint="light"
+                  style={{
+                    borderRadius: 18,
+                    overflow: 'hidden',
+                    backgroundColor: 'rgba(255,255,255,0.42)',
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,255,255,0.75)',
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
                   }}
-                  error={errors.faculty}
+                >
+                  <LinearGradient
+                    colors={['rgba(255,255,255,0.84)', 'rgba(255,255,255,0.18)', 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                    pointerEvents="none"
+                  />
+                  <View
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 12,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: hasEmail ? 'rgba(5,150,105,0.1)' : 'rgba(37,99,235,0.08)',
+                    }}
+                  >
+                    <Feather name={hasEmail ? 'check-circle' : 'mail'} size={16} color={hasEmail ? COLORS.found : COLORS.primary} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.textMuted, marginBottom: 2 }}>
+                      Email Kampus
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: hasEmail ? COLORS.primary : COLORS.textMuted,
+                        fontWeight: '600',
+                      }}
+                      numberOfLines={1}
+                    >
+                      {hasEmail ? email : 'Otomatis dari NIM'}
+                    </Text>
+                  </View>
+                </BlurView>
+
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <View style={{ flex: 1 }}>
+                    <FacultyPicker
+                      label="Fakultas"
+                      value={faculty}
+                      onChange={(f) => {
+                        setFaculty(f);
+                        setProdi(null);
+                      }}
+                      error={errors.faculty}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <ProgramPicker
+                      faculty={faculty}
+                      value={prodi}
+                      onChange={setProdi}
+                      error={errors.prodi}
+                    />
+                  </View>
+                </View>
+
+                <AuthInput
+                  label="Kata Sandi"
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Minimal 6 karakter"
+                  isPassword
+                  autoCapitalize="none"
+                  error={errors.password}
                 />
+
+                <View style={{ paddingTop: 4 }}>
+                  <PrimaryButton label="Daftar Sekarang" onPress={handleSubmit} loading={loading} />
+                </View>
               </View>
-              <View style={{ flex: 1 }}>
-                <ProgramPicker
-                  faculty={faculty}
-                  value={prodi}
-                  onChange={setProdi}
-                  error={errors.prodi}
-                />
-              </View>
-            </View>
 
-            <AuthInput
-              label="Kata Sandi"
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Minimal 6 karakter"
-              secureTextEntry
-              autoCapitalize="none"
-              error={errors.password}
-            />
-
-            <View style={{ paddingTop: 8 }}>
-              <PrimaryButton label="Daftar Sekarang" onPress={handleSubmit} loading={loading} />
-            </View>
-          </View>
-
-          <Text
-            style={{
-              textAlign: 'center',
-              marginTop: 24,
-              fontSize: 14,
-              color: COLORS.textMuted,
-            }}
-          >
-            Sudah punya akun?{' '}
-            <Text
-              style={{ color: COLORS.primary, fontWeight: '700' }}
-              onPress={() => navigation.navigate('Login', { isAdmin: false })}
-            >
-              Masuk
-            </Text>
-          </Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  marginTop: 22,
+                  fontSize: 14,
+                  color: COLORS.textMuted,
+                }}
+              >
+                Sudah punya akun?{' '}
+                <Text
+                  style={{ color: COLORS.primary, fontWeight: '800' }}
+                  onPress={() => navigation.navigate('Login', { isAdmin: false })}
+                >
+                  Masuk
+                </Text>
+              </Text>
+            </BlurView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }

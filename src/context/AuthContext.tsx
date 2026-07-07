@@ -8,6 +8,7 @@ import { supabase } from '@/services/supabase';
 import * as authService from '@/services/auth.service';
 import { createUserModel, type User as UserModel } from '@/models';
 import type { UserRole } from '@/utils/constants';
+import { isValidCampusEmail } from '@/utils/validators';
 
 export interface UserProfile {
   id: string;
@@ -39,6 +40,12 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function inferRoleFromSession(currentSession: Session | null): UserRole | null {
+  const email = currentSession?.user.email?.trim().toLowerCase();
+  if (!email) return null;
+  return isValidCampusEmail(email) ? 'mahasiswa' : 'admin';
+}
+
 async function fetchProfile(userId: string): Promise<UserProfile | null> {
   const { data, error } = await supabase
     .from('profiles')
@@ -58,6 +65,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [roleHint, setRoleHint] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -68,10 +76,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data } = await supabase.auth.getSession();
         if (!mounted) return;
         setSession(data.session);
+        setRoleHint(inferRoleFromSession(data.session));
         if (data.session) {
-          const profile = await fetchProfile(data.session.user.id);
-          if (!mounted) return;
-          setUserProfile(profile);
+          void fetchProfile(data.session.user.id)
+            .then((profile) => {
+              if (!mounted) return;
+              setUserProfile(profile);
+            })
+            .catch(() => {
+              // Profile loading is non-blocking; fallback role stays active.
+            });
         }
       } catch {
         // Network error atau Supabase unreachable — user tetap bisa
@@ -86,12 +100,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       if (!mounted) return;
       setSession(newSession);
+      setRoleHint(inferRoleFromSession(newSession));
       if (newSession) {
-        const profile = await fetchProfile(newSession.user.id);
-        if (!mounted) return;
-        setUserProfile(profile);
+        void fetchProfile(newSession.user.id)
+          .then((profile) => {
+            if (!mounted) return;
+            setUserProfile(profile);
+          })
+          .catch(() => {
+            // Keep the fallback role; profile can retry on next refresh.
+          });
       } else {
         setUserProfile(null);
+        setRoleHint(null);
       }
     });
 
@@ -119,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user ?? null,
       userProfile,
       currentUser: userProfile ? createUserModel(userProfile) : null,
-      role: userProfile?.role ?? null,
+      role: userProfile?.role ?? roleHint ?? null,
       session,
       isLoading,
       isAuthenticated: !!session,
@@ -129,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resetPassword: authService.resetPassword,
       refreshProfile,
     }),
-    [session, userProfile, isLoading, refreshProfile],
+    [session, userProfile, roleHint, isLoading, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

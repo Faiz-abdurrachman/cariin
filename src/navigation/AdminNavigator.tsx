@@ -5,9 +5,9 @@
 // Warna teal (COLORS.admin) sebagai aksen.
 
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DrawerActions, useNavigation, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   createDrawerNavigator,
@@ -15,6 +15,8 @@ import {
   DrawerItem,
   type DrawerContentComponentProps,
 } from '@react-navigation/drawer';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import FabButton from '@/components/FabButton';
@@ -70,77 +72,91 @@ function AdminProfileScreen() {
   const { logout, userProfile } = useAuth();
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', padding: 32 }}>
-      <View
-        style={{
-          width: 80,
-          height: 80,
-          borderRadius: 999,
-          backgroundColor: COLORS.adminLight,
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <Ionicons name="shield-checkmark-outline" size={40} color={COLORS.admin} />
-      </View>
-      <Text style={{ fontSize: 20, fontWeight: '700', color: COLORS.adminText, marginBottom: 4 }}>
-        {userProfile?.name ?? 'Admin'}
-      </Text>
-      <Text style={{ fontSize: 13, color: COLORS.textMuted, marginBottom: 32 }}>
-        Administrator
-      </Text>
+    <View style={{ flex: 1, backgroundColor: COLORS.admin }}>
+      {/* Dark Glass Background Blobs */}
+      <View style={{ position: 'absolute', top: -50, right: -50, width: 350, height: 350, borderRadius: 999, backgroundColor: '#34D399', opacity: 0.15, transform: [{ scale: 1.5 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', bottom: 50, left: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: '#8B5CF6', opacity: 0.25, transform: [{ scale: 1.2 }] }} pointerEvents="none" />
 
-      <View
-        style={{
-          width: '100%',
-          backgroundColor: COLORS.surface,
-          borderRadius: 24,
-          borderWidth: 1,
-          borderColor: COLORS.adminBorder,
-          overflow: 'hidden',
-        }}
-      >
-        {(
-          [
-            ['key-outline', 'Ganti Password', () => Alert.alert('Ganti Password', 'Fitur ini akan hadir di update berikutnya.')],
-            ['log-out-outline', 'Keluar', () => {
-              Alert.alert('Keluar dari Cari.In?', 'Sesi admin akan diakhiri.', [
-                { text: 'Batal', style: 'cancel' },
-                {
-                  text: 'Keluar', style: 'destructive',
-                  onPress: async () => {
-                    try { await logout(); } catch (e) {
-                      Alert.alert('Gagal logout', e instanceof Error ? e.message : 'Coba lagi.');
-                    }
-                  },
-                },
-              ]);
-            }],
-          ] as const
-        ).map(([icon, label, onPress], i, arr) => (
-          <View key={label}>
-            <Ionicons.Button
-              name={icon}
-              onPress={onPress}
-              backgroundColor={COLORS.surface}
-              color={icon === 'log-out-outline' ? COLORS.lost : COLORS.adminText}
-              iconStyle={{ marginRight: 4 }}
-              style={{
-                paddingHorizontal: 20,
-                paddingVertical: 14,
-                borderRadius: 0,
-                justifyContent: 'flex-start',
-              }}
-            >
-              <Text style={{ fontSize: 15, fontWeight: '600', color: icon === 'log-out-outline' ? COLORS.lost : COLORS.adminText, flex: 1 }}>
-                {label}
-              </Text>
-            </Ionicons.Button>
-            {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: COLORS.adminBorder, marginHorizontal: 20 }} />}
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 }}>
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 999,
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 16,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.3)',
+            }}
+          >
+            <Ionicons name="shield-checkmark-outline" size={40} color="#FFFFFF" />
           </View>
-        ))}
-      </View>
+          <Text style={{ fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 4 }}>
+            {userProfile?.name ?? 'Admin'}
+          </Text>
+          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 32 }}>
+            Administrator
+          </Text>
+
+          <BlurView
+            intensity={40}
+            tint="light"
+            style={{
+              width: '100%',
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              borderRadius: 24,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.3)',
+              overflow: 'hidden',
+            }}
+          >
+            <LinearGradient colors={['rgba(255, 255, 255, 0.2)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+            {(
+              [
+                ['key-outline', 'Ganti Password', () => Alert.alert('Ganti Password', 'Fitur ini akan hadir di update berikutnya.')],
+                ['log-out-outline', 'Keluar', () => {
+                  Alert.alert('Keluar dari Cari.In?', 'Sesi admin akan diakhiri.', [
+                    { text: 'Batal', style: 'cancel' },
+                    {
+                      text: 'Keluar', style: 'destructive',
+                      onPress: async () => {
+                        try { await logout(); } catch (e) {
+                          Alert.alert('Gagal logout', e instanceof Error ? e.message : 'Coba lagi.');
+                        }
+                      },
+                    },
+                  ]);
+                }],
+              ] as const
+            ).map(([icon, label, onPress], i, arr) => (
+              <View key={label}>
+                <Ionicons.Button
+                  name={icon}
+                  onPress={onPress}
+                  backgroundColor="transparent"
+                  color={icon === 'log-out-outline' ? '#FCA5A5' : '#FFFFFF'}
+                  iconStyle={{ marginRight: 4 }}
+                  underlayColor="rgba(255,255,255,0.1)"
+                  style={{
+                    paddingHorizontal: 20,
+                    paddingVertical: 14,
+                    borderRadius: 0,
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: icon === 'log-out-outline' ? '#FCA5A5' : '#FFFFFF', flex: 1 }}>
+                    {label}
+                  </Text>
+                </Ionicons.Button>
+                {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 20 }} />}
+              </View>
+            ))}
+          </BlurView>
+        </View>
+      </SafeAreaView>
     </View>
   );
 }
@@ -148,6 +164,9 @@ function AdminProfileScreen() {
 const Tab = createBottomTabNavigator<AdminTabParamList>();
 
 function AdminTabs() {
+  const insets = useSafeAreaInsets();
+  const bottomOffset = Math.max(insets.bottom, 10);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -155,17 +174,67 @@ function AdminTabs() {
         tabBarActiveTintColor: COLORS.admin,
         tabBarInactiveTintColor: COLORS.textMuted,
         tabBarStyle: {
-          backgroundColor: COLORS.surface,
-          borderTopColor: COLORS.adminBorder,
+          position: 'absolute',
+          left: 14,
+          right: 14,
+          bottom: bottomOffset,
+          height: 72,
+          paddingTop: 8,
+          paddingBottom: 10,
+          borderRadius: 26,
+          borderTopWidth: 0,
+          backgroundColor: 'transparent',
+          elevation: 0,
+          shadowColor: '#000',
+          shadowOpacity: 0.12,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 6 },
+          overflow: 'hidden',
+        },
+        tabBarBackground: () => (
+          <BlurView
+            intensity={60}
+            tint="light"
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              borderRadius: 26,
+              backgroundColor: 'rgba(255,255,255,0.46)',
+              borderWidth: 1.25,
+              borderColor: 'rgba(255,255,255,0.78)',
+              overflow: 'hidden',
+            }}
+            >
+              <LinearGradient
+                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.22)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
+          </BlurView>
+        ),
+        tabBarItemStyle: {
+          paddingTop: 6,
+          paddingBottom: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '800',
+          marginBottom: 1,
         },
       }}
     >
       <Tab.Screen
         name="DashboardTab"
         component={DashboardStackNavigator}
-        options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" color={color} size={size} />,
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'AdminDashboard';
+          const display = ['AdminReview'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            title: 'Dashboard',
+            tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" color={color} size={size} />,
+          };
         }}
       />
       <Tab.Screen
@@ -179,25 +248,35 @@ function AdminTabs() {
       <Tab.Screen
         name="CreateTab"
         component={AdminCreateStackNavigator}
-        options={{
-          title: 'Buat',
-          tabBarLabel: '',
-          tabBarButton: (props) => (
-            <FabButton
-              onPress={props.onPress as () => void}
-              containerStyle={props.style}
-              accessibilityLabel="Buat laporan admin"
-              variant="admin"
-            />
-          ),
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'AdminCreateLost';
+          const display = ['AdminCreateLost', 'AdminCreateFound'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            title: 'Buat',
+            tabBarLabel: '',
+            tabBarButton: (props) => (
+              <FabButton
+                onPress={props.onPress as () => void}
+                containerStyle={props.style}
+                accessibilityLabel="Buat laporan admin"
+                variant="admin"
+              />
+            ),
+          };
         }}
       />
       <Tab.Screen
         name="ChatTab"
         component={AdminChatStackNavigator}
-        options={{
-          title: 'Pesan',
-          tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble-outline" color={color} size={size} />,
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'Inbox';
+          const display = ['ChatRoom'].includes(routeName) ? 'none' : 'flex';
+          return {
+            tabBarStyle: { display },
+            title: 'Pesan',
+            tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble-outline" color={color} size={size} />,
+          };
         }}
       />
       <Tab.Screen
@@ -223,9 +302,28 @@ const ABOUT_ROWS: { icon: keyof typeof Ionicons.glyphMap; label: string; value: 
 function AdminAboutScreen() {
   const nav = useNavigation();
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <SafeAreaView edges={['top']} style={{ backgroundColor: COLORS.admin }}>
-        <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.admin }}>
+      {/* Dark Glass Background Blobs */}
+      <View style={{ position: 'absolute', top: -50, right: -50, width: 350, height: 350, borderRadius: 999, backgroundColor: '#34D399', opacity: 0.15, transform: [{ scale: 1.5 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', bottom: 50, left: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: '#8B5CF6', opacity: 0.25, transform: [{ scale: 1.2 }] }} pointerEvents="none" />
+
+      <SafeAreaView edges={['top']} style={{ backgroundColor: 'transparent' }}>
+        <BlurView
+          intensity={40}
+          tint="light"
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: 8,
+            paddingBottom: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            backgroundColor: 'rgba(30,27,75,0.3)',
+            borderBottomWidth: 1,
+            borderBottomColor: 'rgba(255,255,255,0.2)'
+          }}
+        >
+          <LinearGradient colors={['rgba(255, 255, 255, 0.1)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
           <Pressable
             onPress={() => nav.dispatch(DrawerActions.openDrawer())}
             accessibilityRole="button"
@@ -250,38 +348,41 @@ function AdminAboutScreen() {
           </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>Tentang Cari.In</Text>
-            <Text style={{ fontSize: 12, color: COLORS.adminBorder, marginTop: 2 }}>
+            <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>
               Ekosistem Lost &amp; Found kampus
             </Text>
           </View>
-        </View>
+        </BlurView>
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <View
+        <BlurView
+          intensity={40}
+          tint="light"
           style={{
-            backgroundColor: COLORS.surface,
+            backgroundColor: 'rgba(255,255,255,0.1)',
             borderRadius: 24,
             borderWidth: 1,
-            borderColor: COLORS.adminBorder,
+            borderColor: 'rgba(255,255,255,0.3)',
             overflow: 'hidden',
           }}
         >
+          <LinearGradient colors={['rgba(255, 255, 255, 0.2)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
           {ABOUT_ROWS.map((row, i) => (
             <View key={row.label}>
               <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, gap: 14 }}>
-                <Ionicons name={row.icon} size={20} color={COLORS.admin} />
-                <Text style={{ fontSize: 13, color: COLORS.textMuted, width: 80 }}>{row.label}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: COLORS.adminText, flex: 1 }}>
+                <Ionicons name={row.icon} size={20} color="#FFFFFF" />
+                <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', width: 80 }}>{row.label}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#FFFFFF', flex: 1 }}>
                   {row.value}
                 </Text>
               </View>
               {i < ABOUT_ROWS.length - 1 && (
-                <View style={{ height: 1, backgroundColor: COLORS.background, marginHorizontal: 20 }} />
+                <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 20 }} />
               )}
             </View>
           ))}
-        </View>
+        </BlurView>
       </ScrollView>
     </View>
   );
@@ -308,49 +409,78 @@ function AdminDrawerContent(props: DrawerContentComponentProps) {
   };
 
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
-      <View style={{ backgroundColor: COLORS.admin, padding: 20, paddingTop: 48, marginBottom: 8 }}>
-        <View
+    <View style={{ flex: 1, backgroundColor: COLORS.admin }}>
+      {/* Dark Glass Background Blobs */}
+      <View style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: '#34D399', opacity: 0.15, transform: [{ scale: 1.5 }] }} pointerEvents="none" />
+      <View style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: 999, backgroundColor: '#8B5CF6', opacity: 0.25, transform: [{ scale: 1.2 }] }} pointerEvents="none" />
+
+      <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
+        {/* Profile Header (Glass) */}
+        <BlurView
+          intensity={40}
+          tint="light"
           style={{
-            width: 56,
-            height: 56,
-            borderRadius: 999,
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 12,
+            padding: 20,
+            paddingTop: 48,
+            paddingBottom: 24,
+            marginBottom: 16,
+            borderBottomWidth: 1,
+            borderBottomColor: 'rgba(255,255,255,0.2)',
+            backgroundColor: 'rgba(30,27,75,0.3)',
           }}
         >
-          <Ionicons name="shield-checkmark" size={28} color="#FFFFFF" />
+          <LinearGradient colors={['rgba(255, 255, 255, 0.1)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
+          <View
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 32,
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 16,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.4)',
+            }}
+          >
+            <Ionicons name="shield-checkmark" size={32} color="#FFFFFF" />
+          </View>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#FFFFFF' }}>
+            {currentUser?.name ?? userProfile?.name ?? 'Admin'}
+          </Text>
+          <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>
+            {currentUser?.getRoleLabel() ?? 'Administrator'}
+          </Text>
+        </BlurView>
+
+        <View style={{ paddingHorizontal: 12, gap: 8 }}>
+          <DrawerItem
+            label="Beranda"
+            labelStyle={{ color: '#FFFFFF', fontWeight: '600' }}
+            icon={({ size }) => <Ionicons name="home-outline" size={size} color="#FFFFFF" />}
+            onPress={() => props.navigation.navigate('AdminTabs')}
+            style={{ borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)' }}
+          />
+          <DrawerItem
+            label="Tentang Cari.In"
+            labelStyle={{ color: '#FFFFFF', fontWeight: '600' }}
+            icon={({ size }) => <Ionicons name="information-circle-outline" size={size} color="#FFFFFF" />}
+            onPress={() => props.navigation.navigate('AdminAbout')}
+            style={{ borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)' }}
+          />
+
+          <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginVertical: 12, marginHorizontal: 16 }} />
+
+          <DrawerItem
+            label="Keluar"
+            labelStyle={{ color: COLORS.lost, fontWeight: '600' }}
+            icon={({ size }) => <Ionicons name="log-out-outline" size={size} color={COLORS.lost} />}
+            onPress={confirmLogout}
+            style={{ borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)' }}
+          />
         </View>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
-          {currentUser?.name ?? userProfile?.name ?? 'Admin'}
-        </Text>
-        <Text style={{ fontSize: 12, color: COLORS.adminBorder, marginTop: 2 }}>
-          {currentUser?.getRoleLabel() ?? 'Administrator'}
-        </Text>
-      </View>
-
-      <DrawerItem
-        label="Beranda"
-        icon={({ size }) => <Ionicons name="home-outline" size={size} color={COLORS.admin} />}
-        onPress={() => props.navigation.navigate('AdminTabs')}
-      />
-      <DrawerItem
-        label="Tentang Cari.In"
-        icon={({ size }) => <Ionicons name="information-circle-outline" size={size} color={COLORS.admin} />}
-        onPress={() => props.navigation.navigate('AdminAbout')}
-      />
-
-      <View style={{ height: 1, backgroundColor: COLORS.adminBorder, marginVertical: 8, marginHorizontal: 16 }} />
-
-      <DrawerItem
-        label="Keluar"
-        labelStyle={{ color: COLORS.lost }}
-        icon={({ size }) => <Ionicons name="log-out-outline" size={size} color={COLORS.lost} />}
-        onPress={confirmLogout}
-      />
-    </DrawerContentScrollView>
+      </DrawerContentScrollView>
+    </View>
   );
 }
 
@@ -362,8 +492,11 @@ export default function AdminNavigator() {
       drawerContent={(props) => <AdminDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
-        drawerActiveTintColor: COLORS.admin,
+        drawerActiveTintColor: '#FFFFFF',
         drawerType: 'front',
+        drawerStyle: {
+          backgroundColor: 'transparent',
+        },
       }}
     >
       <Drawer.Screen name="AdminTabs" component={AdminTabs} options={{ title: 'Beranda' }} />
