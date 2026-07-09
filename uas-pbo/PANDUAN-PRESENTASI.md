@@ -86,6 +86,9 @@ Yang penting: tombol ini gedein volume.
 
 ### Di project lo — `src/models/User.ts`
 
+**📍 TRACK:** `src/models/User.ts` — baris 18
+**🎯 Cari:** `export abstract class User`
+
 Buka file ini:
 
 ```typescript
@@ -102,9 +105,9 @@ export abstract class User {
 }
 ```
 
-### Cara jelasin:
+### Cara jelasin (pointing ke baris 18-58):
 
-> "Lihat `abstract class User`. Ini tuh blueprint doang, bukan objek beneran. Coba lo ketik `new User()` — dijamin error."
+> "Lihat `abstract class User` baris 18. Ini tuh blueprint doang, bukan objek beneran. Coba lo ketik `new User()` — dijamin error."
 >
 > "Kenapa? Karena User itu konsep abstrak. Di dunia nyata, gak ada 'user' tanpa peran. Yang ada cuma Mahasiswa atau Admin."
 >
@@ -113,6 +116,9 @@ export abstract class User {
 ### Abstraction juga ada di Service Layer
 
 Buka `src/services/report.service.ts`:
+
+**📍 TRACK:** `src/services/report.service.ts` — baris 75
+**🎯 Cari:** `export async function listReports`
 
 ```typescript
 // Screen panggil ini:
@@ -156,11 +162,14 @@ Kalo satpam liat lo masukin uang palsu (`string kosong`), satpam nolak.
 
 ### Di project lo — `src/models/User.ts`
 
+**📍 TRACK:** `src/models/User.ts` — baris 20-21 (field), 37-38 (getter), 45 (setter)
+**🎯 Cari:** `private readonly _id` (baris 20), `set name` (baris 45)
+
 ```typescript
 export abstract class User {
   // 🔒 DIKUNCI — private, gak bisa diakses dari luar
-  private readonly _id: string;
-  private _name: string;
+  private readonly _id: string;         // ← baris 20
+  private _name: string;                // ← baris 21
 
   // 🚪 GETTER — akses baca doang
   get id(): string { return this._id; }     // Bisa baca, gak bisa ubah
@@ -225,6 +234,10 @@ Anak kedua (Admin) juga tinggal — sama-sama pake fasilitas, tapi **dia punya m
 #### Hierarki 1: `User` → `Mahasiswa` & `Admin`
 
 Buka `src/models/Mahasiswa.ts`:
+
+**📍 TRACK:** `src/models/Mahasiswa.ts` — baris 6 | `src/models/Admin.ts` — baris 8
+**🎯 Cari:** `class Mahasiswa extends User` (Mhs baris 6), `class Admin extends User` (Admin baris 8)
+
 ```typescript
 export class Mahasiswa extends User {
   // 👇 Method abstract dari User — wajib diisi
@@ -360,8 +373,11 @@ if (currentUser.canModerate()) {
 
 Buka `src/models/Report.ts`:
 
+**📍 TRACK:** `src/models/Report.ts` — Lost baris 41-55, Found baris 59-84
+**🎯 Cari:** `class LostReport` (baris 41), `class FoundReport` (baris 59)
+
 ```typescript
-// LAPORAN HILANG
+// LAPORAN HILANG (baris 41)
 class LostReport extends ReportModel {
   validate(): string | null {
     if (judul kosong) return 'Judul wajib diisi.';
@@ -545,7 +561,10 @@ Buka app → Login sebagai `faiz@student.unu-jogja.ac.id` → Masuk ke halaman m
 
 **Sambil itu jelasin kode:**
 
-Buka `src/context/AuthContext.tsx`, cari fungsi `createUserModel()`:
+Buka `src/context/AuthContext.tsx`:
+
+**📍 TRACK:** `src/context/AuthContext.tsx` — baris 142
+**🎯 Cari:** `createUserModel` — ada di `src/models/index.ts` baris 28
 
 ```typescript
 function createUserModel(profile: Profile): User {
@@ -571,6 +590,9 @@ Logout → Login sebagai `admin@cariin.app` → Lihat dashboard admin tampilanny
 
 Buka `src/navigation/index.tsx`:
 
+**📍 TRACK:** `src/navigation/index.tsx` — baris 16-29
+**🎯 Cari:** `role === 'admin'` (baris 26)
+
 ```typescript
 export default function RootNavigator() {
   const { role } = useAuth();
@@ -583,10 +605,13 @@ export default function RootNavigator() {
 }
 ```
 
-Buka `src/navigation/AdminNavigator.tsx`, cari pemanggilan `getRoleLabel()`:
+Buka `src/navigation/AdminNavigator.tsx`:
+
+**📍 TRACK:** `src/navigation/AdminNavigator.tsx` — baris 449-452
+**🎯 Cari:** `getRoleLabel()` (baris 452)
 
 ```typescript
-// Di dalem AdminNavigator, ada kode kayak gini:
+// Di dalem AdminNavigator, baris 452:
 <Text>{currentUser.getRoleLabel()}</Text>
 // Kalo Admin → "Administrator"
 // Kalo Mahasiswa → "Mahasiswa"
