@@ -19,6 +19,34 @@
 
 ---
 
+## 📖 GLOSARIUM ISTILAH (Biar Gak Bingung)
+
+| Istilah | Artinya (bahasa sehari-hari) |
+|---------|------------------------------|
+| **Class** | Cetakan / template — belum ada datanya |
+| **Object** | Hasil jadi dari class — udah ada datanya |
+| **Method** | Fungsi / tingkah laku yang bisa dilakukan objek |
+| **Property / Field** | Data / ciri-ciri yang dimiliki objek |
+| **Abstract class** | Blueprint doang — gak bisa dipake langsung, harus diturunin dulu |
+| **Extends** | Mewarisi sifat dari induknya |
+| **Subclass** | Class anak — yang mewarisi |
+| **Superclass / Parent** | Class induk — yang diwarisi |
+| **Private** | Dikunci — cuma class itu sendiri yang bisa akses |
+| **Protected** | Setengah kunci — class sendiri + subclass anak yang bisa akses |
+| **Getter** | Pintu baca — buat liat data yang dikunci |
+| **Setter** | Pintu tulis — buat ngubah data yang dikunci (biasanya ada validasi) |
+| **Constructor** | Fungsi yang otomatis jalan pas objek pertama kali dibuat |
+| **Override** | Nimpah method warisan dari induk — isinya diganti sesuai kebutuhan |
+| **Instance** | Objek beneran yang udah jadi dan bisa dipake |
+| **Interface** | Kontrak doang — cuma daftar method, gak ada implementasi |
+| **Encapsulation** | Ngunci data biar gak dibobol sembarangan |
+| **Inheritance** | Warisan — class anak dapet semua properti induk |
+| **Polymorphism** | Method sama nama, tapi kelakuannya beda tergantung class-nya |
+| **Abstraction** | Nyembunyiin detail ribet, yang keliatan cuma fitur penting |
+| **Service layer** | Lapisan perantara — jembatan antara UI dan database |
+
+---
+
 ## 1. OOP Itu Sebenernya Apa?
 
 ### Dalam 1 kalimat
@@ -44,8 +72,8 @@
 
 | Kenyataan | Jadi Class |
 |-----------|------------|
-| Mahasiswa | `class Mahasiswa extends User` |
-| Admin satpam | `class Admin extends User` |
+| Mahasiswa | `class Mahasiswa **extends** User (mewarisi User)` |
+| Admin satpam | `class Admin **extends** User (mewarisi User)` |
 | Laporan hilang | `class LostReport extends ReportModel` |
 | Laporan temuan | `class FoundReport extends ReportModel` |
 
@@ -87,7 +115,7 @@ Yang penting: tombol ini gedein volume.
 ### Di project lo — `src/models/User.ts`
 
 **📍 TRACK:** `src/models/User.ts` — baris 18
-**🎯 Cari:** `export abstract class User`
+**🎯 Cari:** `export abstract class User` (blueprint doang, gak bisa dipake langsung)
 
 Buka file ini:
 
@@ -99,9 +127,9 @@ export abstract class User {
   }
 
   // 🔴 Method yang MASIH ABSTRACT — WAJIB diisi subclass
-  abstract get role(): UserRole;
-  abstract getRoleLabel(): string;
-  abstract canModerate(): boolean;
+  abstract get role() (masih kosong, wajib diisi subclass): UserRole;
+  abstract getRoleLabel() (masih kosong): string;
+  abstract canModerate() (masih kosong): boolean;
 }
 ```
 
@@ -163,13 +191,13 @@ Kalo satpam liat lo masukin uang palsu (`string kosong`), satpam nolak.
 ### Di project lo — `src/models/User.ts`
 
 **📍 TRACK:** `src/models/User.ts` — baris 20-21 (field), 37-38 (getter), 45 (setter)
-**🎯 Cari:** `private readonly _id` (baris 20), `set name` (baris 45)
+**🎯 Cari:** `private readonly _id (dikunci, cuma bisa dibaca)` (baris 20), `set name` (baris 45)
 
 ```typescript
 export abstract class User {
   // 🔒 DIKUNCI — private, gak bisa diakses dari luar
   private readonly _id: string;         // ← baris 20
-  private _name: string;                // ← baris 21
+  private _name (dikunci, baca lewat getter): string;                // ← baris 21
 
   // 🚪 GETTER — akses baca doang
   get id(): string { return this._id; }     // Bisa baca, gak bisa ubah
@@ -203,7 +231,7 @@ user.id = '002';              // Error! Gak ada setter (readonly)
 
 > "Encapsulation itu ngunci data biar gak dibobol sembarangan. Field `_id` di-private, cuma bisa dibaca lewat getter. Mau ganti nama? Pake setter — tapi ada validasi, kalo kosong ditolak."
 >
-> "Encapsulation juga ada di service layer. Screen gak pernah akses database langsung — semuanya lewat service. Kalo suatu saat ganti backend, screen gak perlu diubah."
+> "Encapsulation juga ada di service layer (lapisan perantara). Screen gak pernah akses database langsung — semuanya lewat service. Kalo suatu saat ganti backend, screen gak perlu diubah."
 
 ### Yang lo hafal:
 
