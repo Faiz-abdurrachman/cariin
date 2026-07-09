@@ -22,9 +22,9 @@ Deskripsi Kegiatan:
 Kegiatan ini berfokus pada identifikasi permasalahan nyata yang dialami mahasiswa terkait kehilangan dan penemuan barang di lingkungan kampus UNU Yogyakarta.
 
 1. Identifikasi Masalah: Ditemukan enam masalah utama: informasi kehilangan cepat tenggelam di grup WhatsApp, tidak adanya sistem pencarian terpusat, rawan klaim palsu karena tanpa verifikasi identitas, privasi terancam karena nomor HP tersebar di grup publik, format pelaporan tidak konsisten, serta mahasiswa yang tidak sempat mengunduh aplikasi memerlukan jalur alternatif melalui satpam.  
-2. Validasi Data: Kami menyebarkan kuesioner kepada 38 responden mahasiswa UNU Yogyakarta (23–24 Mei 2026). Hasilnya sangat signifikan: 65,8% responden pernah kehilangan barang (terbanyak: kunci kendaraan, charger, dompet). Sebanyak 23,7% responden masih mengandalkan grup WhatsApp untuk mencari barang hilang, dan 12 responden masih mengumumkan barang temuan via grup WhatsApp yang berisiko terhadap privasi. Hal terpenting, 84,2% responden menyatakan nyaman menggunakan email kampus untuk verifikasi akun, yang memvalidasi Unique Value Proposition utama Cari.In.  
+2. Validasi Data: Kami menyebarkan kuesioner kepada 39 responden mahasiswa UNU Yogyakarta (23–24 Mei 2026). Hasilnya sangat signifikan: 51% responden pernah kehilangan barang (terbanyak: kunci kendaraan, charger, dompet). Sebanyak 28% responden masih mengandalkan grup WhatsApp untuk mencari barang hilang, dan 22% responden masih mengumumkan barang temuan via grup WhatsApp yang berisiko terhadap privasi. Hal terpenting, 82% responden menyatakan nyaman menggunakan email kampus untuk verifikasi akun, yang memvalidasi Unique Value Proposition utama Cari.In.  
 
-*Gambar 1: Analisis Permasalahan dan Survey Kuesioner — screenshot Google Form survey, grafik hasil kuesioner (pie chart 65.8% pernah kehilangan, bar chart barang paling sering hilang).*
+*Gambar 1: Analisis Permasalahan dan Survey Kuesioner — screenshot Google Form survey, grafik hasil kuesioner (pie chart 51% pernah kehilangan, bar chart barang paling sering hilang).*
 
 **2. Kegiatan 2: Perancangan Database (ERD) & Arsitektur Sistem**
 
@@ -121,12 +121,12 @@ Kontribusi Anggota:
 | 2 | Galih Witradika | 241111013 | Testing fitur chat realtime, validasi flow notifikasi, dokumentasi bug report |
 | 3 | Faiz Abdurrahman | 241111021 | Full-stack development: implementasi auth, feed, detail, create, my posts, profile (FASE 1-4). Implementasi chat realtime dengan Supabase Realtime subscription. Implementasi admin dashboard, review, reports, walk-in. Perancangan color system Calm Campus. Penulisan 17 RLS policies, 4 trigger database (trg_notify_new_message, trg_update_conversation, trg_set_updated_at, trg_handle_new_user), 2 RPC security definer functions. Setup EAS Build dan deployment APK production. |
 | 4 | Ibnul Mubarok | 241111026 | Membantu penyusunan laporan progress, pengujian user flow admin, dokumentasi skenario testing |
-| 5 | Imroatu Zakiyah | 241111032 | Penyebaran dan pengolahan data kuesioner terhadap 38 responden. Identifikasi 6 permasalahan utama dan validasi data lapangan. Memimpin penyusunan laporan progress, dokumentasi, dan materi presentasi. |
+| 5 | Imroatu Zakiyah | 241111032 | Penyebaran dan pengolahan data kuesioner terhadap 39 responden. Identifikasi 6 permasalahan utama dan validasi data lapangan. Memimpin penyusunan laporan progress, dokumentasi, dan materi presentasi. |
 | 6 | Aldo Yulian | 241111037 | Perancangan design system (palet warna, tipografi, spacing). Perancangan 10+ komponen UI reusable. Pembuatan 26 screen prototype interaktif, deployment Vercel, dan pengujian alur navigasi. |
 
 Capaian Kerja: 
 
-1. Hasil survey & analisis masalah: Terhadap 38 responden mahasiswa UNU Yogyakarta, teridentifikasi 6 masalah utama dengan validasi data yang menunjukkan urgensi aplikasi (65,8% pernah kehilangan barang, 84,2% setuju penggunaan email kampus).  
+1. Hasil survey & analisis masalah: Terhadap 39 responden mahasiswa UNU Yogyakarta, teridentifikasi 6 masalah utama dengan validasi data yang menunjukkan urgensi aplikasi (51% pernah kehilangan barang, 82% setuju penggunaan email kampus).  
 2. Design system & komponen UI: Selesai dirancang dengan 10+ reusable components dan palet warna Calm Campus yang konsisten berdasarkan riset neuropsikologi (Blue #2563EB, Teal #0D9488, Orange #F97316, Emerald #059669).  
 3. Rancangan ERD 5 Entitas: Selesai dibuat lengkap dengan relasi kardinalitas, 17 RLS policies, 4 database trigger, 2 RPC security definer functions, dan sistem perizinan berlapis.  
 4. Prototype HTML 26 Screen Interaktif: Telah dideploy di Vercel (https://cariin-lf.vercel.app) dan diuji secara internal, mencakup seluruh user flow dari proses autentikasi hingga moderasi admin.  

@@ -217,7 +217,7 @@ RootNavigator
 
 ```
 RootNavigator
-  └── AdminNavigator (Bottom Tab — 5 item)
+  └── AdminNavigator (Drawer → Bottom Tab — 5 item)
         ├── DashboardTab → DashboardStack
         │     ├── AdminDashboard (4 stat cards + tab filter)
         │     └── AdminReview (approve/reject + chat pemilik)
@@ -445,8 +445,8 @@ eas build --platform android --profile production
 |-------------|--------|
 | React Native + Flexbox, min 5 screens | ✅ 25 screens |
 | Stack Navigator | ✅ AuthNavigator |
-| Tab Navigator | ✅ MainNavigator + AdminNavigator |
-| Drawer Navigator | ✅ (diganti Bottom Tab di Admin — lebih UX-friendly) |
+| Tab Navigator | ✅ MainTabs (mahasiswa) + AdminTabs (di dalam Admin Drawer) |
+| Drawer Navigator | ✅ AdminNavigator (Drawer wrapping Admin Tabs — menu geser kiri) |
 | Context API / Zustand | ✅ 2 Context + 2 Store |
 | REST API / Fetch | ✅ Supabase PostgREST |
 | JWT Authentication | ✅ Supabase Auth |
@@ -465,7 +465,7 @@ eas build --platform android --profile production
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | `admin@cariin.app` | `admin123` |
-| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faiz` |
+| Mahasiswa | `faiz@student.unu-jogja.ac.id` | `faizfaiz` |
 
 ### B. File Kunci
 

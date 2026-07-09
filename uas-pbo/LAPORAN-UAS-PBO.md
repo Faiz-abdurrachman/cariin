@@ -5,7 +5,7 @@
 > **Mata Kuliah:** Pemrograman Berorientasi Objek (PBO)
 > **Program Studi:** Informatika — UNU Yogyakarta
 > **Semester:** 4 (Genap 2025/2026)
-> **Dosen Pengampu:** _[isi nama dosen PBO]_
+> **Dosen Pengampu:** Septian Rico Hernawan, S. Kom., M. Eng.
 
 ### Anggota Kelompok
 
@@ -14,6 +14,9 @@
 | 1 | Irham Zubaidi Alhuda | 241111006 | Analisis kebutuhan, dokumentasi laporan |
 | 2 | Galih Witradika | 241111013 | Perancangan sistem, pengujian, UML |
 | 3 | Faiz Abdurrachman | 241111021 | Full-stack development, implementasi OOP |
+| 4 | Ibnul Mubarok | 241111026 | Penyusunan laporan progress, pengujian user flow admin, dokumentasi skenario testing |
+| 5 | Imroatu Zakkiyah | 241111032 | Penyebaran & pengolahan data kuesioner (39 responden), dokumentasi laporan, materi presentasi |
+| 6 | Aldo Yulian Widyadewangga | 241111037 | Perancangan design system & 10+ komponen UI reusable, pembuatan 26 screen prototype HTML, deployment Vercel |
 
 ---
 
