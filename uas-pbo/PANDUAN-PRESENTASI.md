@@ -83,6 +83,9 @@
 
 ### Class = cetakan kue
 
+**📍 TRACK:** `src/models/Mahasiswa.ts` — baris 6
+**🎯 Cari:** `class Mahasiswa extends User`
+
 ```typescript
 export class Mahasiswa extends User {
   get role(): UserRole { return 'mahasiswa'; }
@@ -92,7 +95,11 @@ Ini CETAKAN-nya. Belum ada data siapa yang make.
 
 ### Object = kue jadi
 
-Pas lo login, baru dibuat objeknya:
+Pas lo login, baru dibuat objeknya (di `models/index.ts` baris 36):
+
+**📍 TRACK:** `src/models/index.ts` — baris 28-41
+**🎯 Cari:** `function createUserModel`
+
 ```typescript
 const faiz = new Mahasiswa({ id: '001', name: 'Faiz', email: 'faiz@student...' });
 ```
@@ -214,6 +221,9 @@ export abstract class User {
 
 ### Yang bisa dan gak bisa dilakukan:
 
+**📍 TRACK:** `src/models/User.ts` — baris 20-47
+**🎯 Cari:** `private readonly _id` (baris 20), `set name` (baris 45)
+
 ```typescript
 const user = new Mahasiswa({ id: '001', name: 'Faiz' });
 
@@ -279,6 +289,10 @@ export class Mahasiswa extends User {
 ```
 
 Buka `src/models/Admin.ts`:
+
+**📍 TRACK:** `src/models/Admin.ts` — baris 8-35
+**🎯 Cari:** `class Admin extends User` (baris 8), `approveReport` (baris 29)
+
 ```typescript
 export class Admin extends User {
   // 👇 Method abstract dari User — wajib diisi
@@ -307,6 +321,9 @@ export class Admin extends User {
 #### Hierarki 2: `ReportModel` → `LostReport` & `FoundReport`
 
 Buka `src/models/Report.ts`:
+
+**📍 TRACK:** `src/models/Report.ts` — baris 15-35
+**🎯 Cari:** `abstract class ReportModel`
 
 ```typescript
 export abstract class ReportModel {
@@ -371,9 +388,17 @@ Methodnya sama-sama `bersuara()`, tapi hasilnya beda. Itu polimorfisme.
 
 #### Bukti 1: `canModerate()` — User & Admin
 
+**📍 TRACK:** `src/models/Mahasiswa.ts` baris 17 | `src/models/Admin.ts` baris 11
+**🎯 Cari:** `canModerate()`
+
 ```typescript
-class Mahasiswa extends User {
-  canModerate(): boolean { return false; }  // ❌ Gak bisa
+class Mahasiswa extends User {           // Mhs baris 6
+  canModerate(): boolean { return false; }  // Mhs baris 17
+}
+
+class Admin extends User {                 // Admin baris 8
+  canModerate(): boolean { return true; }   // Admin baris 11
+}  // ❌ Gak bisa
 }
 
 class Admin extends User {
@@ -385,12 +410,17 @@ class Admin extends User {
 > "Method `canModerate()` dipanggil. Tapi kalo Mahasiswa, jawabannya `false`. Kalo Admin, `true`. Method SAMA, hasil BEDA."
 
 **Dipakai di mana?**
-Di `AdminNavigator.tsx`:
-```typescript
-const { currentUser } = useAuth();
 
-// currentUser bisa Mahasiswa atau Admin — tergantung yang login
-if (currentUser.canModerate()) {
+**📍 TRACK:** `src/navigation/index.tsx` — baris 26
+**🎯 Cari:** `role === "admin"`
+
+```typescript
+// Di navigation/index.tsx baris 24-29:
+if (role === "admin") {
+  return <AdminNavigator />;
+} else {
+  return <MainNavigator />;
+}
   // Tampilin menu admin
 } else {
   // Redirect ke halaman mahasiswa
@@ -440,6 +470,9 @@ const error = model.validate();
 ```
 
 ### Bedanya kalo pake cara lama (if-else):
+
+**📍 TRACK:** `src/models/index.ts` — baris 41-50 (factory `createReportModel`)
+**🎯 Cari:** `createReportModel`
 
 ```typescript
 // ❌ CARA LAMA — setiap nambah tipe, nambah if
@@ -674,10 +707,13 @@ class LostReport extends ReportModel {
 
 Back ke form → Tap "Ditemukan" → Ada field **Titik Penitipan** tambahan.
 
-Buka `src/models/Report.ts` (scroll ke `FoundReport`):
+Buka `src/models/Report.ts` (scroll ke `FoundReport` baris 59):
+
+**📍 TRACK:** `src/models/Report.ts` — Found baris 59-84
+**🎯 Cari:** `class FoundReport` (baris 59)
 
 ```typescript
-// LAPORAN TEMUAN — validasi lebih berat
+// LAPORAN TEMUAN — validasi lebih berat (baris 59)
 class FoundReport extends ReportModel {
   validate(): string | null {
     if (judul kosong) return 'Judul wajib.';
@@ -748,18 +784,24 @@ Scroll feed — tunjukkin laporan muncul.
 
 Buka `src/services/report.service.ts`:
 
+**📍 TRACK:** `src/services/report.service.ts` — baris 75
+**🎯 Cari:** `export async function listReports`
+
 ```typescript
-export async function listReports(filter) {
+export async function listReports(filter) {    // baris 75
   let q = supabase.from('reports').select('*');
   // ... query ribuan ...
   return data;
 }
 ```
 
-Terus buka `src/screens/main/HomeScreen.tsx`, cari panggilannya:
+Terus buka `src/screens/main/HomeScreen.tsx`, cari panggilan `listReports`:
+
+**📍 TRACK:** `src/screens/main/HomeScreen.tsx`
+**🎯 Cari:** `reportService.listReports`
 
 ```typescript
-// Di HomeScreen — sesimpel ini:
+// Di HomeScreen — sesimpel ini (gak peduli query di dalemnya):
 const reports = await reportService.listReports(filter);
 ```
 
