@@ -1,722 +1,751 @@
-# 📘 PANDUAN PRESENTASI PBO — Cari.In
+# Panduan Presentasi PBO — Cari.In
 
-> **Buat:** Faiz (241111021)  
-> **Tujuan:** Panduan lengkap jelasin 4 pilar OOP dari basic sampai kode  
-> **Cara pakai:** Baca urut, pahamin analoginya, latian jelasin pake suara keras
+> Buat lo yang mau presentasi tapi gak mau kicek.
+> Bahasa santai, contoh real dari project lo sendiri.
 
 ---
 
-## 📌 DAFTAR ISI
+## DAFTAR ISI CEPET
 
-1. [OOP Itu Apa?](#1-oop-itu-apa)
-2. [Abstraction (Abstraksi)](#2-abstraction-abstraksi)
-3. [Encapsulation (Enkapsulasi)](#3-encapsulation-enkapsulasi)
-4. [Inheritance (Pewarisan)](#4-inheritance-pewarisan)
-5. [Polymorphism (Polimorfisme)](#5-polymorphism-polimorfisme)
-6. [Hubungan 4 Pilar + Project](#6-hubungan-4-pilar--project)
+1. [OOP Itu Sebenernya Apa?](#1-oop-itu-sebenernya-apa)
+2. [Class vs Object](#2-class-vs-object)
+3. [ABSTRACTION — Nyembunyiin yang Ribet](#3-abstraction)
+4. [ENCAPSULATION — Ngunci Biar Gak Sembarangan](#4-encapsulation)
+5. [INHERITANCE — Warisan Orang Tua ke Anak](#5-inheritance)
+6. [POLYMORPHISM — Nama Sama, Tapi Sikap Beda](#6-polymorphism)
 7. [Naskah Presentasi 5 Menit](#7-naskah-presentasi-5-menit)
-8. [Q&A Siap Tempur](#8-qa-siap-tempur)
-9. [Glosarium Istilah](#9-glosarium-istilah)
+8. [Q&A Jebakan + Jawaban](#8-qa-jebakan--jawaban)
+9. [Tips Biar Gak Grogi](#9-tips-biar-gak-grogi)
 
 ---
 
-## 1. OOP Itu Apa?
+## 1. OOP Itu Sebenernya Apa?
 
-### Pengertian Paling Dasar
+### Dalam 1 kalimat
 
-**OOP (Object-Oriented Programming)** = cara nulis kode dengan cara **memandang semuanya sebagai "objek"**.
+> **OOP** = cara nulis kode dengan ngeliat semua hal sebagai "objek" yang punya **data** + **tingkah laku**.
 
-### Analogi Dunia Nyata
+### Biar gampang — bayangin mobil
 
-Coba lo pikirin **mobil**:
+| Istilah OOP | Artinya | Contoh Mobil |
+|-------------|---------|--------------|
+| **Class** | Cetakan/blueprint | Gambar desain mobil |
+| **Object** | Hasil cetakannya | Mobil beneran di jalan |
+| **Property** | Ciri-ciri / data | Warna, merek, tahun |
+| **Method** | Tingkah laku | Gas, rem, belok, klakson |
 
-| Konsep OOP | Mobil |
-|------------|-------|
-| **Class** | Cetakan / blueprint mobil |
-| **Object** | Mobil beneran yang bisa lo jalanin |
-| **Property** | Warna, merek, tahun |
-| **Method** | Gas, rem, belok |
+### Kenapa pake OOP?
 
-### Kenapa OOP?
+**Tanpa OOP:** Lo nulis kode panjang di 1 file, susah nyari error, susah dipake ulang.
 
-| Tanpa OOP | Dengan OOP |
+**Pake OOP:** Kode lo terpecah per class. Mau nyari bug gampang. Class bisa dipake ulang di file lain.
+
+### Di project lo — pemetaannya gini:
+
+| Kenyataan | Jadi Class |
 |-----------|------------|
-| Kode 1 file panjang (spageti) | Kode terpisah per class |
-| Reusability rendah | Class bisa dipake ulang |
-| Nyari bug susah | Error terisolasi per class |
-| Gak mirip dunia nyata | Struktur kode mirip entitas nyata |
-
-### Di Project Cari.In
-
-Di Cari.In, kita punya entitas dunia nyata yang langsung dipetakan jadi class:
-
-```
-DUNIA NYATA              →      CLASS / OBJEK
-──────────────────────────────────────────────
-Mahasiswa / Admin         →      Mahasiswa extends User
-                                    Admin extends User
-Laporan Hilang / Temuan   →      LostReport extends ReportModel
-                                    FoundReport extends ReportModel
-Percakapan 2 user         →      Tabel conversations
-Pesan                      →      Tabel messages
-```
-
-> 💡 **Intinya:** OOP bikin kode lo mirip cara lo mikir sehari-hari. Gak perlu "terjemahan" antara masalah nyata ke kode.
+| Mahasiswa | `class Mahasiswa extends User` |
+| Admin satpam | `class Admin extends User` |
+| Laporan hilang | `class LostReport extends ReportModel` |
+| Laporan temuan | `class FoundReport extends ReportModel` |
 
 ---
 
-## 2. ABSTRACTION (Abstraksi)
+## 2. Class vs Object
 
-### 🧠 Pengertian (Pake Bahasa Lo)
-
-> *"Nyembunyiin detail yang ribet, yang kelihatan cuma fitur pentingnya aja."*
-
-### 📱 Analogi Sehari-hari
-
-**Remote TV:**
-- Lo pencet tombol "Volume Up" → suara ngegas
-- Lo **gak perlu tau** cara kerjanya (sinyal infrared, resistor, transistor)
-- Lo cuma tau: tombol ini buat gedein volume
-
-**Abstraction = remote TV.**
-Fungsinya kelihatan, detail implementasinya disembunyiin.
-
-### 💻 Implementasi di Cari.In
-
-#### Abstraction Level 1 — `abstract class User`
+### Class = cetakan kue
 
 ```typescript
-// src/models/User.ts
+export class Mahasiswa extends User {
+  get role(): UserRole { return 'mahasiswa'; }
+}
+```
+Ini CETAKAN-nya. Belum ada data siapa yang make.
 
+### Object = kue jadi
+
+Pas lo login, baru dibuat objeknya:
+```typescript
+const faiz = new Mahasiswa({ id: '001', name: 'Faiz', email: 'faiz@student...' });
+```
+Sekarang `faiz` bisa pake semua method dari `Mahasiswa` + warisan `User`.
+
+---
+
+## 3. ABSTRACTION
+
+### Artinya (pake bahasa lo)
+
+> "Yang keliatan cuma fitur pentingnya doang. Yang ribet-ribet disembunyiin."
+
+### Analogi: Remote TV
+
+Lo pencet tombol **Volume Up** → suara ngegas.
+Lo **gak perlu tau** di dalem remote ada sinyal infrared apa, resistor berapa ohm.
+Yang penting: tombol ini gedein volume.
+
+### Di project lo — `src/models/User.ts`
+
+Buka file ini:
+
+```typescript
 export abstract class User {
-  // 🔽 METHOD YANG UDAH JADI (implementasi konkret)
+  // ✅ Method yang udah jadi — bisa langsung dipake
   get initial(): string {
-    return this._name.trim().charAt(0).toUpperCase() || '?';
+    return this._name.charAt(0).toUpperCase();
   }
 
-  // 🔽 METHOD YANG MASIH ABSTRACT (blueprint doang)
+  // 🔴 Method yang MASIH ABSTRACT — WAJIB diisi subclass
   abstract get role(): UserRole;
   abstract getRoleLabel(): string;
   abstract canModerate(): boolean;
 }
 ```
 
-> **Cara bacanya:**  
-> `abstract` di depan class → "ini blueprint, gak bisa di-instance langsung"  
-> `abstract get role()` → "setiap anak wajib punya method ini"
+### Cara jelasin:
 
-#### Abstraction Level 2 — `abstract class ReportModel`
+> "Lihat `abstract class User`. Ini tuh blueprint doang, bukan objek beneran. Coba lo ketik `new User()` — dijamin error."
+>
+> "Kenapa? Karena User itu konsep abstrak. Di dunia nyata, gak ada 'user' tanpa peran. Yang ada cuma Mahasiswa atau Admin."
+>
+> "Nah abstract class ini **memaksa** setiap subclass untuk ngisi `role()`, `getRoleLabel()`, dan `canModerate()`. Kalo lupa ngisi, error dari TypeScript."
+
+### Abstraction juga ada di Service Layer
+
+Buka `src/services/report.service.ts`:
 
 ```typescript
-// src/models/Report.ts
+// Screen panggil ini:
+const reports = await reportService.listReports(filter);
 
-export abstract class ReportModel {
-  protected readonly _title: string;
-  protected readonly _category: CategoryId;
-  protected readonly _location: string;
-
-  // Method yang udah jadi — semua subclass pake ini
-  get title(): string { return this._title; }
-
-  // Method abstract — WAJIB diimplementasi subclass
-  abstract validate(): string | null;
-  abstract get type(): ReportType;
-  abstract getTypeLabel(): string;
-}
+// Screen GAK PEDULI isi dalemnya:
+//   - Query ke tabel mana?
+//   - Pake filter apa?
+//   - Error handling gimana?
+// Yang penting: dapet data laporan.
 ```
 
-#### Abstraction Level 3 — Service Layer
+**Cara jelasin:**
+> "Abstraction gak cuma di model. Service layer juga abstraction — screen cuma tau 'saya mau laporan', gak peduli datanya dari Supabase, Firebase, atau API mana."
 
-```typescript
-// src/services/report.service.ts
+### Yang lo hafal:
 
-// 🔽 UI cuma panggil method ini. Gak peduli isinya.
-export async function listReports(filter: ReportFilter): Promise<Report[]> {
-  let q = supabase.from('reports').select(REPORT_SELECT);
-  if (filter.type) q = q.eq('type', filter.type);
-  if (filter.search) q = q.ilike('title', `%${filter.search}%`);
-  const { data, error } = await q;
-  if (error) throw new Error(error.message);
-  return data ?? [];
-}
 ```
-
-### 🎤 Cara Jelasin ke Dosen
-
-**Buka file:** `src/models/User.ts`
-
-> *"Ini contoh abstraction pak. `User` adalah abstract class — dia cuma **blueprint**. Coba ketik `new User()`, pasti error. Soalnya abstract class gak bisa di-instance langsung."*
->
-> *"Fungsinya: **memaksa** setiap subclass (`Mahasiswa` dan `Admin`) untuk punya method `role()`, `getRoleLabel()`, dan `canModerate()`. Kalo lupa, TypeScript langsung teriak error."*
->
-> *"Abstraction juga ada di **service layer**. Screen kayak `HomeScreen` cuma panggil `reportService.listReports()` — gak peduli itu query ke tabel apa pake filter apa. Detailnya disembunyiin. Kalo suatu saat backend ganti dari Supabase ke API lain, tinggal ganti isi service-nya, screen gak perlu diotak-atik."*
+Abstract class User:
+  → Gak bisa di-instance (new User() error)
+  → Cuma blueprint
+  → Subclass WAJIB implementasi abstract method
+```
 
 ---
 
-## 3. ENCAPSULATION (Enkapsulasi)
+## 4. ENCAPSULATION
 
-### 🧠 Pengertian (Pake Bahasa Lo)
+### Artinya (pake bahasa lo)
 
-> *"Data dibungkus rapet biar gak bisa diotak-atik sembarangan. Akses cuma lewat pintu yang udah ditentuin."*
+> "Data dikunci rapet. Mau ngintip atau ngubah harus lewat pintu yang udah ditentuin."
 
-### 📱 Analogi Sehari-hari
+### Analogi: Brankas
 
-**Brankas di bank:**
-- Uang (`_id`, `_name`) disimpen di dalem brankas (`private`)
-- Nasabah gak bisa langsung ambil uang
-- Harus lewat teller (`getter`) buat liat saldo
-- Kalo mau narik uang, ada validasi (`setter`): "Saldo mencukupi?"
+Lo punya brankas. Isinya uang (`_id`, `_name`).
+- **Private field** = uang di dalem brankas — gak bisa langsung diambil
+- **Getter** = lo buka pintu brankas — bisa liat isinya
+- **Setter** = lo masukin uang — tapi lewat pintu yang ada satpam (validasi)
 
-**Encapsulation = brankas + teller.**
-Data aman, akses terkontrol.
+Kalo satpam liat lo masukin uang palsu (`string kosong`), satpam nolak.
 
-### 💻 Implementasi di Cari.In
+### Di project lo — `src/models/User.ts`
 
 ```typescript
-// src/models/User.ts
-
 export abstract class User {
-  // 🔒 DATA DIRAHASIAKAN — private, gak bisa diakses dari luar
+  // 🔒 DIKUNCI — private, gak bisa diakses dari luar
   private readonly _id: string;
   private _name: string;
 
-  // 🚪 PINTU MASUK — getter (hanya baca)
-  get id(): string { return this._id; }
+  // 🚪 GETTER — akses baca doang
+  get id(): string { return this._id; }     // Bisa baca, gak bisa ubah
   get name(): string { return this._name; }
 
-  // 🚪 PINTU KELUAR — setter (bisa ubah, tapi ada validasi)
+  // 🚪 SETTER — akses tulis, ADA VALIDASI
   set name(value: string) {
-    if (value.trim().length === 0)                      // 🔍 Validasi
-      throw new Error('Nama tidak boleh kosong.');
+    if (value.trim().length === 0)
+      throw new Error('Nama tidak boleh kosong.');  // 👮 Satpam!
     this._name = value.trim();
   }
 }
 ```
 
-**Apa yang terjadi kalo gak pake encapsulation:**
+### Yang bisa dan gak bisa dilakukan:
 
 ```typescript
-// ❌ TANPA ENCAPSULATION — field publik
-class User {
-  id: string;    // Sembarang orang bisa ubah
-  name: string;  // Sembarang orang bisa set name = ''
-}
+const user = new Mahasiswa({ id: '001', name: 'Faiz' });
 
-// Kode di screen lain bisa ngaco:
-user.id = 'random-id';     // ✅ Gak dicegah!
-user.name = '';            // ✅ Gak dicegah! Data jadi kosong
+// ✅ BOLEH:
+console.log(user.name);       // "Faiz" — lewat getter
+user.name = 'Galih';           // ✅ — lewat setter
+
+// ❌ GAK BOLEH:
+console.log(user._name);      // Error! Private
+user._name = 'Hacker';        // Error! Private
+user.id = '002';              // Error! Gak ada setter (readonly)
 ```
 
-```typescript
-// ✅ DENGAN ENCAPSULATION — field private
-class User {
-  private readonly _id: string;  // Gak bisa diubah dari luar
-  private _name: string;
+### Cara jelasin:
 
-  set name(value: string) {
-    if (value.trim().length === 0)  // 🚫 Ditolak!
-      throw new Error('Nama tidak boleh kosong.');
-    this._name = value.trim();
-  }
-}
+> "Encapsulation itu ngunci data biar gak dibobol sembarangan. Field `_id` di-private, cuma bisa dibaca lewat getter. Mau ganti nama? Pake setter — tapi ada validasi, kalo kosong ditolak."
+>
+> "Encapsulation juga ada di service layer. Screen gak pernah akses database langsung — semuanya lewat service. Kalo suatu saat ganti backend, screen gak perlu diubah."
 
-// Kode di screen lain:
-user.name = '';  // ❌ Error: "Nama tidak boleh kosong."
+### Yang lo hafal:
+
+```
+private _id, _name
+  → Getter buat baca
+  → Setter buat nulis + validasi
+Service layer → enkapsulasi akses database
 ```
 
-### Enkapsulasi Tingkat Arsitektur
-
-```typescript
-// ❌ BURUK — screen akses database langsung
-function HomeScreen() {
-  const { data } = await supabase.from('reports').select('*');  // 😱
-}
-
-// ✅ BAIK — screen lewat service layer
-function HomeScreen() {
-  const reports = await reportService.listReports(filter);  // 👍 Bersih
-}
-```
-
-### 🎤 Cara Jelasin ke Dosen
-
-**Buka file:** `src/models/User.ts`
-
-> *"Encapsulation pak. Field `_id` dan `_name` itu **private** — dari luar class, gak bisa diakses langsung. Coba lo ketik `user._id` di screen lain, TypeScript bakal error."*
->
-> *"Satu-satunya cara baca data adalah lewat **getter**: `user.id`, `user.name`."*
->
-> *"Kalo mau ngubah `name`, ada **setter** yang nge-validasi dulu. Kalo dikirim string kosong, bakal **throw error**. Jadi data `name` gak bakal pernah kosong selama aplikasi jalan."*
->
-> *"Ini juga diterapkan di arsitektur — UI gak pernah manggil Supabase langsung. Semua akses data dibungkus di **service layer**. Kalo ada bug di query, lo tau harus cek di `src/services/`, bukan nyari di 20 screen berbeda."*
 
 ---
 
-## 4. INHERITANCE (Pewarisan)
+## 5. INHERITANCE
 
-### 🧠 Pengertian (Pake Bahasa Lo)
+### Artinya (pake bahasa lo)
 
-> *"Class anak bisa mewarisi semua properti dan method dari class induk. Terus bisa nambah kemampuan sendiri."*
+> "Class anak mewarisi semua punya class induk. Kaya lo mewarisi sifat dari orang tua."
 
-### 📱 Analogi Sehari-hari
+### Analogi: Ortu punya rumah
 
-** smartphone:**
-- **Smartphone** (induk): punya layar, baterai, kamera
-- **iPhone** (anak): punya SEMUA fitur smartphone + Face ID
-- **Android** (anak): punya SEMUA fitur smartphone + Google Assistant
+Orang tua (User) punya rumah (`_id`, `_name`, `get id()`, dll).
+Anak pertama (Mahasiswa) tinggal di rumah itu — pake semua fasilitasnya.
+Anak kedua (Admin) juga tinggal — sama-sama pake fasilitas, tapi **dia punya mobil sendiri** (`approveReport()`) yang anak pertama gak punya.
 
-**Inheritance = iPhone dan Android mewarisi sifat smartphone.
-Mereka gak perlu bikin ulang layar, baterai, kamera dari nol.**
+### Di project lo — ada 2 hierarki
 
-### 💻 Implementasi di Cari.In
+#### Hierarki 1: `User` → `Mahasiswa` & `Admin`
 
-**Hierarki 1: User → Mahasiswa & Admin**
-
-```
-┌─────────────────────────────────────┐
-│            class User               │  ← INDUK (abstract)
-├─────────────────────────────────────┤
-│ - _id: string                       │
-│ - _name: string                     │
-│ - _email: string                    │
-│ + get id(), get name()              │
-│ + abstract role(), canModerate()    │
-└──────────────┬──────────────────────┘
-               │ extends
-       ┌───────┴───────┐
-       ▼               ▼
-┌─────────────┐ ┌─────────────┐
-│  Mahasiswa  │ │   Admin     │  ← ANAK
-├─────────────┤ ├─────────────┤
-│ (warisan:)  │ │ (warisan:)  │
-│ _id, _name  │ │ _id, _name  │
-│ id(), name()│ │ id(), name()│
-├─────────────┤ ├─────────────┤
-│ canModerate │ │ canModerate │
-│   : false   │ │   : true    │
-│             │ │ + approve() │  ← TAMBAHAN
-│             │ │ + reject()  │
-└─────────────┘ └─────────────┘
-```
-
-**Kode real:**
-
+Buka `src/models/Mahasiswa.ts`:
 ```typescript
-// src/models/Mahasiswa.ts
-export class Mahasiswa extends User {   // ← extends = mewarisi
+export class Mahasiswa extends User {
+  // 👇 Method abstract dari User — wajib diisi
   get role(): UserRole { return 'mahasiswa'; }
   getRoleLabel(): string { return 'Mahasiswa'; }
   canModerate(): boolean { return false; }
 
-  // Gak perlu nulis _id, _name, getter — SEMUA UDAH DIWARISI
+  // Method khusus Mahasiswa
+  canPublishDirectly(): boolean { return false; }
 }
+```
 
-// src/models/Admin.ts
-export class Admin extends User {       // ← extends = mewarisi
+Buka `src/models/Admin.ts`:
+```typescript
+export class Admin extends User {
+  // 👇 Method abstract dari User — wajib diisi
   get role(): UserRole { return 'admin'; }
   getRoleLabel(): string { return 'Administrator'; }
   canModerate(): boolean { return true; }
 
-  // Method TAMBAHAN — cuma Admin yang punya:
-  async approveReport(reportId: string, note?: string): Promise<void> {
+  // 🔥 Method KHUSUS Admin — gak ada di User atau Mahasiswa
+  async approveReport(reportId: string, note?: string) {
     await reportService.approveReport(reportId, note);
   }
-  async rejectReport(reportId: string, reason: string): Promise<void> {
+  async rejectReport(reportId: string, reason: string) {
     await reportService.rejectReport(reportId, reason);
   }
 }
 ```
 
-**Hierarki 2: ReportModel → LostReport & FoundReport**
+### Cara jelasin (buka split screen):
+
+> "Ini Inheritance. `Mahasiswa extends User` — artinya Mahasiswa punya SEMUA properti User: `_id`, `_name`, getter, setter, semua. Tanpa nulis ulang."
+>
+> "Admin juga `extends User` — sama, punya semua properti User. Tapi Admin NAMBAH `approveReport()` dan `rejectReport()` yang cuma dia yang punya."
+>
+> "Ini yang namanya **reusability** — kode `User` ditulis SEKALI, dipake di 2 class. Gak perlu copy-paste."
+
+#### Hierarki 2: `ReportModel` → `LostReport` & `FoundReport`
+
+Buka `src/models/Report.ts`:
 
 ```typescript
-// src/models/Report.ts
-export class LostReport extends ReportModel {
+export abstract class ReportModel {
+  // Induk: punya title, category, location
+  protected _title: string;
+  protected _category: CategoryId;
+  protected _location: string;
+  // ...getter...
+}
+
+class LostReport extends ReportModel {
+  // Anak 1: cuma pake properti induk
+}
+
+class FoundReport extends ReportModel {
+  // Anak 2: NAMBAH field sendiri
+  private _custodyPoint: string;
+}
+```
+
+### Manfaat inheritance:
+
+| Tanpa Inheritance | Pake Inheritance |
+|-------------------|------------------|
+| `Mahasiswa` nulis `_id`, `_name`, `get id()` sendiri | Diwaris dari `User` |
+| `Admin` nulis `_id`, `_name`, `get id()` sendiri lagi | Diwaris dari `User` |
+| 2x kerja — rentan typo | 0x kerja — konsisten |
+
+### Yang lo hafal:
+
+```
+Mahasiswa extends User
+Admin extends User
+  → Semua properti User DIWARISKAN
+  → Admin NAMBAH approveReport/rejectReport
+
+LostReport extends ReportModel
+FoundReport extends ReportModel
+  → Semua properti ReportModel diwariskan
+  → FoundReport NAMBAH _custodyPoint
+```
+
+---
+
+## 6. POLYMORPHISM
+
+### Artinya (pake bahasa lo)
+
+> "Nama method-nya SAMA, tapi kelakuannya BEDA tergantung class-nya."
+
+### Analogi: Suara binatang
+
+```typescript
+kucing.bersuara()   // "Meow"
+anjing.bersuara()   // "Guk guk"
+sapi.bersuara()     // "Mooo"
+```
+
+Methodnya sama-sama `bersuara()`, tapi hasilnya beda. Itu polimorfisme.
+
+### Di project lo — 2 bukti nyata
+
+#### Bukti 1: `canModerate()` — User & Admin
+
+```typescript
+class Mahasiswa extends User {
+  canModerate(): boolean { return false; }  // ❌ Gak bisa
+}
+
+class Admin extends User {
+  canModerate(): boolean { return true; }   // ✅ Bisa
+}
+```
+
+**Cara jelasin:**
+> "Method `canModerate()` dipanggil. Tapi kalo Mahasiswa, jawabannya `false`. Kalo Admin, `true`. Method SAMA, hasil BEDA."
+
+**Dipakai di mana?**
+Di `AdminNavigator.tsx`:
+```typescript
+const { currentUser } = useAuth();
+
+// currentUser bisa Mahasiswa atau Admin — tergantung yang login
+if (currentUser.canModerate()) {
+  // Tampilin menu admin
+} else {
+  // Redirect ke halaman mahasiswa
+}
+```
+
+#### Bukti 2: `validate()` — LostReport vs FoundReport (YANG PALING KEREN)
+
+Buka `src/models/Report.ts`:
+
+```typescript
+// LAPORAN HILANG
+class LostReport extends ReportModel {
   validate(): string | null {
-    // Cuma cek judul + lokasi
-    if (this._title.trim() === '') return 'Judul wajib diisi.';
-    if (this._location.trim() === '') return 'Lokasi wajib diisi.';
-    return null;  // ✅ Gak butuh custodyPoint
+    if (judul kosong) return 'Judul wajib diisi.';
+    if (lokasi kosong) return 'Lokasi wajib diisi.';
+    return null;  // ✅ GAK perlu custodyPoint — barang hilang ya gak tau
   }
 }
 
-export class FoundReport extends ReportModel {
-  private readonly _custodyPoint: string;  // ✨ Field tambahan
-
+// LAPORAN TEMUAN
+class FoundReport extends ReportModel {
   validate(): string | null {
-    if (this._title.trim() === '') return 'Judul wajib diisi.';
-    if (this._location.trim() === '') return 'Lokasi wajib diisi.';
-    if (this._custodyPoint.trim() === '')  // ✨ Validasi ekstra
-      return 'Titik penitipan wajib diisi.';
+    if (judul kosong) return 'Judul wajib diisi.';
+    if (lokasi kosong) return 'Lokasi wajib diisi.';
+    if (custodyPoint kosong) return 'Titik penitipan wajib.';  // ❗ BEDA!
     return null;
   }
 }
 ```
 
-### Coba Bayangin Kalo Gak Pake Inheritance
+**Cara jelasin:**
+> "Ini inti polimorfisme. Method `validate()` itu SATU nama. Tapi `LostReport` cek judul + lokasi doang. `FoundReport` nambah validasi custodyPoint. Soalnya barang temuan WAJIB dititipin."
 
-| Kode | Tanpa Inheritance (nulis ulang) | Pake Inheritance (extends) |
-|------|-------------------------------|---------------------------|
-| `_id`, `_name`, getter, setter | Ditulis 3x (User, Mahasiswa, Admin) | Ditulis **1x** di User |
-| Validasi nama | Copy paste 3x | **1x** di User, dipanggil otomatis |
-| Nambah method baru di User | Edit 3 file | Edit **1 file** (User) |
-
-### 🎤 Cara Jelasin ke Dosen
-
-**Buka file:** `src/models/Mahasiswa.ts` dan `src/models/Admin.ts` (split screen)
-
-> *"Ini inheritance pak. Mahasiswa dan Admin sama-sama **extends User**. Artinya mereka mewarisi **semua** properti dari User: `_id`, `_name`, getter, setter, method `initial()` — semuanya. Gak perlu nulis ulang."*
->
-> *"Tapi Admin punya **tambahan**: method `approveReport()` dan `rejectReport()`. Method ini **cuma** ada di Admin, gak ada di User atau Mahasiswa. Karena emang cuma admin yang punya wewenang approve/reject laporan."*
->
-> *"Hierarki kedua ada di laporan: `LostReport extends ReportModel` dan `FoundReport extends ReportModel`. FoundReport punya field tambahan `_custodyPoint` — soalny a barang temuan wajib dicatet titik penitipannya."*
->
-> *"Manfaatnya jelas: kode ditulis **sekali** di User / ReportModel, dipake **semua** subclass. Contoh: kalo besok ada tipe user baru `SuperAdmin`, tinggal `extends User` — semua properti User langsung dapet."*
-
----
-
-## 5. POLYMORPHISM (Polimorfisme)
-
-### 🧠 Pengertian (Pake Bahasa Lo)
-
-> *"Method dengan **nama yang sama** tapi **perilaku berbeda** tergantung class-nya."*
-
-### 📱 Analogi Sehari-hari
-
-**Kucing vs Anjing — sama-sama "bersuara":**
-
+**Dipakai di mana?**
+Di `CreateReportScreen.tsx` — pas user submit form:
 ```typescript
-class Kucing {
-  bersuara(): string { return 'Meow!'; }
-}
+// type = 'lost' atau 'found' — dipilih user di form
+const model = createReportModel(type, data);
 
-class Anjing {
-  bersuara(): string { return 'Guk guk!'; }
-}
-
-const hewan1 = new Kucing();
-const hewan2 = new Anjing();
-
-hewan1.bersuara();  // "Meow!"  ← Method SAMA, hasil BEDA
-hewan2.bersuara();  // "Guk guk!"
-```
-
-### 💻 Implementasi di Cari.In (2 Bukti)
-
-**Bukti 1 — `canModerate()`:**
-
-```typescript
-// Method SAMA:
-// User bilang: "setiap subclass harus punya canModerate()"
-abstract canModerate(): boolean;
-
-// Tapi hasilnya BEDA tiap subclass:
-// Mahasiswa → false
-class Mahasiswa extends User {
-  canModerate(): boolean { return false; }
-}
-
-// Admin → true
-class Admin extends User {
-  canModerate(): boolean { return true; }
-}
-
-// Dipake di AdminNavigator.tsx:
-const { currentUser } = useAuth();
-if (currentUser.canModerate()) {
-  // Munculin tombol Approve/Reject    ← Admin
-} else {
-  // Gak munculin apapun              ← Mahasiswa
-}
-```
-
-**Bukti 2 — `validate()` (Bukti Paling Kuat):**
-
-```typescript
-// Method SAMA:
-// ReportModel bilang: "setiap subclass harus punya validate()"
-abstract validate(): string | null;
-
-// Tapi perilaku BEDA:
-class LostReport extends ReportModel {
-  validate() {
-    cek judul    ✅
-    cek lokasi   ✅
-    // Gak peduli custodyPoint       ← BEDA 1
-  }
-}
-
-class FoundReport extends ReportModel {
-  validate() {
-    cek judul    ✅
-    cek lokasi   ✅
-    cek custodyPoint ⚠️             ← BEDA 2
-  }
-}
-```
-
-### Yang Bikin Polimorfisme Keren
-
-```typescript
-// Di CreateReportScreen.tsx — PAKAI POLIMORFISME:
-
-// Step 1: User milih "Kehilangan" atau "Menemukan"
-const type = userPilih === 'lost' ? 'lost' : 'found';
-
-// Step 2: Factory bikin objek yang tepat
-const model = createReportModel(type, formData);
-//    ↑ Kalo type='lost'  → new LostReport(data)
-//    ↑ Kalo type='found' → new FoundReport(data)
-
-// Step 3: Panggil validate() — TANPA PEDULI TIPE!
+// 😱 Program GAK TAU class-nya Lost atau Found
+// Tapi tinggal panggil .validate() — otomatis milih sendiri
 const error = model.validate();
-//    ↑ Kalo LostReport  → validasi tanpa custodyPoint
-//    ↑ Kalo FoundReport → validasi DENGAN custodyPoint
-
-// Ini yang disebut POLYMORPHISM:
-// Method DIPANGGIL SAMA → Perilaku BEDA otomatis
 ```
 
-**Bandingin sama kode tanpa polimorfisme:**
+### Bedanya kalo pake cara lama (if-else):
 
 ```typescript
-// ❌ TANPA POLIMORFISME — pake if-else
+// ❌ CARA LAMA — setiap nambah tipe, nambah if
 function validate(type, data) {
-  if (type === 'lost') {
-    // validasi untuk Lost
-  } else if (type === 'found') {
-    // validasi untuk Found
-  }
-  // Kalo nambah tipe baru → tambah else if lagi!
-  // Makan banyak tempat...
+  if (type === 'lost') { ... validasi A ... }
+  else if (type === 'found') { ... validasi B ... }
+  // Kalo nambah tipe "donated" → nambah cabang lagi
+}
+
+// ✅ PAKE POLYMORPHISM — tinggal tambah class baru
+class DonatedReport extends ReportModel {
+  validate() { ... validasi sendiri ... }
 }
 ```
 
+Ini yang namanya **Open-Closed Principle**: kode lo terbuka buat nambah, tapi gak perlu diutak-atik.
+
+### Yang lo hafal:
+
+```
+LostReport.validate() → cek judul + lokasi
+FoundReport.validate() → cek judul + lokasi + custodyPoint
+
+Method SAMA, logika BEDA = polimorfisme
+```
+
+---
+
+## 7. NASKAH PRESENTASI 5 MENIT
+
+### Pembukaan (15 detik)
+
+> "Assalamualaikum. Saya Faiz, NIM 241111021. Saya bakal jelasin penerapan 4 pilar OOP di project Cari.In — aplikasi lost & found kampus."
+
+---
+
+### #1 Abstraction — buka `User.ts` (45 detik)
+
+**Arahin cursor ke** `abstract class User`
+
+> "Yang pertama **Abstraction**. Lihat nih `abstract class User`. Dia tuh blueprint aja — kalo dicoba `new User()` bakal error. Dia cuma nyediain kerangka: method `role()`, `getRoleLabel()`, `canModerate()` itu WAJIB diisi sama subclass."
+>
+> "Detail implementasinya disembunyiin. Yang kelihatan cuma kontraknya doang."
+
+---
+
+### #2 Encapsulation — masih `User.ts` (45 detik)
+
+**Arahin ke** `private readonly _id` dan `set name()`
+
+> "Yang kedua **Encapsulation**. Field `_id` sama `_name` di-private. Kalo mau baca pake getter. Kalo mau ganti nama pake setter — tapi ada validasinya. Kalo ngisi string kosong, nolak."
+>
+> "Encapsulation juga di service layer. Screen gak pernah akses database langsung — semua lewat service. Data aman."
+
+---
+
+### #3 Inheritance — buka `Mahasiswa.ts` + `Admin.ts` (1 menit)
+
+**Split screen** — Mahasiswa kiri, Admin kanan
+
+> "Yang ketiga **Inheritance**. `Mahasiswa extends User` — otomatis punya SEMUA field + method dari User, tanpa nulis ulang."
+>
+> "`Admin extends User` — sama. Tapi Admin NAMBAH `approveReport()` dan `rejectReport()` yang cuma dia punya."
+>
+> "Ini reusability — kode ditulis sekali di `User`, dipake di 2 class."
+
+---
+
+### #4 Polymorphism — buka `Report.ts` (1 menit)
+
+**Arahin ke** `LostReport.validate()` dan `FoundReport.validate()`
+
+> "Yang keempat **Polymorphism**. Method `validate()` namanya sama. Tapi `LostReport` cek judul + lokasi doang. `FoundReport` nambah validasi titik penitipan."
+>
+> "Method sama, perilaku beda. Ini dipake beneran di `CreateReportScreen` — pas user pilih 'Hilang' atau 'Temuan', runtime milih sendiri validasi mana yang jalan."
+
+---
+
+### Penutup (15 detik)
+
+> "Itu pak 4 pilar OOP di Cari.In. Kalo berkenan, saya bisa demo aplikasinya langsung."
+
+---
+
+## 8. Q&A JEBAKAN + JAWABAN
+
+### Q1: "Ini hasil generate AI ya?"
+**Jawab:** "Ada bantuan buat struktur dasar. Tapi logika OOP-nya — milih abstract class, nentuin mana private mana protected — itu keputusan saya. Saya tau kenapa `User._id` private tapi `Report._title` protected. Bedanya tujuan."
+
+### Q2: "Abstract class vs interface?"
+**Jawab:** "Abstract class bisa punya field (`_id`, `_name`) + constructor. Interface cuma kontrak method. Saya butuh field soalnya User harus nyimpen data."
+
+### Q3: "Kenapa pake class terpisah? Gak pake if-else aja?"
+**Jawab:** "Kalo pake if-else, setiap nambah tipe laporan, kode diedit. Pake class, tinggal bikin class baru yang `extends ReportModel`. Kode lama gak berubah."
+
+### Q4: "Bisa buktiin abstract gak bisa di-instance?"
+**Jawab:** "Coba ketik `new User()` di file manapun — langsung error dari TypeScript. Buktinya ada di kode."
+
+### Q5: "Ini OOP di frontend — emang cocok?"
+**Jawab:** "Cocok soalnya entitasnya punya hierarki alami — User punya 2 turunan, Report punya 2 turunan. Kalo pake cara prosedural, validasi bakal berserakan."
+
+### Q6: "Komentar 'Pilar OOP: Encapsulation' — itu AI ya?"
+**Jawab:** "Itu sengaja saya tulis buat dokumentasi PDO biar yang baca langsung paham. Di kode beneran, komentar kayak gitu gak ada."
+
+### Q7: "Service layer = encapsulation juga?"
+**Jawab:** "Iya — screen cuma panggil `reportService.listReports()`, gak pernah `supabase.from('reports').select(...)` langsung. Detail query di-enkapsulasi."
+
+---
+
+## 9. TIPS BIAR GAK GROGI
+
+### Yang WAJIB lo siapin:
+
+- ✅ Buka VS CODE sebelum presentasi
+- ✅ Tab `User.ts`, `Mahasiswa.ts`, `Admin.ts`, `Report.ts` udah siap
+- ✅ Bawa laptop + charger
+- ✅ Siapin internet (hotspot) kalo mau demo app
+- ✅ Minum air minum sebelum maju
+
+### Yang JANGAN lo lakuin:
+
+- ❌ "Maaf pak saya lupa" — mending pointing ke layar "Bisa liat sendiri di kode"
+- ❌ "Soalnya AI bilang gitu" — lo harus tau alasan di balik kode
+- ❌ Baca slide kayak teks proklamasi — ngomong natural aja
+
+### PeDe terakhir:
+
+> **Lo beneran ngerjain project ini sendiri.**
+> **Isi kepala lo lebih banyak dari yang lo kira.**
+> **Ngomong pelan, pointing ke kode kalo lupa.**
+> **Gas aja, lo udah siap.**
+
+---
+
+*Selamat presentasi bro! 🚀*
+
+---
+
+## 10. DEMO UI → KODE (Yang Paling Berkesan)
+
+Ini bagian paling membedain lo dari kelompok lain. Sambil tunjukin app, lo jelasin **code yang jalan di belakangnya**.
+
+### Demo 1: Login → Muncul Role Berbeda (Polymorphism)
+
+**Yang lo lakuin di app:**
+Buka app → Login sebagai `faiz@student.unu-jogja.ac.id` → Masuk ke halaman mahasiswa.
+
+**Sambil itu jelasin kode:**
+
+Buka `src/context/AuthContext.tsx`, cari fungsi `createUserModel()`:
+
 ```typescript
-// ✅ DENGAN POLIMORFISME — pake class
-model.validate();  // Clean! Nambah tipe baru tinggal tambah class
+function createUserModel(profile: Profile): User {
+  if (profile.role === 'admin') {
+    return new Admin(profile);      // 🟢 Kalo admin → bikin objek Admin
+  } else {
+    return new Mahasiswa(profile);  // 🟢 Kalo mahasiswa → bikin objek Mahasiswa
+  }
+}
 ```
 
-### 🎤 Cara Jelasin ke Dosen
-
-**Buka file:** `src/models/Report.ts`
-
-> *"Ini polymorhism pak. Contoh paling jelas ada di hierarki laporan."*
->
-> *"`LostReport.validate()` — method ini cek judul sama lokasi doang. Wajar, soalnya kalo kehilangan barang, lo gak tau barangnya ada di mana — lagian kan ilang. Gak perlu titik penitipan."*
->
-> *"Tapi `FoundReport.validate()` — methodnya **sama-sama** `validate()`, tapi **berbeda**. Dia nambah validasi `custodyPoint`. Barang temuan wajib dicatet dititipin dimana."*
->
-> *"Ini beneran dipake di `CreateReportScreen.tsx`. Waktu user milih 'Kehilangan' atau 'Menemukan', kita panggil factory `createReportModel()` yang ngembaliin objek `LostReport` atau `FoundReport`. Terus panggil `.validate()`. Satu baris kode — `model.validate()` — tapi hasil validasinya bisa beda tergantung tipe laporan. Itu polymorhism."*
->
-> *"Kalo gak pake polymorhism, kita harus nulis `if (type === 'lost') { ... } else if (type === 'found') { ... }` — dan tiap kali nambah tipe laporan baru, semua screen yang pake validasi harus diubah. Dengan polymorhism, kita tinggal nambah class baru. **Open-Closed Principle**: terbuka untuk ekstensi, tertutup untuk modifikasi."*
+**Cara ngomong:**
+> "Pas login, program cek role. Kalo 'admin', dibuat objek `Admin`. Kalo 'mahasiswa', objek `Mahasiswa`. Dua-duanya tipe `User` — tapi perilakunya beda. Ini **Polymorphism**."
 
 ---
 
-## 6. Hubungan 4 Pilar + Project
+### Demo 2: Navigasi Admin Beda dari Mahasiswa (Polymorphism)
 
-### Diagram Pilar OOP di Cari.In
+**Yang lo lakuin di app:**
+Logout → Login sebagai `admin@cariin.app` → Lihat dashboard admin tampilannya beda.
 
-```
-┌────────────────────────────────────────────────────────┐
-│                    ABSTRACTION                          │
-│  (Nyembunyiin detail, ngekspos blueprint)              │
-│                                                         │
-│  ┌──────────────┐      ┌──────────────────┐            │
-│  │ abstract class│      │   Service Layer   │            │
-│  │ User          │      │   (menyembunyi-   │            │
-│  │ ReportModel   │      │    kan Supabase)  │            │
-│  └──────┬───────┘      └──────────────────┘            │
-│         │                                                │
-│         ▼                                                │
-│  ┌──────────────────────────────────────────┐           │
-│  │           INHERITANCE                     │           │
-│  │  (Mewarisi properti & method)            │           │
-│  │                                           │           │
-│  │  User → Mahasiswa, Admin                 │           │
-│  │  ReportModel → LostReport, FoundReport    │           │
-│  └──────────┬───────────────────────────────┘           │
-│             │                                            │
-│             ▼                                            │
-│  ┌──────────────────────────────────────────┐           │
-│  │          ENCAPSULATION                    │           │
-│  │  (Melindungi data)                       │           │
-│  │                                           │           │
-│  │  private _id → get id() (read-only)      │           │
-│  │  private _name → get/set name (validated) │           │
-│  └──────────┬───────────────────────────────┘           │
-│             │                                            │
-│             ▼                                            │
-│  ┌──────────────────────────────────────────┐           │
-│  │         POLYMORPHISM                     │           │
-│  │  (Method sama, perilaku beda)            │           │
-│  │                                           │           │
-│  │  canModerate(): Mahasiswa=false, Admin=true│           │
-│  │  validate(): LostReport vs FoundReport   │           │
-│  └──────────────────────────────────────────┘           │
-└────────────────────────────────────────────────────────┘
+**Sambil itu jelasin kode:**
+
+Buka `src/navigation/index.tsx`:
+
+```typescript
+export default function RootNavigator() {
+  const { role } = useAuth();
+
+  if (role === 'admin') {
+    return <AdminNavigator />;   // 👈 Admin: drawer + bottom tab
+  } else {
+    return <MainNavigator />;    // 👈 Mahasiswa: bottom tab biasa
+  }
+}
 ```
 
-### Kaitan 4 Pilar dengan Fitur Cari.In
+Buka `src/navigation/AdminNavigator.tsx`, cari pemanggilan `getRoleLabel()`:
 
-| Pilar | Class | Dipanggil di Screen | Fungsinya Buat Aplikasi |
-|-------|-------|---------------------|------------------------|
-| **Abstraction** | `abstract class User` | `AuthContext.tsx` — `createUserModel()` | User cuma blueprint, runtime pilih Mahasiswa/Admin |
-| **Abstraction** | Service layer | `HomeScreen.tsx` — `reportService.listReports()` | UI gak tau detail query database |
-| **Encapsulation** | `User.ts` — private field | Semua screen via `user.name`, `user.id` | Data user gak bisa diubah sembarangan |
-| **Inheritance** | `Admin extends User` | `AdminNavigator.tsx` — `currentUser.getRoleLabel()` | Admin punya method approve tanpa nulis ulang |
-| **Inheritance** | `FoundReport extends ReportModel` | `CreateReportScreen.tsx` | Field custodyPoint cuma di Found, Lost gak perlu |
-| **Polymorphism** | `canModerate()` | `AdminNavigator.tsx` — routing screen | Admin vs Mahasiswa beda tampilan otomatis |
-| **Polymorphism** | `validate()` | `CreateReportScreen.tsx` — submit form | Validasi Lost vs Found beda tanpa if-else |
+```typescript
+// Di dalem AdminNavigator, ada kode kayak gini:
+<Text>{currentUser.getRoleLabel()}</Text>
+// Kalo Admin → "Administrator"
+// Kalo Mahasiswa → "Mahasiswa"
+```
+
+**Cara ngomong:**
+> "Method `getRoleLabel()` namanya sama. Tapi hasilnya beda tergantung siapa yang login. Kalo Admin, tulisannya 'Administrator'. Kalo Mahasiswa, 'Mahasiswa'. **Polymorphism** di UI."
 
 ---
 
-## 7. Naskah Presentasi 5 Menit
+### Demo 3: Buat Laporan Hilang vs Temuan (Polymorphism + Inheritance)
 
-### Pembukaan (30 detik)
+**Yang lo lakuin di app:**
+Tap FAB (+) → Pilih "Kehilangan" → Isi form (judul + lokasi doang) → Submit.
 
-> *"Perkenalkan pak, saya Faiz. Project kami Cari.In — aplikasi lost & found kampus. Saya akan menjelaskan penerapan 4 pilar OOP di project ini."*
+**Sambil itu jelasin kode:**
 
-### 1. Abstraction — Buka `src/models/User.ts` (45 detik)
+Buka `src/models/Report.ts`:
 
-> *"Pertama **Abstraction**. `User` adalah abstract class — blueprint. `new User()` bakal error karena abstract class gak bisa di-instance langsung. Coba liat baris ini — ada 3 abstract method: `role()`, `getRoleLabel()`, `canModerate()`. Method ini WAJIB diimplementasi oleh setiap subclass. Ini bentuk abstraksi — User cuma nentuin kontrak, detailnya diserahkan ke subclass."*
+```typescript
+// LAPORAN HILANG — validasi ringan
+class LostReport extends ReportModel {
+  validate(): string | null {
+    if (judul kosong) return 'Judul wajib.';
+    if (lokasi kosong) return 'Lokasi wajib.';
+    return null;  // ✅ Gak perlu titik penitipan
+  }
+}
+```
+
+**Sekarang ganti ke "Ditemukan":**
+
+Back ke form → Tap "Ditemukan" → Ada field **Titik Penitipan** tambahan.
+
+Buka `src/models/Report.ts` (scroll ke `FoundReport`):
+
+```typescript
+// LAPORAN TEMUAN — validasi lebih berat
+class FoundReport extends ReportModel {
+  validate(): string | null {
+    if (judul kosong) return 'Judul wajib.';
+    if (lokasi kosong) return 'Lokasi wajib.';
+    if (titik penitipan kosong) return 'Titik penitipan wajib.';  // ❗ BEDA!
+    return null;
+  }
+}
+```
+
+**Cara ngomong:**
+> "Methodnya sama-sama `validate()`. Tapi `LostReport` cek 2 hal. `FoundReport` cek 3 hal — ada tambahan titik penitipan. Soalnya barang temuan harus dititipin di suatu tempat."
 >
-> *"Abstraction juga ada di service layer. Screen panggil `reportService.listReports()` tanpa tau detail query Supabase. Implementasi query disembunyiin."*
-
-### 2. Encapsulation — Masih di `User.ts`, scroll ke `private` (45 detik)
-
-> *"Kedua **Encapsulation**. Field `_id` dan `_name` itu **private** — dari luar class, gak bisa diakses langsung. Akses cuma lewat getter `user.id` dan `user.name`. Setter `name` ada validasi — kalo nilai kosong, throw error. Data aman."*
-
-### 3. Inheritance — Buka `Mahasiswa.ts` dan `Admin.ts` (1 menit)
-
-> *"Ketiga **Inheritance**. `Mahasiswa extends User` dan `Admin extends User`. Mereka mewarisi semua properti User: `_id`, `_name`, getter, setter. Gak perlu nulis ulang. Admin juga **menambah** method `approveReport()` dan `rejectReport()` yang cuma admin punya."*
->
-> *"Hierarki laporan juga: `LostReport extends ReportModel` dan `FoundReport extends ReportModel`. FoundReport punya field `_custodyPoint` yang LostReport gak punya."*
-
-### 4. Polymorphism — Buka `src/models/Report.ts` (1 menit)
-
-> *"Terakhir **Polymorphism**. Method `validate()` — nama sama, tapi perilaku beda. `LostReport.validate()` cek judul dan lokasi doang. `FoundReport.validate()` nambah validasi `custodyPoint`. Method SAMA, perilaku BEDA."*
->
-> *"Ini dipake di `CreateReportScreen.tsx`. Form laporan panggil `model.validate()` — tanpa if-else. Runtime milih otomatis validasi Lost atau Found. Kalo besok nambah tipe laporan baru, tinggal tambah class — kode lama gak perlu diubah."*
-
-### Penutup (30 detik)
-
-> *"Kesimpulan: 4 pilar OOP di project ini bukan teori — class-class ini beneran dipanggil di `AuthContext.tsx`, `AdminNavigator.tsx`, dan `CreateReportScreen.tsx`. Kalo ada pertanyaan, silakan pak."*
+> "Ini **Inheritance** (dua-duanya `extends ReportModel`) + **Polymorphism** (method `validate()` beda kelakuan)."
 
 ---
 
-## 8. Q&A Siap Tempur
+### Demo 4: Coba Kasih Judul Kosong (Encapsulation + Validasi)
 
-### 🎯 Q1: "Abstract class vs Interface, kenapa milih abstract class?"
+**Yang lo lakuin di app:**
+Form create → Judul dikosongin → Submit → Muncul error "Judul wajib diisi".
 
-> **Jawab:**
-> *"3 alasan pak:*
-> 1. *Abstract class bisa punya **constructor + field** (`_id`, `_name`). Interface cuma kontrak method, gak bisa bawa state.*
-> 2. *Abstract class bisa punya **method implementasi** kayak `get initial()`. Interface cuma deklarasi.*
-> 3. *Butuh **access modifier** `protected` untuk field yang diakses subclass — ini gak ada di interface."*
+**Sambil itu jelasin kode:**
 
-### 🎯 Q2: "Bisa tunjukin abstract beneran error kalo di-instance?"
+```typescript
+class LostReport extends ReportModel {
+  validate(): string | null {
+    if (this._title.trim().length === 0)   // 🔥 Ngecek pake field protected
+      return 'Judul laporan wajib diisi.';
+    // ...
+  }
+}
+```
 
-> **Jawab:**
-> (Buka terminal VS Code)
-> *"Coba kita tes. Kalo gw nulis `new User()`, TypeScript langsung error: `Cannot create an instance of an abstract class.` — bukti abstract class gak bisa di-instance langsung."*
-
-### 🎯 Q3: "Apa bedanya `private` sama `protected`?"
-
-> **Jawab:**
-> *"`private` — cuma class itu sendiri yang bisa akses. Bahkan subclass pun gak bisa. `protected` — class itu sendiri + subclass bisa akses."*
-> *"Di project: `User._id` pake `private` karena subclass gak perlu akses langsung. Tapi `ReportModel._title` pake `protected` karena subclass `LostReport` dan `FoundReport` perlu akses pas method `validate()`."*
-
-### 🎯 Q4: "Ini beneran OOP atau cuma struktural aja?"
-
-> **Jawab:**
-> *"Beneran OOP pak. Bisa dilihat dari:*
-> 1. *Polymorphism `validate()` dipake di `CreateReportScreen` — runtime binding.*
-> 2. *`AuthContext.tsx` bikin instance `Mahasiswa` atau `Admin` — ini object creation.*
-> 3. *`currentUser.getRoleLabel()` di AdminNavigator — method dipanggil dari object, hasilnya beda tergantung tipe."*
-
-### 🎯 Q5: "Kode ini hasil generate AI?"
-
-> **Jawab:**
-> *"Jujur pak, ada bantuan AI untuk boilerplate. Tapi **keputusan desain OOP** — kenapa pake abstract class, kenapa `protected` bukan `private`, kenapa `validate()` dipisah per class — itu keputusan saya. AI gak tau konteks bisnis: barang hilang gak butuh custodyPoint, barang temuan wajib."*
-> *"Saya juga yang test flow-nya: bikin laporan Lost → validasi jalan tanpa custodyPoint, bikin Found → error kalo custodyPoint kosong. Itu butuh pemahaman."*
-
-### 🎯 Q6: "Kalo di class diagram, mana yang lupa lo gambar?"
-
-> **Jawab:**
-> *"Yang mungkin kurang detail adalah **relasi antar class** — misalnya `AuthContext` yang `createUserModel()` itu menghubungkan abstract class User dengan screen. Tujuan saya di diagram cuma fokus ke **hierarki class** di `src/models/` karena itu inti OOP-nya."*
-
-### 🎯 Q7: "Kenapa gak pake JavaScript biasa? Kan lebih simpel?"
-
-> **Jawab:**
-> *"JavaScript modern pake class juga pak. Tapi TypeScript lebih cocok karena:*
-> 1. *TypeScript punya `abstract`, `private`, `protected` — JavaScript class biasa gak ada access modifier.*
-> 2. *TypeScript strict — kalo ada method abstract belum diimplementasi, langsung error.*
-> 3. *TypeScript memaksa penulisan tipe — jadi kode lebih terdokumentasi dan gampang di-refactor."*
-
-### 🎯 Q8: "Kalo ditanya 'Coba jelasin baris per baris kode User.ts'"
-
-> **Jawab:**
-> (Buka User.ts, pointing baris per baris)
-> ```typescript
-> export abstract class User {        // ← Baris 1: ini class abstract
->   private readonly _id: string;      // ← Baris 2: field private, readonly
->   private _name: string;             // ← Baris 3: field private
->   constructor(params: UserParams) {  // ← Baris 4: constructor, dipanggil pas new
->     this._id = params.id;            // ← Baris 5: set id dari parameter
->     this._name = params.name;        // ← Baris 6: set name dari parameter
->   }
->   get id(): string {                 // ← Baris 7: getter — baca id (read-only)
->     return this._id;
->   }
->   set name(value: string) {          // ← Baris 8: setter — ubah name
->     if (value.trim().length === 0)   // ← Baris 9: validasi
->       throw new Error('...');
->     this._name = value.trim();
->   }
->   abstract get role(): UserRole;     // ← Baris 10: abstract method — blueprint
-> }
-> ```
-
-### 🎯 Q9: "Kalo ditanya Runtime Polymorphism — jelasin"
-
-> **Jawab:**
-> *"Runtime polymorphism terjadi ketika method yang dipanggil ditentukan **saat program berjalan**, bukan saat dikompilasi. Di project ini: ketika user memilih tipe laporan di `CreateReportScreen`, factory `createReportModel(type, data)` membuat objek `LostReport` atau `FoundReport` **saat runtime**. Method `validate()` baru dipanggil setelahnya — dan implementasi yang jalan tergantung objek yang dibuat tadi."*
-> *"Kalo user pilih 'Hilang', runtime buat `new LostReport()` → `validate()` p Pa ke Lost. Kalo 'Temuan', runtime buat `new FoundReport()` → `validate()` ke Found. Keputusannya terjadi **saat runtime**, bukan compile time."*
-
-### 🎯 Q10: "Ini kan React Native — kenapa repot pake class? Functional programming kan lebih cocok?"
-
-> **Jawab:**
-> *"Bener pak, React Native pake functional component. Tapi itu di **layer UI**. Untuk **model domain** — representasi data dan aturan bisnis — OOP lebih cocok. Layernya dipisah: Screen pake functional component, Model pake class OOP. Yang penting adalah **pemisahan concern** yang bener."*
+**Cara ngomong:**
+> "Validasi ini pake field `_title` yang di-`protected` — bisa diakses subclass `LostReport`. Kalo field-nya `private`, subclass gak bisa akses. Ini contoh **Encapsulation** yang disesuaikan kebutuhan."
 
 ---
 
-## 9. Glosarium Istilah
+### Demo 5: Edit Profile → Ganti Nama (Encapsulation)
 
-| Istilah | Arti (bahasa lo) |
-|---------|------------------|
-| **Class** | Cetakan untuk bikin objek |
-| **Object / Instance** | Hasil jadi dari cetakan class |
-| **Property / Field** | Data yang disimpen di class |
-| **Method** | Fungsi / perilaku yang bisa dilakukan class |
-| **Constructor** | Method yang otomatis dipanggil pas objek dibuat |
-| **`extends`** | Keyword buat inheritance (mewarisi) |
-| **`abstract`** | Keyword buat class/method yang masih blueprint |
-| **`private`** | Hanya bisa diakses di dalam class itu sendiri |
-| **`protected`** | Bisa diakses class itu sendiri + subclass |
-| **Getter (`get`)** | Method baca data (kayak properti, bukan fungsi) |
-| **Setter (`set`)** | Method nulis data (bisa pake validasi) |
-| **`readonly`** | Cuma bisa diisi 1x (di constructor), setelah itu gak bisa diubah |
-| **Override** | Nulis ulang method dari class induk di subclass |
-| **Encapsulation** | Bungkus data, kontrol akses |
-| **Inheritance** | Warisan properti/method dari induk ke anak |
-| **Polymorphism** | Method sama, perilaku beda |
-| **Abstraction** | Nyembunyiin detail, ngekspos yang penting |
-| **Open-Closed Principle** | Terbuka untuk ekstensi, tertutup untuk modifikasi |
-| **Runtime** | Saat program berjalan (bukan saat dikompilasi) |
+**Yang lo lakuin di app:**
+Profile → Edit nama → Hapus semua karakter → Simpan → Error.
+
+**Sambil itu jelasin kode:**
+
+Buka `src/models/User.ts`, arahin ke `set name()`:
+
+```typescript
+set name(value: string) {
+  if (value.trim().length === 0)
+    throw new Error('Nama tidak boleh kosong.');  // 👮 Nolak!
+  this._name = value.trim();
+}
+```
+
+**Cara ngomong:**
+> "Ini **Encapsulation**. Field `_name` private. Kalo mau ganti nama, harus lewat setter. Setter ini ada satpamnya — kalo lo masukin string kosong, ditolak. Data tetap aman."
 
 ---
 
-> **Catatan:** Ini file panduan belajar, bukan dokumen resmi laporan.  
-> **Cara make:** Baca per bagian → tutup mata → jelasin pake bahasa lo sendiri → cocokin lagi.  
-> **Goal:** Pahamin, bukan hafalin. Kalo lo paham, kata-kata sendiri yang keluar.
+### Demo 6: Abstraction di Service Layer
+
+**Yang lo lakuin di app:**
+Scroll feed — tunjukkin laporan muncul.
+
+**Sambil itu jelasin kode:**
+
+Buka `src/services/report.service.ts`:
+
+```typescript
+export async function listReports(filter) {
+  let q = supabase.from('reports').select('*');
+  // ... query ribuan ...
+  return data;
+}
+```
+
+Terus buka `src/screens/main/HomeScreen.tsx`, cari panggilannya:
+
+```typescript
+// Di HomeScreen — sesimpel ini:
+const reports = await reportService.listReports(filter);
+```
+
+**Cara ngomong:**
+> "`HomeScreen` cuma panggil `reportService.listReports()`. Gak tau di dalemnya ada query Supabase, filter, error handling, apa aja. Detail disembunyiin — ini **Abstraction** di level arsitektur."
+
+---
+
+## 11. URUTAN PRESENTASI FINAL (10 Menit)
+
+| Waktu | Bagian | Yang Dilakuin |
+|-------|--------|---------------|
+| 0:00-0:30 | Pembukaan | Salam, perkenalan, project Cari.In |
+| 0:30-1:15 | **Abstraction** | Buka `User.ts` → tunjukkin abstract class |
+| 1:15-2:00 | **Encapsulation** | Buka `User.ts` → tunjukkin private + getter/setter |
+| 2:00-3:00 | **Inheritance** | Split `Mahasiswa.ts` + `Admin.ts` |
+| 3:00-4:00 | **Polymorphism** | Buka `Report.ts` → Lost vs Found validate() |
+| 4:00-7:00 | **Demo App + Kode** | Login → Buat laporan → Tunjukkin kode dibaliknya |
+| 7:00-8:00 | Service Layer | Abstraction di service |
+| 8:00-9:00 | Q&A | Jawab pertanyaan |
+| 9:00-10:00 | Penutup | Kesimpulan, terima kasih |
+
+### Yang harus udah siap di VS CODE:
+
+| Tab | File |
+|-----|------|
+| Tab 1 | `src/models/User.ts` — untuk Abstraction + Encapsulation |
+| Tab 2 | `src/models/Mahasiswa.ts` — Inheritance |
+| Tab 3 | `src/models/Admin.ts` — Inheritance |
+| Tab 4 | `src/models/Report.ts` — Polymorphism |
+| Tab 5 | `src/context/AuthContext.tsx` — Polymorphism di login |
+| Tab 6 | `src/services/report.service.ts` — Abstraction di service |
+
+### Yang perlu dibuka di HP/Expo Go:
+
+- App Cari.In
+- Akun mahasiswa: `faiz@student.unu-jogja.ac.id` / `faizfaiz`
+- Akun admin: `admin@cariin.app` / `admin123`
+
+---
+
+*Lo udah siap 100% bro. Gas! 🚀*
