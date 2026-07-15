@@ -106,7 +106,7 @@ Kesimpulan survei: **67% mahasiswa mengandalkan satpam** untuk mencari dan menye
 
 ### 3.3 Database Schema
 
-**5 tabel utama + 4 triggers + 8 RLS policies:**
+**5 tabel utama + 5 triggers + 15 RLS policies:**
 
 | Tabel | Fungsi | RLS |
 |-------|--------|-----|
@@ -116,13 +116,14 @@ Kesimpulan survei: **67% mahasiswa mengandalkan satpam** untuk mencari dan menye
 | `messages` | Isi pesan realtime antar user | ✅ |
 | `notifications` | Notifikasi in-app (approved/rejected/new_message) | ✅ |
 
-**4 Trigger Database:**
+**5 Trigger Database:**
 | Trigger | Fungsi |
 |---------|--------|
 | `trg_profiles_updated_at` | Auto-update timestamp |
 | `trg_reports_updated_at` | Auto-update timestamp |
 | `trg_messages_update_conversation` | Update last_message + last_at di conversation |
 | `trg_notify_new_message` | Auto-insert notifikasi saat pesan baru |
+| `trg_on_auth_user_created` | Auto-buat row di tabel profiles saat user baru daftar |
 
 **2 RPC Security Definer Function:**
 | Function | Fungsi |
@@ -320,8 +321,8 @@ Setiap service file mengisolasi operasi database. Error handling konsisten: `Pos
 | Service | Fungsi | Jumlah Fungsi |
 |---------|--------|---------------|
 | `auth.service.ts` | loginWithEmail, register, logout, resetPassword | 4 |
-| `report.service.ts` | CRUD reports + approveReport, rejectReport, createAdminReport, getAdminStats | 11 |
-| `upload.service.ts` | pickImageFromLibrary, takePhoto, uploadReportPhoto, uploadAvatar | 6 |
+| `report.service.ts` | listReports, getReportById, createReport, updateReport, deleteReport, markAsResolved, approveReport, rejectReport, createAdminReport, getAdminStats | 10 |
+| `upload.service.ts` | pickImageFromLibrary, takePhoto, uploadReportPhoto, uploadAvatar | 4 |
 | `chat.service.ts` | listConversations, getOrCreateConversation, listMessages, sendMessage, subscribeToMessages, markMessagesAsRead | 6 |
 | `notification.service.ts` | listNotifications, markAsRead, markAllAsRead, unreadCount | 4 |
 
@@ -367,8 +368,8 @@ Keduanya memvalidasi `is_admin()` sebelum eksekusi.
 
 | Metrik | Nilai |
 |--------|-------|
-| Total file source | 55 (`.ts`/`.tsx`) |
-| Total lines of code | ~14,900 |
+| Total file source | 67 (`.ts`/`.tsx`) |
+| Total lines of code | ~12,800 |
 | TypeScript strict | ✅ `noImplicitAny`, `noUncheckedIndexedAccess` |
 | tsc errors | **0** |
 | ESLint errors | **0** |
@@ -471,7 +472,7 @@ eas build --platform android --profile production
 
 | File | Deskripsi |
 |------|-----------|
-| `supabase-schema.sql` | DDL lengkap: 5 tabel + 4 trigger + 8 RLS + 2 RPC |
+| `supabase-schema.sql` | DDL lengkap: 5 tabel + 5 trigger + 15 RLS + 2 RPC |
 | `USER_FLOW.md` | 8 user flow naratif lengkap |
 | `CHECKPOINT.md` | Status progres per fase |
 | `NEXT_STEPS.md` | Plan fase berikutnya |
