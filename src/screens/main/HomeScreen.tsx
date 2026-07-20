@@ -247,7 +247,7 @@ export default function HomeScreen() {
                 <TextInput
                   value={filter.search}
                   onChangeText={(t) => setFilter({ search: t })}
-                  placeholder="Cari barang, lokasi, atau kata kunci..."
+                  placeholder="Cari barang, lokasi, atau deskripsi..."
                   placeholderTextColor={COLORS.textMuted}
                   style={{
                     flex: 1,

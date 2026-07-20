@@ -44,8 +44,9 @@ export default function CreateReportScreen() {
   const insets = useSafeAreaInsets();
   const refreshFeed = useFeedStore((s) => s.fetch);
 
-  const type: ReportType = route.name === 'CreateLost' ? 'lost' : 'found';
-
+  const [type, setType] = useState<ReportType>(
+    route.name === 'CreateLost' ? 'lost' : 'found',
+  );
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<CategoryId | null>(null);
@@ -56,7 +57,7 @@ export default function CreateReportScreen() {
 
   const switchType = (target: ReportType) => {
     if (target === type) return;
-    nav.replace(target === 'lost' ? 'CreateLost' : 'CreateFound');
+    setType(target);
   };
 
   const closeModal = () => {

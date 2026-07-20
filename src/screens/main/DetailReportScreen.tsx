@@ -12,6 +12,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Share,
   Text,
   View,
 } from 'react-native';
@@ -136,6 +137,26 @@ export default function DetailReportScreen() {
 
   const ctaLabel = isLost ? 'Info Telah Ditemukan' : 'Chat Penemu';
   const canChat = !isOwner && report.status === 'approved';
+  const shareReport = async () => {
+    try {
+      await Share.share({
+        title: report.title,
+        message: [
+          `Cari.In — Barang ${isLost ? 'Hilang' : 'Ditemukan'}`,
+          report.title,
+          `Lokasi: ${report.location}`,
+          report.description ? `Deskripsi: ${report.description}` : null,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      });
+    } catch (shareError) {
+      Alert.alert(
+        'Gagal membagikan laporan',
+        shareError instanceof Error ? shareError.message : 'Coba lagi.',
+      );
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.surface }}>
@@ -176,9 +197,7 @@ export default function DetailReportScreen() {
               <RoundIconButton icon="arrow-left" onPress={() => nav.goBack()} />
               <RoundIconButton
                 icon="share-2"
-                onPress={() =>
-                  Alert.alert('Segera hadir', 'Fitur share laporan akan tersedia di update berikutnya.')
-                }
+                onPress={() => void shareReport()}
               />
             </View>
           </SafeAreaView>
