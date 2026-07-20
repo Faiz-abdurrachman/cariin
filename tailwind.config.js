@@ -8,8 +8,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Palet brand Cari.In — sinkron dengan COLORS di src/utils/constants.ts
-        // Sinkron dengan COLORS di src/utils/constants.ts
         primary: '#2563EB',
         primaryLight: '#DBEAFE',
         lost: '#F97316',
