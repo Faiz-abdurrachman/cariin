@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
-import { useFocusEffect, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, Image, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,30 +17,15 @@ import { COLORS } from '@/utils/constants';
 import { formatRelativeTime } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<ChatStackParamList, 'Inbox'>;
-type Route = RouteProp<ChatStackParamList, 'Inbox'>;
 
 export default function InboxScreen() {
   const nav = useNavigation<Nav>();
-  const route = useRoute<Route>();
-  const redirectHandled = useRef<string | null>(null);
-
   const { user, role } = useAuth();
   const { conversations, loadingConversations, fetchConversations } = useChatStore();
   const [refreshing, setRefreshing] = useState(false);
   const isAdmin = role === 'admin';
   const accent = isAdmin ? COLORS.admin : COLORS.primary;
   const background = isAdmin ? COLORS.adminLight : COLORS.background;
-
-  useEffect(() => {
-    const { openConversationId, openReportId } = route.params ?? {};
-    if (openConversationId && openReportId && redirectHandled.current !== openConversationId) {
-      redirectHandled.current = openConversationId;
-      nav.navigate('ChatRoom', {
-        conversationId: openConversationId,
-        reportId: openReportId,
-      });
-    }
-  }, [route.params, nav]);
 
   useFocusEffect(
     useCallback(() => {
