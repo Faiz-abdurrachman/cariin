@@ -123,11 +123,7 @@ export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
         custody_point:
           reportType === 'found' ? custodyPoint.trim() : null,
         photo_url: photoUrl,
-        event_time: eventTime.trim()
-          ? new Date(
-              new Date().toDateString() + ' ' + eventTime.trim()
-            ).toISOString()
-          : null,
+        event_time: parseEventTime(eventTime.trim()),
         reporter_name: reporterName.trim() || null,
         reporter_nim: reporterNim.trim() || null,
         reporter_faculty: reporterFaculty.trim() || null,
@@ -485,6 +481,16 @@ export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
       </KeyboardAvoidingView>
     </View>
   );
+}
+
+function parseEventTime(raw: string): string | null {
+  if (!raw) return null;
+  if (!/^\d{1,2}:\d{2}$/.test(raw)) return null;
+  const [h, m] = raw.split(':').map(Number) as [number, number];
+  if (h! > 23 || m! > 59) return null;
+  const d = new Date();
+  d.setHours(h!, m!, 0, 0);
+  return d.toISOString();
 }
 
 function FieldLabel({ children, required }: { children: string; required?: boolean }) {
