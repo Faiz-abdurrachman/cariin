@@ -23,6 +23,7 @@ export type AuthStackParamList = {
   Login: { isAdmin?: boolean } | undefined;
   Register: undefined;
   ForgotPassword: undefined;
+  ResetPassword: undefined;
 };
 
 // === MAIN — nested stacks per tab ===
@@ -38,6 +39,8 @@ export type ChatStackParamList = {
   Inbox: undefined;
   ChatRoom: { conversationId: string; reportId: string };
   UserProfile: { userId: string };
+  DetailLost: { reportId: string };
+  DetailFound: { reportId: string };
   Notifications: undefined;
 };
 
@@ -53,6 +56,9 @@ export type ProfileStackParamList = {
   Settings: undefined;
   Help: undefined;
   UserProfile: { userId: string };
+  ChatRoom: { conversationId: string; reportId: string };
+  DetailLost: { reportId: string };
+  DetailFound: { reportId: string };
 };
 
 export type MainTabParamList = {
@@ -80,6 +86,7 @@ export type RootStackParamList = {
 export type AdminDashboardStackParamList = {
   AdminDashboard: undefined;
   AdminReview: { reportId: string };
+  AdminEditReport: { reportId: string };
 };
 
 export type AdminCreateStackParamList = {
@@ -92,12 +99,17 @@ export type AdminChatStackParamList = {
   ChatRoom: { conversationId: string; reportId: string };
 };
 
+export type AdminProfileStackParamList = {
+  AdminProfile: undefined;
+  AdminChangePassword: undefined;
+};
+
 export type AdminTabParamList = {
   DashboardTab: NavigatorScreenParams<AdminDashboardStackParamList>;
   ReportsTab: undefined;
   CreateTab: undefined;
   ChatTab: NavigatorScreenParams<AdminChatStackParamList>;
-  AdminProfileTab: undefined;
+  AdminProfileTab: NavigatorScreenParams<AdminProfileStackParamList>;
 };
 
 // Drawer membungkus AdminTabs — admin punya BOTH Drawer (menu geser kiri) DAN

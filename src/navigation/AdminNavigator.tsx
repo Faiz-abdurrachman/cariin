@@ -6,7 +6,7 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DrawerActions, useNavigation, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
@@ -17,13 +17,18 @@ import {
 } from '@react-navigation/drawer';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  type StackNavigationProp,
+} from '@react-navigation/stack';
 
-import FabButton from '@/components/FabButton';
+import LiquidTabBar from '@/components/LiquidTabBar';
 import { useAuth } from '@/context/AuthContext';
 import AdminCreateFoundScreen from '@/screens/admin/AdminCreateFoundScreen';
 import AdminCreateLostScreen from '@/screens/admin/AdminCreateLostScreen';
+import AdminChangePasswordScreen from '@/screens/admin/AdminChangePasswordScreen';
 import AdminDashboardScreen from '@/screens/admin/AdminDashboardScreen';
+import AdminEditReportScreen from '@/screens/admin/AdminEditReportScreen';
 import AdminReportsScreen from '@/screens/admin/AdminReportsScreen';
 import AdminReviewScreen from '@/screens/admin/AdminReviewScreen';
 import ChatRoomScreen from '@/screens/chat/ChatRoomScreen';
@@ -35,6 +40,7 @@ import type {
   AdminCreateStackParamList,
   AdminDashboardStackParamList,
   AdminDrawerParamList,
+  AdminProfileStackParamList,
   AdminTabParamList,
 } from './types';
 
@@ -44,6 +50,7 @@ function DashboardStackNavigator() {
     <DashboardStack.Navigator screenOptions={{ headerShown: false }}>
       <DashboardStack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
       <DashboardStack.Screen name="AdminReview" component={AdminReviewScreen} />
+      <DashboardStack.Screen name="AdminEditReport" component={AdminEditReportScreen} />
     </DashboardStack.Navigator>
   );
 }
@@ -70,6 +77,10 @@ function AdminChatStackNavigator() {
 
 function AdminProfileScreen() {
   const { logout, userProfile } = useAuth();
+  const nav =
+    useNavigation<
+      StackNavigationProp<AdminProfileStackParamList, 'AdminProfile'>
+    >();
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.admin }}>
@@ -116,7 +127,11 @@ function AdminProfileScreen() {
             <LinearGradient colors={['rgba(255, 255, 255, 0.2)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
             {(
               [
-                ['key-outline', 'Ganti Password', () => Alert.alert('Ganti Password', 'Fitur ini akan hadir di update berikutnya.')],
+                [
+                  'key-outline',
+                  'Ganti Password',
+                  () => nav.navigate('AdminChangePassword'),
+                ],
                 ['log-out-outline', 'Keluar', () => {
                   Alert.alert('Keluar dari Cari.In?', 'Sesi admin akan diakhiri.', [
                     { text: 'Batal', style: 'cancel' },
@@ -161,67 +176,42 @@ function AdminProfileScreen() {
   );
 }
 
+const AdminProfileStack =
+  createStackNavigator<AdminProfileStackParamList>();
+
+function AdminProfileStackNavigator() {
+  return (
+    <AdminProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <AdminProfileStack.Screen
+        name="AdminProfile"
+        component={AdminProfileScreen}
+      />
+      <AdminProfileStack.Screen
+        name="AdminChangePassword"
+        component={AdminChangePasswordScreen}
+      />
+    </AdminProfileStack.Navigator>
+  );
+}
+
 const Tab = createBottomTabNavigator<AdminTabParamList>();
 
 function AdminTabs() {
-  const insets = useSafeAreaInsets();
-  const bottomOffset = Math.max(insets.bottom, 10);
-
   return (
     <Tab.Navigator
+      tabBar={(props) => (
+        <LiquidTabBar
+          {...props}
+          variant="admin"
+          onCreatePress={() =>
+            props.navigation.navigate('CreateTab', {
+              screen: 'AdminCreateLost',
+            })
+          }
+        />
+      )}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.admin,
-        tabBarInactiveTintColor: COLORS.textMuted,
-        tabBarStyle: {
-          position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: bottomOffset,
-          height: 72,
-          paddingTop: 8,
-          paddingBottom: 10,
-          borderRadius: 26,
-          borderTopWidth: 0,
-          backgroundColor: 'transparent',
-          elevation: 0,
-          shadowColor: '#000',
-          shadowOpacity: 0.12,
-          shadowRadius: 18,
-          shadowOffset: { width: 0, height: 6 },
-          overflow: 'hidden',
-        },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={60}
-            tint="light"
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              borderRadius: 26,
-              backgroundColor: 'rgba(255,255,255,0.46)',
-              borderWidth: 1.25,
-              borderColor: 'rgba(255,255,255,0.78)',
-              overflow: 'hidden',
-            }}
-            >
-              <LinearGradient
-                colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.22)', 'transparent']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFillObject}
-                pointerEvents="none"
-              />
-          </BlurView>
-        ),
-        tabBarItemStyle: {
-          paddingTop: 6,
-          paddingBottom: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '800',
-          marginBottom: 1,
-        },
       }}
     >
       <Tab.Screen
@@ -229,7 +219,7 @@ function AdminTabs() {
         component={DashboardStackNavigator}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? 'AdminDashboard';
-          const display = ['AdminReview'].includes(routeName) ? 'none' : 'flex';
+          const display = ['AdminReview', 'AdminEditReport'].includes(routeName) ? 'none' : 'flex';
           return {
             tabBarStyle: { display },
             title: 'Dashboard',
@@ -254,15 +244,6 @@ function AdminTabs() {
           return {
             tabBarStyle: { display },
             title: 'Buat',
-            tabBarLabel: '',
-            tabBarButton: (props) => (
-              <FabButton
-                onPress={props.onPress as () => void}
-                containerStyle={props.style}
-                accessibilityLabel="Buat laporan admin"
-                variant="admin"
-              />
-            ),
           };
         }}
       />
@@ -281,10 +262,24 @@ function AdminTabs() {
       />
       <Tab.Screen
         name="AdminProfileTab"
-        component={AdminProfileScreen}
-        options={{
-          title: 'Profil',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" color={color} size={size} />,
+        component={AdminProfileStackNavigator}
+        options={({ route }) => {
+          const routeName =
+            getFocusedRouteNameFromRoute(route) ?? 'AdminProfile';
+          return {
+            tabBarStyle: {
+              display:
+                routeName === 'AdminChangePassword' ? 'none' : 'flex',
+            },
+            title: 'Profil',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name="person-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          };
         }}
       />
     </Tab.Navigator>
@@ -409,9 +404,8 @@ function AdminDrawerContent(props: DrawerContentComponentProps) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.admin }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.admin, overflow: 'hidden' }}>
       {/* Dark Glass Background Blobs */}
-      <View style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: 999, backgroundColor: '#34D399', opacity: 0.15, transform: [{ scale: 1.5 }] }} pointerEvents="none" />
       <View style={{ position: 'absolute', bottom: -50, left: -50, width: 250, height: 250, borderRadius: 999, backgroundColor: '#8B5CF6', opacity: 0.25, transform: [{ scale: 1.2 }] }} pointerEvents="none" />
 
       <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
@@ -496,6 +490,7 @@ export default function AdminNavigator() {
         drawerType: 'front',
         drawerStyle: {
           backgroundColor: 'transparent',
+          overflow: 'hidden',
         },
       }}
     >

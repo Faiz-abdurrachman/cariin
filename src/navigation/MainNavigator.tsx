@@ -10,8 +10,8 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation, getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import { createStackNavigator, type StackNavigationProp } from '@react-navigation/stack';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import LiquidTabBar from '@/components/LiquidTabBar';
 import ChatRoomScreen from '@/screens/chat/ChatRoomScreen';
@@ -29,7 +29,6 @@ import MyPostsScreen from '@/screens/profile/MyPostsScreen';
 import ProfileScreen from '@/screens/profile/ProfileScreen';
 import SettingsScreen from '@/screens/profile/SettingsScreen';
 import UserProfileScreen from '@/screens/profile/UserProfileScreen';
-import { COLORS } from '@/utils/constants';
 
 import type {
   ChatStackParamList,
@@ -61,6 +60,8 @@ function ChatNavigator() {
       <ChatStack.Screen name="Inbox" component={InboxScreen} />
       <ChatStack.Screen name="ChatRoom" component={ChatRoomScreen} />
       <ChatStack.Screen name="UserProfile" component={UserProfileScreen} />
+      <ChatStack.Screen name="DetailLost" component={DetailLostScreen} />
+      <ChatStack.Screen name="DetailFound" component={DetailFoundScreen} />
       <ChatStack.Screen name="Notifications" component={NotificationsScreen} />
     </ChatStack.Navigator>
   );
@@ -86,6 +87,9 @@ function ProfileNavigator() {
       <ProfileStack.Screen name="Settings" component={SettingsScreen} />
       <ProfileStack.Screen name="Help" component={HelpScreen} />
       <ProfileStack.Screen name="UserProfile" component={UserProfileScreen} />
+      <ProfileStack.Screen name="ChatRoom" component={ChatRoomScreen} />
+      <ProfileStack.Screen name="DetailLost" component={DetailLostScreen} />
+      <ProfileStack.Screen name="DetailFound" component={DetailFoundScreen} />
     </ProfileStack.Navigator>
   );
 }
@@ -98,8 +102,6 @@ function CreateTabPlaceholder() {
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 function MainTabs() {
-  const rootNav = useNavigation<StackNavigationProp<RootStackParamList>>();
-
   return (
     <Tab.Navigator
       tabBar={(props) => <LiquidTabBar {...props} />}
@@ -127,7 +129,7 @@ function MainTabs() {
         component={ChatNavigator}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? 'Inbox';
-          const display = ['ChatRoom', 'UserProfile', 'Notifications'].includes(routeName) ? 'none' : 'flex';
+          const display = ['ChatRoom', 'UserProfile', 'DetailLost', 'DetailFound'].includes(routeName) ? 'none' : 'flex';
           return {
             tabBarStyle: { display },
             tabBarLabel: 'Pesan',
@@ -161,7 +163,7 @@ function MainTabs() {
         component={ProfileNavigator}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile';
-          const display = ['Settings', 'Help', 'UserProfile'].includes(routeName) ? 'none' : 'flex';
+          const display = ['Settings', 'Help', 'UserProfile', 'ChatRoom', 'DetailLost', 'DetailFound'].includes(routeName) ? 'none' : 'flex';
           return {
             tabBarStyle: { display },
             tabBarLabel: 'Profil',

@@ -13,7 +13,7 @@ import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 
 export default function RootNavigator() {
-  const { isLoading, isAuthenticated, role } = useAuth();
+  const { isLoading, isAuthenticated, isPasswordRecovery, role } = useAuth();
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -21,8 +21,8 @@ export default function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {!isAuthenticated ? (
-        <AuthNavigator />
+      {!isAuthenticated || isPasswordRecovery ? (
+        <AuthNavigator key={isPasswordRecovery ? 'recovery' : 'auth'} />
       ) : role === 'admin' ? (
         <AdminNavigator />
       ) : (
