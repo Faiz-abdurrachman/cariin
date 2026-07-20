@@ -10,9 +10,14 @@ interface Props {
   message: Message;
   isMine: boolean;
   showTime: boolean;
+  variant?: 'default' | 'admin';
 }
 
-export default function ChatBubble({ message, isMine, showTime }: Props) {
+export default function ChatBubble({ message, isMine, showTime, variant = 'default' }: Props) {
+  const accent = variant === 'admin' ? COLORS.admin : COLORS.primary;
+  const ownBubble =
+    variant === 'admin' ? 'rgba(13,148,136,0.92)' : 'rgba(37,99,235,0.92)';
+
   return (
     <View
       style={{
@@ -32,7 +37,7 @@ export default function ChatBubble({ message, isMine, showTime }: Props) {
           borderRadius: 22,
           borderBottomRightRadius: isMine ? 6 : 22,
           borderBottomLeftRadius: isMine ? 22 : 6,
-          backgroundColor: isMine ? 'rgba(37,99,235,0.92)' : 'rgba(255,255,255,0.62)',
+          backgroundColor: isMine ? ownBubble : 'rgba(255,255,255,0.62)',
           borderWidth: 1,
           borderColor: isMine ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.82)',
           overflow: 'hidden',
@@ -53,7 +58,7 @@ export default function ChatBubble({ message, isMine, showTime }: Props) {
           style={{
             fontSize: 14,
             lineHeight: 20,
-            color: isMine ? '#FFFFFF' : COLORS.primary,
+            color: isMine ? '#FFFFFF' : accent,
             fontWeight: '600',
           }}
         >

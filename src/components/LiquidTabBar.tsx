@@ -1,23 +1,35 @@
 import { View, Pressable, StyleSheet, Platform } from 'react-native';
-import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { COLORS } from '@/utils/constants';
 
-export default function LiquidTabBar({ state, navigation, descriptors }: BottomTabBarProps) {
+interface LiquidTabBarProps extends BottomTabBarProps {
+  variant?: 'default' | 'admin';
+  onCreatePress?: () => void;
+}
+
+export default function LiquidTabBar({
+  state,
+  navigation,
+  descriptors,
+  variant = 'default',
+  onCreatePress,
+}: LiquidTabBarProps) {
   const insets = useSafeAreaInsets();
   const bottomOffset = Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : Math.max(insets.bottom, 8);
-  const activeRoute = state.routes[state.index];
-  const descriptor = descriptors[activeRoute.key];
+  const accent = variant === 'admin' ? COLORS.admin : COLORS.primary;
+  const activeRoute = state.routes[state.index] ?? state.routes[0];
+  const descriptor = activeRoute ? descriptors[activeRoute.key] : undefined;
   const tabBarStyle = descriptor?.options.tabBarStyle as { display?: string } | undefined;
 
   if (tabBarStyle?.display === 'none') {
     return null;
   }
-  
+
   return (
     <View
       style={{
@@ -64,7 +76,6 @@ export default function LiquidTabBar({ state, navigation, descriptors }: BottomT
         </BlurView>
 
         {state.routes.map((route, index) => {
-
           const isFocused = state.index === index;
           const isCenterFab = route.name === 'CreateTab';
 
@@ -81,60 +92,75 @@ export default function LiquidTabBar({ state, navigation, descriptors }: BottomT
           };
 
           let iconName: keyof typeof Ionicons.glyphMap = 'home-outline';
+          let accessibilityLabel = 'Navigasi';
           // User routes
-          if (route.name === 'HomeTab') iconName = isFocused ? 'home' : 'home-outline';
-          if (route.name === 'ChatTab') iconName = isFocused ? 'chatbubbles' : 'chatbubbles-outline';
-          if (route.name === 'MyPostsTab') iconName = isFocused ? 'document-text' : 'document-text-outline';
-          if (route.name === 'ProfileTab') iconName = isFocused ? 'person' : 'person-outline';
+          if (route.name === 'HomeTab') {
+            iconName = isFocused ? 'home' : 'home-outline';
+            accessibilityLabel = 'Beranda';
+          }
+          if (route.name === 'ChatTab') {
+            iconName = isFocused ? 'chatbubbles' : 'chatbubbles-outline';
+            accessibilityLabel = 'Pesan';
+          }
+          if (route.name === 'MyPostsTab') {
+            iconName = isFocused ? 'document-text' : 'document-text-outline';
+            accessibilityLabel = 'Laporanku';
+          }
+          if (route.name === 'ProfileTab') {
+            iconName = isFocused ? 'person' : 'person-outline';
+            accessibilityLabel = 'Profil';
+          }
           // Admin routes
-          if (route.name === 'DashboardTab') iconName = isFocused ? 'grid' : 'grid-outline';
-          if (route.name === 'ReportsTab') iconName = isFocused ? 'list' : 'list-outline';
-          if (route.name === 'AdminProfileTab') iconName = isFocused ? 'person' : 'person-outline';
+          if (route.name === 'DashboardTab') {
+            iconName = isFocused ? 'grid' : 'grid-outline';
+            accessibilityLabel = 'Dashboard';
+          }
+          if (route.name === 'ReportsTab') {
+            iconName = isFocused ? 'list' : 'list-outline';
+            accessibilityLabel = 'Semua laporan';
+          }
+          if (route.name === 'AdminProfileTab') {
+            iconName = isFocused ? 'person' : 'person-outline';
+            accessibilityLabel = 'Profil admin';
+          }
           // Center
           if (isCenterFab) iconName = 'add';
 
           if (isCenterFab) {
-            // Render the Center FAB inside the pill
             return (
               <Pressable
                 key={route.key}
-                onPress={() => navigation.navigate('CreateModal', { screen: 'CreateLost' })}
+                onPress={() => {
+                  if (onCreatePress) {
+                    onCreatePress();
+                  } else {
+                    navigation.navigate('CreateModal', { screen: 'CreateLost' });
+                  }
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Buat laporan baru"
               >
                 {({ pressed }) => (
                   <View
                     style={{
                       width: 52,
                       height: 52,
-                      borderRadius: 20,
+                      borderRadius: 26,
                       marginHorizontal: 4,
                       opacity: pressed ? 0.8 : 1,
                       transform: [{ scale: pressed ? 0.95 : 1 }],
-                      backgroundColor: COLORS.primary,
+                      backgroundColor: accent,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      shadowColor: COLORS.primary,
-                      shadowOpacity: 0.4,
-                      shadowRadius: 12,
-                      shadowOffset: { width: 0, height: 6 },
+                      shadowColor: accent,
+                      shadowOpacity: 0.28,
+                      shadowRadius: 10,
+                      shadowOffset: { width: 0, height: 5 },
                       elevation: 6,
                       borderWidth: 1,
-                      borderColor: 'rgba(255,255,255,0.4)',
+                      borderColor: 'rgba(255,255,255,0.52)',
                     }}
                   >
-                    <LinearGradient
-                      colors={['rgba(255, 255, 255, 0.4)', 'rgba(255,255,255,0)']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
-                      pointerEvents="none"
-                    />
-                    <LinearGradient
-                      colors={['rgba(0, 0, 0, 0.1)', 'transparent']}
-                      start={{ x: 1, y: 1 }}
-                      end={{ x: 0, y: 0 }}
-                      style={StyleSheet.absoluteFillObject}
-                      pointerEvents="none"
-                    />
                     <Ionicons name="add" size={32} color="#FFFFFF" />
                   </View>
                 )}
@@ -142,50 +168,38 @@ export default function LiquidTabBar({ state, navigation, descriptors }: BottomT
             );
           }
 
-          // Normal Tab Items
           return (
             <Pressable
-                key={route.key}
-                onPress={onPress}
-                style={{
-                  flex: 1,
-                  paddingVertical: 9,
-                  borderRadius: 18,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginHorizontal: 4,
-                }}
-              >
-              {isFocused ? (
-                // Active Liquid Glass Button Background
-                <View style={StyleSheet.absoluteFillObject}>
-                  <View
-                    style={{
-                      ...StyleSheet.absoluteFillObject,
-                      borderRadius: 18,
-                      backgroundColor: 'rgba(255,255,255,0.56)',
-                      borderWidth: 1,
-                      borderColor: 'rgba(255,255,255,0.82)',
-                    }}
-                  >
-                    <LinearGradient
-                      colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
-                      pointerEvents="none"
-                    />
-                  </View>
-                </View>
-              ) : null}
-
+              key={route.key}
+              onPress={onPress}
+              accessibilityRole="button"
+              accessibilityLabel={accessibilityLabel}
+              accessibilityState={{ selected: isFocused }}
+              style={{
+                flex: 1,
+                minHeight: 52,
+                paddingVertical: 7,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginHorizontal: 2,
+              }}
+            >
               <Ionicons
                 name={iconName}
-                size={24}
-                color={isFocused ? COLORS.primary : COLORS.textMuted}
+                size={25}
+                color={isFocused ? accent : COLORS.textMuted}
                 style={{
                   textShadowColor: isFocused ? 'rgba(255,255,255,0.8)' : 'transparent',
-                  textShadowRadius: 8,
+                  textShadowRadius: 6,
+                }}
+              />
+              <View
+                style={{
+                  width: isFocused ? 18 : 4,
+                  height: 3,
+                  borderRadius: 999,
+                  backgroundColor: isFocused ? accent : 'transparent',
+                  marginTop: 4,
                 }}
               />
             </Pressable>
