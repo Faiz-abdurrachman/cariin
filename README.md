@@ -41,52 +41,149 @@ Aplikasi **lost & found** untuk lingkungan kampus UNU Yogyakarta. Mahasiswa bisa
 
 ---
 
-## Installation
+## Installation — Fresh Clone Setup
 
 ### Prerequisites
-- Node.js 18+
-- Expo CLI (`npx expo`)
-- Supabase project (lihat `supabase-schema.sql`)
 
-### Setup
+Pastikan sudah terinstall:
+
+| Tools | Versi | Cek |
+|-------|-------|-----|
+| **Node.js** | 18+ | `node -v` |
+| **npm** | 9+ | `npm -v` |
+| **Expo Go** | Terbaru | Install dari App Store / Play Store |
+| **Git** | 2.x+ | `git --version` |
+
+### Langkah 1 — Clone Repository
 
 ```bash
-# 1. Clone repo
-git clone https://github.com/username/cariin.git
+# Repo ini PRIVATE. Pastikan SSH key atau token GitHub sudah dikonfigurasi.
+git clone https://github.com/Faiz-abdurrachman/cariin.git
 cd cariin/cariin-mobile
-
-# 2. Install dependencies
-npm install
-
-# 3. Setup environment
-cp .env.example .env
-# Isi .env dengan Supabase URL + Anon Key
-
-# 4. Setup Supabase
-# Buka Supabase Dashboard → SQL Editor
-# Paste dan run isi supabase-schema.sql
-
-# 5. Verifikasi Storage
-# Schema membuat bucket report-photos + avatars (public), chat-media (private),
-# serta policy upload yang membatasi setiap user ke folder UUID miliknya.
-
-# 6. Run dev server
-npx expo start
-
-# 7. Scan QR code dengan Expo Go (iPhone / Android)
 ```
 
----
+### Langkah 2 — Install Dependencies
 
-## Environment Variables (`.env`)
+```bash
+npm install
+```
+
+Tunggu sampai selesai (biasanya 1-2 menit pertama kali). Ini akan menginstall semua
+package termasuk Expo SDK 54, React Native 0.81, NativeWind v4, Supabase client,
+dan React Navigation v7.
+
+### Langkah 3 — Setup Environment Variables (`.env`)
+
+Aplikasi **tidak akan berjalan** tanpa `.env`. Copy template lalu isi:
+
+```bash
+cp .env.example .env
+```
+
+Buka `.env` dan isi semua nilai. File `.env.example` berisi template berikut:
 
 ```env
+# === Supabase Config ===
 EXPO_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
+
+# === Domain & App Identity ===
 EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN=student.unu-jogja.ac.id
 EXPO_PUBLIC_APP_NAME=Cari.In
 EXPO_PUBLIC_APP_ENV=development
 ```
+
+**Cara mendapatkan nilai Supabase:**
+
+1. Buka [Supabase Dashboard](https://supabase.com/dashboard)
+2. Pilih project Cari.In
+3. **Settings → API**
+4. Copy **Project URL** → isi `EXPO_PUBLIC_SUPABASE_URL`
+5. Copy **anon/public key** (format `sb_publishable_...`) → isi `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+> ⚠️ **PENTING**: Pakai **anon key** (publishable), BUKAN `service_role` secret key.
+> Secret key bypass RLS dan TIDAK BOLEH di-bundle ke aplikasi mobile.
+
+### Langkah 4 — Setup Supabase Database
+
+1. Buka **Supabase Dashboard → SQL Editor**
+2. Klik **New Query**
+3. Copy-paste **seluruh isi** `supabase-schema.sql` dari repo ini
+4. Klik **Run**
+
+Schema ini idempotent (aman di-run ulang berkali-kali). Ia membuat:
+- **5 tabel**: `profiles`, `reports`, `conversations`, `messages`, `notifications`
+- **24 RLS policy** — row-level security granular
+- **8 RPC function** — admin moderation + profile access
+- **3 Storage bucket**: `report-photos` (public), `avatars` (public), `chat-media` (private)
+- **Trigger** — auto-create profile, notifikasi pesan baru, update conversation
+
+Verifikasi: buka **Table Editor**, pastikan 5 tabel muncul tanpa error.
+
+### Langkah 5 — Setup Supabase Auth Redirect (Reset Password)
+
+Di Supabase Dashboard:
+1. **Authentication → URL Configuration**
+2. Tambahkan redirect URL: `cariin://reset-password`
+3. **Simpan**
+
+### Langkah 6 — Seed Akun Test
+
+Buka **SQL Editor**, jalankan query berikut untuk membuat akun test:
+
+```sql
+-- Admin (pakai email non-kampus)
+SELECT create_user('admin@cariin.app', 'admin123', 'admin');
+
+-- Mahasiswa (pakai email kampus)
+SELECT create_user('faiz@student.unu-jogja.ac.id', 'faizfaiz', 'mahasiswa');
+```
+
+> Ganti `create_user` dengan trigger manual bila perlu. Atau daftar langsung
+> dari aplikasi untuk akun mahasiswa (register via UI sudah otomatis
+> membuat profil).
+
+### Langkah 7 — Jalankan Dev Server
+
+```bash
+npx expo start
+```
+
+Akan muncul QR code di terminal. Scan dengan **Expo Go** di HP.
+
+**Mode tambahan:**
+```bash
+# Tunnel — buat akses dari jaringan berbeda (via ngrok)
+npx expo start --tunnel
+
+# Clear cache — kalau Metro bundler bermasalah
+npx expo start --clear
+
+# Web preview — buka di Chrome laptop
+npx expo start --web
+```
+
+### Langkah 8 — Verifikasi
+
+```bash
+# TypeScript type check
+npx tsc --noEmit
+
+# Lint
+npm run lint
+
+# Expo health check
+npx expo-doctor
+```
+
+Ketiganya harus menghasilkan **0 error** sebelum klaim setup berhasil.
+
+---
+
+## Environment Variables
+
+Semua konfigurasi environment ada di file `.env`. Lihat **Langkah 3** di atas untuk
+cara setup. Template lengkap tersedia di `.env.example`.
 
 ---
 
