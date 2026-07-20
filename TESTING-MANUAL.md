@@ -3,19 +3,81 @@
 > Checklist E2E lengkap untuk verifikasi semua kondisi sebelum submit / rekam video demo.
 > Legend: 🆕 = fitur/perubahan baru (Drawer, SecureStore, offline cache) · ⭐ = critical path (wajib jalan) · ⚠️ = edge case
 >
-> **Device utama:** Expo Go (iPhone/Android). Jalankan `npx expo start --clear`.
+> **Device utama:** Expo Go (iPhone/Android). Untuk lintas jaringan jalankan
+> `npx expo start --tunnel --clear`; `@expo/ngrok` sudah terpasang lokal.
+
+### Catatan Eksekusi Aktual — 20 Juli 2026
+
+- Checklist UI/perangkat di bawah **belum dijalankan dan sengaja belum
+  dicentang**.
+- Project Supabase sudah dipulihkan menjadi `ACTIVE_HEALTHY`; migration fungsi,
+  privilege, RLS, trigger, Storage, dan Realtime berhasil diterapkan.
+- Smoke test SQL dan client API dengan dua session akun nyata lulus untuk login,
+  RPC, RLS, trigger, Storage, dan Realtime. Dua subscription terautentikasi
+  menerima pesan baru setelah masa warm-up koneksi.
+- RPC admin edit laporan dan menyelesaikan laporan aktif lulus transaksi
+  rollback; pemanggilan dengan identitas mahasiswa ditolak.
+- Password salah, registrasi domain luar, eskalasi role, pemanggilan RPC admin
+  oleh mahasiswa, serta upload ke folder Storage milik akun lain ditolak sesuai
+  harapan.
+- Request reset password diterima dan log Auth membuktikan email recovery
+  dikirim. Klik link email → deep-link aplikasi → simpan password baru tetap
+  belum diuji.
+- Redirect Auth `cariin://reset-password` sudah tersimpan dan diverifikasi via
+  Management API tanpa mengubah Site URL.
+- NIM akun utama dipertahankan, dua profil duplikat dinormalisasi menjadi
+  `NULL`, dan unique index NIM sudah aktif.
+- Semua report, message, notification, dan object Storage yang dibuat smoke test
+  sudah dibersihkan; query verifikasi terakhir menghasilkan nol artefak uji.
+- Environment ini tidak memiliki perangkat Android/iOS, ADB, atau simulator.
+- APK production final-config berhasil dibangun dan diverifikasi statis:
+  build `4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b`, package `id.cariin.app`,
+  scheme `cariin`, archive valid, dan permission `RECORD_AUDIO` tidak ada.
+- Build tersebut dibuat sebelum polish/admin full CRUD terbaru. Rebuild
+  production dari source terkini belum dilakukan.
+- Dua session Node membuktikan backend multi-client, tetapi **bukan** pengganti
+  pengujian UI pada dua perangkat fisik.
 
 ---
 
 ## 0. Persiapan
 
-- [ ] `npx expo start --clear` (WAJIB `--clear` — ada perubahan storage engine + babel)
-- [ ] Supabase Dashboard: pastikan `supabase-schema.sql` sudah di-run (5 tabel + RLS + trigger `trg_notify_new_message`)
-- [ ] Storage buckets aktif: `report-photos`, `avatars` (public)
+- [ ] `npx expo start --tunnel --clear` dan tunggu URL/QR tunnel siap
+- [ ] Buka URL tunnel di browser HP bila Expo Go gagal; URL `exp.direct`
+  bersifat sementara dan berubah saat restart
+- [x] Supabase remote: `supabase-schema.sql` terbaru sudah diterapkan dan
+  diverifikasi (5 tabel, 6 RPC aplikasi, 14 policy public, trigger, Realtime, bucket +
+  policy Storage)
+- [x] Supabase Auth URL Configuration memuat redirect `cariin://reset-password`
+- [x] Storage buckets aktif: `report-photos`, `avatars` (public), `chat-media`
+  (private/reserved); upload/download/remove dua bucket aktif dan isolasi folder
+  antar-user sudah diuji lewat client API
 - [ ] Akun test siap:
   - Admin: `admin@cariin.app` / `admin123`
   - Mahasiswa: `faiz@student.unu-jogja.ac.id` / `faizfaiz`
 - [ ] (Opsional) Siapkan HP kedua / akun mahasiswa kedua untuk test chat 2 arah
+
+### 0.1 Verifikasi Backend Otomatis/Client API
+
+- [x] Login password dua akun nyata berhasil; password salah ditolak
+- [x] `get_my_profile` berhasil dan kolom profil sensitif tidak dapat dibaca
+  langsung oleh client
+- [x] Mahasiswa tidak dapat menaikkan `profiles.role`
+- [x] Mahasiswa tidak dapat mengubah `reports.status` secara langsung
+- [x] Mahasiswa tidak dapat memanggil RPC khusus admin
+- [x] Admin dapat membuat laporan walk-in melalui `create_admin_report`
+- [x] Admin dapat edit dan menyelesaikan laporan melalui RPC khusus; mahasiswa
+  ditolak oleh authorization gate
+- [x] Upload/download/remove `report-photos` dan `avatars` berhasil pada folder
+  sendiri; cross-user upload ditolak
+- [x] Dua client terautentikasi menerima event Realtime pesan baru
+- [x] Trigger memperbarui `conversations.last_message*` dan membuat notifikasi
+  `new_message`
+- [x] Request recovery diterima dan email recovery tercatat terkirim
+- [x] Signup domain luar ditolak trigger; tidak meninggalkan row `auth.users`
+  atau `profiles`
+- [x] Cleanup terverifikasi: nol report, message, notification terkait, dan
+  object Storage smoke test tersisa
 
 ---
 
@@ -49,6 +111,7 @@
 ### 1.5 Forgot Password
 - [ ] Dari Login → "Lupa sandi?" → ForgotPasswordScreen
 - [ ] Email valid → tap kirim → konfirmasi email reset terkirim
+- [ ] Tap link email → app terbuka ke ResetPasswordScreen → password baru tersimpan
 - [ ] Email kosong/invalid → error
 
 ---
@@ -91,7 +154,9 @@
 - [ ] Tombol tutup modal (X) berfungsi (dismiss ke feed)
 
 ### 4.2 Create Found
-- [ ] Switch ke tab "Ditemukan" di form
+- [ ] Isi sebagian form Kehilangan → switch ke "Menemukan" → tidak ada transisi
+  pindah halaman dan isian bersama tetap tersimpan
+- [ ] Aksen berubah orange untuk Kehilangan dan hijau untuk Menemukan
 - [ ] ⭐ Field "Titik Penitipan" WAJIB muncul & tervalidasi
 - [ ] Submit lengkap → Success → pending
 
@@ -118,6 +183,10 @@
 ### 6.2 Chat Room (Realtime) ⭐
 - [ ] Buka percakapan → riwayat pesan tampil (bubble kiri lawan / kanan sendiri)
 - [ ] Kirim pesan → muncul instan di kanan
+- [ ] Buka chat sebagai mahasiswa → aksen header/input/bubble sendiri berwarna biru
+- [ ] Buka chat sebagai admin → aksen header/input/bubble sendiri berwarna teal/hijau
+- [ ] iOS: fokus input → composer tepat di atas keyboard tanpa celah besar atau
+  menutupi pesan terakhir
 - [ ] ⭐ **Realtime**: dari device/akun kedua kirim pesan → masuk otomatis TANPA refresh
 - [ ] Read indicator berubah saat pesan dibaca
 - [ ] ⚠️ Keluar & masuk chat lagi → riwayat tetap ada (tidak dobel)
@@ -136,6 +205,7 @@
 - [ ] Tab "Profil" → data user (nama, NIM, fakultas, email)
 - [ ] ⭐ Tap avatar → kamera/galeri → upload → foto berubah (tidak nampil cache lama)
 - [ ] Menu Pengaturan (Settings) → ubah nama / password
+- [ ] Toggle Notifikasi In-App off → badge/polling berhenti; tutup-buka app → preferensi tetap
 - [ ] Menu Bantuan (Help) → FAQ accordion buka-tutup, tombol kontak
 - [ ] Buka profil user lain (dari chat/detail) → UserProfileScreen
 - [ ] ⭐ Logout → konfirmasi → balik ke AuthNavigator (Splash/Role)
@@ -150,6 +220,8 @@
 - [ ] Login admin → Dashboard tampil
 - [ ] 🆕 Tombol **☰** kiri atas header Dashboard → tap → drawer geser masuk dari kiri
 - [ ] 🆕 Swipe dari tepi kiri layar (di Dashboard) → drawer juga kebuka
+- [ ] Drawer tertutup → tidak ada blob/dekorasi drawer yang bocor ke sisi kiri
+  screen Dashboard, Review, atau tab admin lain
 - [ ] Isi drawer: header (shield + nama admin + "Administrator") + **Beranda**, **Tentang Cari.In**, garis, **Keluar**
 
 ### 8.2 Navigasi Drawer 🆕
@@ -157,7 +229,9 @@
 - [ ] 🆕 Di layar About, tombol ☰ → buka drawer lagi (bukan dead-end)
 - [ ] Tap "Beranda" → balik ke Bottom Tab admin
 - [ ] ⭐ Bottom Tab admin (Dashboard/Laporan/Buat/Pesan/Profil) tetap jalan normal di dalam drawer
+- [ ] Navbar admin memakai liquid bar yang sama dengan mahasiswa, dengan aksen teal
 - [ ] Tap "Keluar" → konfirmasi → logout ke AuthNavigator
+- [ ] Tab Profil admin → Ganti Password → konfirmasi password → berhasil disimpan
 
 ---
 
@@ -166,24 +240,43 @@
 ### 9.1 Dashboard
 - [ ] Stat cards: Pending / Disetujui / Ditolak / Total (angka sesuai data)
 - [ ] Tab Pending / Aktif / Selesai → list berubah
+- [x] Header, stat cards, tombol aksi, tab filter, judul section, dan kartu
+  laporan tidak saling overlap pada iPhone yang diuji
+- [ ] Ulangi pemeriksaan layout dashboard pada Android
 - [ ] Bell notif admin berfungsi
 - [ ] Tombol "Buat Laporan Admin" → ke form walk-in
 
 ### 9.2 Moderasi (AdminReview) ⭐
 - [ ] Tap laporan pending → AdminReviewScreen (detail lengkap)
+- [ ] Tombol kembali dan hapus tampil bulat tanpa artefak kotak di iOS
+- [ ] Ikon Edit → AdminEditReportScreen dan data laporan tersimpan
+- [ ] Tombol Hapus → konfirmasi destructive → laporan hilang dari list
 - [ ] ⭐ **Approve** → laporan jadi `approved` → muncul di feed publik mahasiswa
 - [ ] ⭐ **Reject** wajib isi alasan → laporan jadi `rejected`
+- [ ] ⭐ Laporan Aktif → **Selesaikan** → status berubah menjadi `resolved`
 - [ ] ⚠️ Reject tanpa alasan → validasi menolak
 - [ ] Cek: mahasiswa pemilik dapat notifikasi approved/rejected (via trigger/RPC)
 
 ### 9.3 Walk-in Report ⭐
 - [ ] Buat laporan (AdminCreateLost/Found) atas nama pelapor (nama/NIM/fakultas manual)
+- [ ] Isi sebagian form Kehilangan → switch ke Menemukan → tidak ada transisi
+  pindah screen dan seluruh isian bersama tetap tersimpan
+- [ ] Switch kembali ke Kehilangan → field Titik Penitipan disembunyikan tanpa
+  menghapus draft field lainnya
 - [ ] ⭐ Submit → laporan langsung `approved` (created_by_admin=true)
+- [ ] Edit laporan walk-in → ubah foto/data barang dan identitas pelapor → data
+  detail ikut berubah
+- [ ] Selesaikan laporan walk-in → berpindah dari Aktif ke Selesai
 - [ ] Cek di feed: badge "Via Admin" muncul
 
 ### 9.4 Semua Laporan (AdminReports)
 - [ ] Tab "Laporan" → semua laporan semua status
 - [ ] Filter status + search berfungsi
+
+### 9.5 Navbar Mahasiswa & Admin
+- [ ] Ikon tab menyatu langsung dengan glass bar tanpa tile/kotak individual
+- [ ] Tab aktif ditandai warna role + garis kecil, bukan background kotak
+- [ ] Tombol `+` tengah berbentuk lingkaran pada mahasiswa dan admin
 
 ---
 
@@ -207,9 +300,10 @@ Urutan rekomendasi biar semua requirement kelihatan:
 3. Buat laporan Lost + upload foto → pending (CRUD create + Storage) [40s]
 4. Chat realtime 2 device (Realtime DB) [40s]
 5. Logout → **Login admin** → buka **Drawer** (☰) → Tentang → Beranda (Drawer nav) [40s]
-6. Moderasi: approve laporan pending → muncul di feed (CRUD update + RPC) [30s]
-7. Walk-in report admin (CRUD create) [20s]
-8. Kill app → buka → masih login (SecureStore persist) [15s]
+6. Moderasi: approve laporan pending → muncul di feed (CRUD update + RPC) [25s]
+7. Walk-in admin: switch jenis tanpa pindah screen → create [25s]
+8. Admin Edit Data → simpan → Selesaikan laporan aktif [25s]
+9. Kill app → buka → masih login (SecureStore persist) [15s]
 
 ---
 

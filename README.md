@@ -36,6 +36,7 @@ Aplikasi **lost & found** untuk lingkungan kampus UNU Yogyakarta. Mahasiswa bisa
 - ✅ Moderasi laporan (approve/reject dengan alasan)
 - ✅ Semua laporan (filter status, search)
 - ✅ Walk-in report (buat laporan atas nama mahasiswa)
+- ✅ Full CRUD laporan admin (edit data/foto, selesaikan, hapus)
 - ✅ Notifikasi otomatis ke mahasiswa saat laporan di-review
 
 ---
@@ -65,8 +66,9 @@ cp .env.example .env
 # Buka Supabase Dashboard → SQL Editor
 # Paste dan run isi supabase-schema.sql
 
-# 5. Setup Storage buckets (manual via Dashboard)
-# Buat 3 bucket: report-photos, avatars (public), chat-media (private)
+# 5. Verifikasi Storage
+# Schema membuat bucket report-photos + avatars (public), chat-media (private),
+# serta policy upload yang membatasi setiap user ke folder UUID miliknya.
 
 # 6. Run dev server
 npx expo start
@@ -104,9 +106,44 @@ EXPO_PUBLIC_APP_ENV=development
 npm install -g eas-cli
 eas login
 
-# Build Android APK
-eas build --platform android --profile preview
+# Build kandidat/final Android APK
+eas build --platform android --profile production
 ```
+
+---
+
+## Status Verifikasi Terakhir
+
+Per 20 Juli 2026:
+
+- TypeScript: 0 error
+- ESLint: 0 error, 0 warning
+- Expo Doctor: 18/18 checks passed
+- Build production terakhir yang terverifikasi statis:
+  [4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b](https://expo.dev/accounts/faiz.abdurrachman/projects/cariin/builds/4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b)
+- APK: 80.572.407 byte (76,84 MiB)
+- SHA-256:
+  `6c6d30f0af72d0ba1b29a16a463e1b9bd14176ac74b96fe7c1152d2129479c82`
+- Archive APK valid, package `id.cariin.app`, scheme `cariin`, minSdk 24,
+  targetSdk 36, dan `RECORD_AUDIO` tidak ada pada manifest final.
+
+APK belum diinstal atau smoke test di perangkat. Project Supabase sudah
+`ACTIVE_HEALTHY`; migration remote serta smoke test SQL dan client API berhasil
+untuk Auth dua akun, RPC, RLS, Storage, Realtime, dan trigger. Request recovery
+diterima dan email tercatat terkirim; redirect recovery juga sudah tersimpan.
+Penyelesaian reset melalui deep-link serta manual test UI dua perangkat belum
+dijalankan. Instalasi APK sedang ditunda.
+
+Catatan: build `4d5739ec...` dibuat sebelum perbaikan UI/admin full CRUD
+terbaru. Source terkini kembali lulus TypeScript, ESLint, Expo Doctor,
+`git diff --check`, dan export bundle iOS, tetapi APK production terbaru belum
+direbuild.
+
+## Screenshots
+
+Screenshot perangkat untuk dokumentasi laporan belum tersedia. Bagian ini
+disengaja tetap tanpa gambar sampai flow dijalankan pada perangkat dan buktinya
+benar-benar dikumpulkan.
 
 ---
 

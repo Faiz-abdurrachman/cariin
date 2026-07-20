@@ -2,7 +2,7 @@
 
 > Snapshot kondisi project tiap akhir fase. Baca file ini + `NEXT_STEPS.md` saat resume sesi (urutan: CLAUDE.md → CHECKPOINT.md → NEXT_STEPS.md).
 >
-> **Last updated:** 2026-07-06 | **Branch:** `main` | **Local ahead origin:** FASE 4.5 + bug fixes + Drawer admin + SecureStore JWT belum commit + belum push.
+> **Last updated:** 2026-07-20 06:44 WIB | **Branch:** `main` | **Local ahead origin:** worktree dirty dengan polish UI, hardening schema, recovery password, admin full CRUD, dan dokumentasi handoff; belum push.
 
 ---
 
@@ -16,7 +16,7 @@
 | FASE 4 | Core Mahasiswa (Home, Detail, Create, MyPosts, Profile) | ✅ Selesai | `9e511f6` |
 | **FASE 4.5** | **Chat & Notifikasi (realtime, mahasiswa flow lengkap)** | ✅ **Selesai** | *(commit incoming)* |
 | FASE 5 | Admin Screens (moderate, dashboard, walk-in) | ✅ Selesai | `4547443` |
-| **FASE 6** | **Polish (Settings, Help, UserProfile, EAS build)** | 🟡 **Partial** | *(commit incoming)* |
+| **FASE 6** | **Polish, hardening RLS, testing, EAS build, dan submission** | 🟡 **Partial** | *(commit incoming)* |
 
 `git log --oneline -10` untuk konfirmasi hash terkini.
 
@@ -29,8 +29,12 @@
 - **Bahasa:** TypeScript strict (`noImplicitAny`, `noUncheckedIndexedAccess`)
 - **Path alias:** `@/*` → `src/*`
 - **Lint:** ESLint v9 + flat config (`eslint.config.js`). `npm run lint` clean, 0 errors/warnings.
+- **Expo Doctor:** 18/18 checks passed pada 2026-07-20.
 - **Web preview:** `@expo/metro-runtime` tersedia (`npx expo start --web`).
-- **iPhone Expo Go** = primary test device (user manual test).
+- **Manual test:** jalankan melalui Expo Go/tunnel; hasil aktual harus dicatat di
+  `TESTING-MANUAL.md`.
+- **Current UI focus:** implementasi polish terbaru selesai secara statis;
+  fokus berikutnya retest perangkat, bukan redesign ulang.
 
 ---
 
@@ -41,20 +45,47 @@
 - **`.env`** lokal terisi (URL + ANON_KEY + ALLOWED_EMAIL_DOMAIN=`student.unu-jogja.ac.id` + APP_NAME + APP_ENV)
 - **Schema:** lihat `supabase-schema.sql` (idempotent, aman di-rerun). 5 tabel + RLS + triggers + GRANTs.
 - **Email Auth:** ✅ Enabled, **Confirm email: OFF** (dev convenience)
-- **Google OAuth:** ❌ Dihapus — login hanya via email kampus (UVP domain validation)
-- **Redirect URLs deep link:** ❌ Belum dipasang di URL Configuration (defer FASE 6)
+- **Google OAuth:** ❌ Tidak diimplementasikan — login memakai email/password; registrasi mahasiswa dibatasi domain kampus.
+- **Redirect URLs deep link:** ✅ `cariin://reset-password` tersimpan di Auth
+  `uri_allow_list`; PATCH dan GET verifikasi HTTP 200, Site URL tidak berubah.
+- **Konektivitas remote per 2026-07-20:** project berhasil dipulihkan melalui
+  Supabase MCP dari `INACTIVE` menjadi `ACTIVE_HEALTHY`.
+- **Migration remote:** ✅ `cariin_fase6_functions_privileges_rls`,
+  `cariin_fase6_storage_realtime`, dan
+  `cariin_fase6_function_execution_hardening` berhasil. Migration
+  `add_admin_report_full_crud` juga sudah diterapkan dan diverifikasi.
+- **Unique NIM:** ✅ NIM dipertahankan pada akun mahasiswa utama, dua profil
+  duplikat dinormalisasi menjadi `NULL`, dan `idx_profiles_nim_unique` aktif.
+  Jumlah profil tetap 5 dan tidak ada nilai NIM duplikat.
+- **Runtime backend:** ✅ Dua session akun nyata lulus login, RPC, RLS, Storage,
+  Realtime, dan trigger. Negative auth/authorization test ditolak sesuai
+  harapan; cleanup terakhir menunjukkan nol artefak smoke test.
 
 ### Storage Buckets
 
 | Bucket | Public | Policies | Status |
 |--------|--------|----------|--------|
-| `report-photos` | Yes | 3 (insert+update+delete by user folder prefix) | ✅ Active |
-| `avatars` | Yes | 3 (insert+update+delete by user folder prefix) | ✅ Active |
+| `report-photos` | Yes | select+insert+update+delete by folder UUID | ✅ Remote |
+| `avatars` | Yes | select+insert+update+delete by folder UUID | ✅ Remote |
 | `chat-media` | No | 0 | ⏸ Defer (MVP text-only) |
 
 ### New Trigger (FASE 4.5)
 
-- `trg_notify_new_message` — AFTER INSERT di `messages`, auto-insert notification ke receiver. Sudah di `supabase-schema.sql`, **perlu di-apply di Supabase Dashboard** (run SQL).
+- Remote memiliki 6 RPC aplikasi, 14 policy public, 8 policy Storage, dan 3
+  bucket.
+- Smoke test read-only RLS/RPC lulus; RPC approve → notifikasi → mark-resolved
+  lulus dalam transaksi yang di-rollback.
+- Smoke test client API lulus untuk `get_my_profile`, isolasi field sensitif,
+  penolakan eskalasi role/perubahan langsung status report/RPC admin, laporan
+  walk-in admin, Storage dua bucket, dua subscription Realtime, dan trigger
+  conversation/notifikasi.
+- Request recovery diterima dan email tercatat terkirim; deep-link sampai
+  password baru masih perlu perangkat.
+- Supabase Security Advisor masih memberi warning untuk tujuh fungsi
+  `SECURITY DEFINER` yang memang diekspos ke role `authenticated`; authorization
+  gate RPC sudah diuji. Warning lain: leaked-password protection Auth belum
+  aktif. Performance Advisor terakhir hanya melaporkan satu index message belum
+  terpakai pada database kecil, bukan error schema.
 
 ### Akun Seeded
 
@@ -80,6 +111,18 @@
 | AuthContext `loadInitial()` no try/catch → stuck splash | ✅ Fixed FASE 6 | Try/catch/finally di loadInitial. |
 | Admin pakai Bottom Tab, requirement dosen minta Drawer | ✅ Fixed | `AdminNavigator` jadi Drawer membungkus `AdminTabs` (Beranda + Tentang + Keluar). Hamburger ☰ di header Dashboard. |
 | JWT disimpan di AsyncStorage (requirement: SecureStorage) | ✅ Fixed | `supabase.ts` pakai SecureStore adapter (chunked, workaround limit 2KB). AsyncStorage dipindah ke `feedStore` persist (cache offline). |
+| `Notifications` sempat kehilangan navbar karena tab bar disembunyikan terlalu agresif | ✅ Fixed | `ChatTab` sekarang hanya fullscreen di `ChatRoom` dan `UserProfile`, `Notifications` tetap tampil navbar utama. |
+| `MyPosts` belum satu bahasa visual dengan auth/chat | ✅ Fixed | `src/screens/profile/MyPostsScreen.tsx` dipoles ke glass layout dengan statistik, filter, dan card baru. |
+| Project Supabase sempat `INACTIVE`/`NXDOMAIN` | ✅ Dipulihkan FASE 6 | Status remote kini `ACTIVE_HEALTHY`; project ref tidak berubah. |
+| Dashboard admin overlap pada viewport perangkat | ✅ Fixed + retest iPhone | Header/actions dan `FlatList` sekarang berada dalam satu `SafeAreaView`; screenshot retest menunjukkan seluruh section tidak overlap. Blob dekoratif atas kemudian dihapus atas feedback user agar tidak mengganggu header. |
+| Chat admin masih memakai aksen biru mahasiswa | 🟡 Fixed lokal, perlu retest | `InboxScreen`, `ChatRoomScreen`, dan `ChatBubble` memilih aksen berdasarkan role. |
+| Composer chat iOS terlalu jauh dari keyboard | 🟡 Fixed lokal, perlu retest | Keyboard offset custom dihapus dan bottom safe-area ekstra tidak diterapkan saat keyboard terbuka. |
+| Blob drawer bocor ke sisi kiri screen saat drawer tertutup | 🟡 Fixed lokal, perlu retest | Blob kanan-atas drawer dihapus dan root/drawer style memakai `overflow: hidden`. |
+| Tombol back/hapus AdminReview berartefak kotak di iOS | 🟡 Fixed lokal, perlu retest | Wrapper blur/gradient diganti surface lingkaran 44×44 dengan shadow ringan. |
+| Navbar admin berbeda dari liquid navbar mahasiswa dan ikon terasa “ngotak” | 🟡 Fixed lokal, perlu retest | Admin/mahasiswa memakai `LiquidTabBar`; tile aktif dihapus, indikator aktif berupa garis, dan FAB dibuat bulat dengan aksen role. |
+| Switch Hilang/Temuan terasa seperti pindah halaman dan mereset form | 🟡 Fixed lokal, perlu retest | `CreateReportScreen` mengganti mode melalui local state, bukan `nav.replace`, sehingga field bersama tetap terjaga. |
+| Admin walk-in tidak dapat diedit/diselesaikan dari UI | 🟡 Fixed source + remote, perlu retest perangkat | `AdminEditReportScreen`, tombol Edit/Selesaikan, RPC `update_admin_report`, dan `admin_mark_report_resolved` sudah aktif; success + non-admin rejection diuji dalam transaksi rollback. |
+| Switch Hilang/Temuan form walk-in admin terasa pindah halaman dan mereset draft | 🟡 Fixed lokal, perlu retest | `AdminCreateLostScreen` dan `AdminCreateFoundScreen` memakai `reportType` lokal; tidak lagi memanggil `nav.replace`, dan field bersama dipertahankan. |
 
 ---
 
@@ -90,8 +133,8 @@ RootNavigator (src/navigation/index.tsx)
   ├── isLoading → LoadingScreen
   ├── !isAuthenticated → AuthNavigator
   │     └── Splash → RoleSelection → Login | Register | ForgotPassword
-  ├── role==='admin' → AdminNavigator (Drawer indigo) [FASE 5 ✅]
-  │     └── Dashboard (stats+pending list) | Semua Laporan (filter+search) | Buat Laporan (walk-in) | (Logout custom)
+  ├── role==='admin' → AdminNavigator (Drawer + aksen teal) [FASE 5 ✅]
+  │     └── Dashboard/Review/Edit | Semua Laporan | Buat Walk-In | Chat | Profil
   └── role==='mahasiswa' → MainNavigator (Bottom Tab + Modal)
         ├── HomeTab → HomeStack
         │     ├── HomeFeed (bell badge notif ✅)
@@ -123,6 +166,13 @@ State global:
 - `feedStore` (Zustand) — reports cache + filter
 - `chatStore` ✅ (Zustand) — conversations, messages, realtime subscription
 
+UI screens yang baru dipoles:
+- `RoleSelectionScreen`
+- `LoginScreen` / `RegisterScreen`
+- `LiquidTabBar`
+- `MyPostsScreen`
+- `NotificationsScreen` visibility behavior
+
 ---
 
 ## 6. FILE PENTING
@@ -140,6 +190,7 @@ State global:
 | `CLAUDE.md` | Pattern + gotcha untuk AI baru. |
 | `CHECKPOINT.md` | Status snapshot (file ini). |
 | `NEXT_STEPS.md` | Plan fase berikutnya. |
+| `AI_NEXT_PROMPT.md` | Prompt copy-paste dan urutan kerja AI berikutnya. |
 
 ### Code reference
 | File | Isi |
@@ -158,17 +209,61 @@ State global:
 ### Sudah selesai (Bug Fix & Polish session):
 - ✅ SettingsScreen, HelpScreen, UserProfileScreen
 - ✅ Avatar upload di ProfileScreen (tap → camera/gallery → uploadAvatar)
-- ✅ Google OAuth button di LoginScreen (mahasiswa only)
 - ✅ `eas.json` build config
+- ✅ App icon/adaptive icon/favicon diarahkan ke asset brand Cari.In
+- ✅ Kandidat EAS production APK berhasil: build `c1217c5d-ac3b-480e-8577-841877bbb68b`, 76,83 MiB
+- ✅ Rebuild production final-config berhasil: build
+  `4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b`, status `FINISHED`, 80.572.407 byte
+  (76,84 MiB), SHA-256
+  `6c6d30f0af72d0ba1b29a16a463e1b9bd14176ac74b96fe7c1152d2129479c82`
+  — artifact ini dibuat sebelum polish/admin full CRUD terbaru sehingga sekarang
+  menjadi bukti historis terverifikasi, bukan build source terkini
+- ✅ APK final-config tersimpan lokal di
+  `dist/cariin-production-4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b.apk`
+  (`dist/` di-ignore Git/EAS)
+- ✅ APK final-config lulus `unzip -t`/`zipinfo -t`, terbaca sebagai package
+  `id.cariin.app` version `1.0.0` (versionCode 1), scheme `cariin`, minSdk 24,
+  targetSdk 36, dan manifest final tidak memuat `RECORD_AUDIO`
 - ✅ `README.md` comprehensive
 - ✅ SplashScreen fade-in animation
 - ✅ Bug fix: AuthContext stuck splash, isValidPassword crash, feedStore searchTimer
+- ✅ RoleSelection scroll/syntax fix
+- ✅ Navbar behavior: Notifications tetap ada navbar, ChatRoom fullscreen
+- ✅ `MyPostsScreen` glass polish
+- ✅ Final consistency pass: `ProfileScreen` (glass layout update), `AdminDashboardScreen` (tombol Buat & Semua Laporan), `AdminReviewScreen` (tambah fungsi Hapus Laporan).
+- ✅ Admin full CRUD: form edit data/foto termasuk identitas walk-in, tombol
+  Selesaikan laporan aktif, dan dua RPC admin-only sudah diterapkan ke remote
+- ✅ Reset-password deep-link sampai update password
+- ✅ FAQ accordion, toggle notifikasi persisten, public-profile chat, dan share report
+- ✅ Akses Supabase pada screen dipindahkan ke service layer
+- ✅ Hardening schema: role/status/participant/message fields dilindungi privilege + RPC
+- ✅ Bucket dan policy Storage didefinisikan di schema; upload dibatasi ke folder UUID pemilik
+- ✅ Ganti kata sandi admin sudah menjadi flow nyata, bukan placeholder
+- ✅ Chat menangani race response HTTP/realtime tanpa menduplikasi pesan
+- ✅ Laporan Mopro pernah diselaraskan pada snapshot sebelum enhancement admin
+  terbaru; versi lama sudah dikumpulkan user dan tidak boleh diubah lagi tanpa
+  instruksi eksplisit
+- ✅ Schema/Auth remote terverifikasi; redirect recovery aktif
+- ✅ Backend diuji dengan dua session akun nyata untuk Auth, RPC, RLS, Storage,
+  Realtime, trigger, negative cases, dan cleanup
+- 🟡 Tiga regresi UI dari screenshot perangkat sudah diperbaiki di source:
+  dashboard overlap, warna chat admin, dan jarak composer iOS; belum boleh
+  dinyatakan lulus sebelum screenshot/retest perangkat terbaru
+- 🟡 Regresi tambahan sudah diperbaiki statis: drawer leak, ikon review, navbar
+  tanpa tile kotak, switch form mahasiswa/admin tanpa route transition, serta
+  admin Edit/Selesaikan; seluruhnya masih perlu retest perangkat
 
 ### Belum selesai:
-- Google OAuth setup (Cloud Console + Supabase provider + redirect URLs) — external setup
-- App icon final
-- EAS build standalone APK (butuh `eas build`)
-- expo-doctor re-check
+- Lanjutkan test UI Auth, Realtime, dan Storage pada dua perangkat
+- Selesaikan reset password dari link email sampai password baru
+- Jalankan seluruh `TESTING-MANUAL.md` dan simpan bukti
+- Rebuild production APK dari source terbaru setelah retest UI selesai
+- Install dan smoke test APK production final-config pada perangkat Android
+  (ditunda atas keputusan user)
+- Update README dengan screenshot terbaru
+- Rekam video demo dan siapkan bukti submission
+- Jangan menyinkronkan ulang laporan Mopro yang sudah dikumpulkan tanpa
+  permintaan eksplisit user
 
 ---
 

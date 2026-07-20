@@ -2,9 +2,13 @@
 
 > Plan detail per fase remaining. Baca `CHECKPOINT.md` dulu untuk konteks status.
 >
-> **Status saat ini:** FASE 1-5 ✅ done. FASE 4.5 ✅ done (Chat & Notifikasi). FASE 6 🟡 partial.
+> **Status saat ini:** FASE 1-5 ✅ done. FASE 4.5 ✅ done. FASE 6 🟡 partial;
+> schema/Auth/admin CRUD remote serta smoke test backend sudah terverifikasi.
+> APK terakhir valid secara statis tetapi mendahului perubahan source terbaru.
 >
-> **Yang belum:** Google OAuth setup, app icon final, EAS build APK.
+> **Yang belum:** pengujian UI dua perangkat, alur reset password end-to-end,
+> rebuild production terbaru, smoke test instalasi APK (ditunda atas keputusan
+> user), video, screenshot, dan bukti submission.
 
 ---
 
@@ -12,49 +16,109 @@
 
 | Skenario | Urutan |
 |----------|--------|
-| Submission final | **FASE 6** (Google OAuth external setup + EAS build + app icon) |
+| Submission final | **FASE 6** (retest UI terbaru → testing dua perangkat + reset E2E → rebuild APK source terbaru → verifikasi → screenshot/video/lampiran) |
+
+## START HERE — AI/SESI BERIKUTNYA
+
+1. Baca `AI_HANDOFF.md` penuh dan gunakan `AI_NEXT_PROMPT.md`.
+2. Jalankan audit read-only: `git status --short`, `git diff --check`, proses
+   Expo/port 8081, lalu TypeScript/ESLint.
+3. Jangan apply ulang schema remote: migration sampai
+   `add_admin_report_full_crud` sudah ada. Periksa drift sebelum mutation.
+4. Gunakan Expo tunnel yang sudah didukung:
+
+```bash
+npx expo start --tunnel --clear
+```
+
+5. Retest dahulu bug yang baru diperbaiki:
+   - dashboard/drawer/navbar admin;
+   - warna chat role dan composer iOS;
+   - switch Hilang/Temuan mahasiswa serta walk-in admin;
+   - admin Edit Data, Selesaikan, dan Hapus.
+6. Lanjutkan critical path dua akun/perangkat dan reset password E2E.
+7. Setelah source stabil, rebuild APK production dan ulangi SHA-256,
+   integritas, package/scheme/permission. Jangan install sebelum user
+   mencabut penundaan.
+8. Update checklist hanya berdasarkan bukti aktual; jangan mengubah laporan
+   Mopro yang sudah dikumpulkan tanpa instruksi eksplisit.
 
 ---
 
 ## FASE 6 — Polish Final & Submission
 
-> **Tujuan:** Google OAuth fully working, build APK standalone, siap submit ke dosen.
+> **Tujuan:** Schema produksi sinkron, seluruh checklist teruji, APK standalone tersedia, dan bukti submission lengkap.
 >
-> **Estimasi:** 2-3 jam (banyak setup external).
+> **Estimasi:** bergantung pada akses Supabase, EAS, perangkat uji, dan kestabilan koneksi.
 
-### 6.1 — Google OAuth Setup (external)
-- [ ] Google Cloud Console: buat project, enable OAuth, generate client ID (Web application type)
-- [ ] Supabase Dashboard → Auth → Providers → Google: isi Client ID + Client Secret
-- [ ] Supabase Dashboard → Auth → URL Configuration: tambah redirect URL `cariin://auth-callback`
-- [ ] Test login via Google di Expo Go
+### 6.1 — Supabase Schema & Auth
+- [x] Pulihkan project menjadi `ACTIVE_HEALTHY`
+- [x] Apply hardening fungsi, privilege, RLS, trigger, Storage, dan Realtime
+- [x] Pastikan RPC `get_my_profile` dan `mark_report_resolved` tersedia
+- [x] Normalisasi dua profil dengan NIM duplikat dan aktifkan
+  `idx_profiles_nim_unique`; akun utama mempertahankan NIM
+- [x] Verifikasi registrasi domain luar ditolak oleh trigger database dan tidak
+  meninggalkan user/profile
+- [x] Verifikasi user biasa tidak dapat membaca field profil sensitif, menaikkan
+  `profiles.role`, mengubah `reports.status` langsung, atau memanggil RPC admin
+- [x] Tambahkan dan verifikasi `cariin://reset-password` pada redirect URL
+  Supabase Auth tanpa mengubah Site URL
+- [x] Tambahkan dan uji RPC admin untuk edit penuh serta menyelesaikan laporan
+  aktif; migration remote `add_admin_report_full_crud` lulus uji rollback dan
+  authorization gate
 
-### 6.2 — Supabase trigger apply
-- [ ] Run `supabase-schema.sql` section baru (trigger `trg_notify_new_message`) di SQL Editor
-- [ ] Verify notifikasi auto-insert saat pesan baru (test E2E chat)
+### 6.2 — Pengujian Fungsional
+- [ ] Jalankan dan centang seluruh `TESTING-MANUAL.md`
+- [x] Uji backend dengan dua session akun nyata: Auth, RPC, RLS, Storage,
+  Realtime, dan trigger lulus; seluruh artefak uji dibersihkan
+- [ ] Uji chat realtime melalui UI dengan dua akun/perangkat fisik
+- [ ] Uji UI admin Edit Data + Selesaikan untuk laporan walk-in dan mahasiswa
+- [ ] Retest switch Hilang/Temuan form mahasiswa dan admin tanpa transisi route
+- [ ] Retest dashboard/drawer/navbar, warna chat admin, dan composer iOS
+- [ ] Uji reset password dari email sampai kata sandi baru
+- [x] Verifikasi request reset diterima dan email recovery terkirim
+- [ ] Simpan screenshot/log bukti untuk laporan
 
 ### 6.3 — EAS Build
-- [ ] `eas login` (kalau belum)
-- [ ] `eas build --platform android --profile preview` → generate APK
-- [ ] Test APK di device Android
+- [x] EAS login sebagai `faiz.abdurrachman`
+- [x] Environment variable preview/production tersimpan di EAS
+- [x] Build kandidat production → APK 76,83 MiB (integritas archive valid)
+- [x] Rebuild production final-config → build
+  `4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b`
+- [x] Verifikasi APK final-config → 80.572.407 byte (76,84 MiB), archive
+  valid, package/scheme benar, `RECORD_AUDIO` tidak ada, SHA-256 tercatat
+- [ ] Rebuild production dari source terbaru setelah seluruh perubahan
+  UI/admin lolos retest; build `4d5739ec...` tidak memuat perubahan terbaru
+- [ ] Test APK di device Android — ditunda atas keputusan user
 
 ### 6.4 — Final Polish
-- [ ] App icon final (assets/icon.png, adaptive-icon.png)
-- [ ] Verifikasi `expo-doctor` pass
-- [ ] `npx tsc --noEmit` + `npm run lint` clean
+- [x] App icon final dikonfigurasi dari `assets/icon.png` untuk app/adaptive/web
+- [x] Verifikasi `expo-doctor` pass — 18/18 checks
+- [x] `npx tsc --noEmit` + `npm run lint` clean
 - [ ] Update README dengan screenshot terbaru
+- [x] Final consistency pass untuk `Profile`, `AdminDashboard`, dan screen lain yang masih beda bahasa visual
+- [x] FAQ accordion, toggle polling persisten, public-profile chat, share report, dan reset-password deep-link
+- [x] Ganti kata sandi admin, deduplikasi pesan realtime, dan policy Storage
+- [x] Presentation layer tidak lagi mengakses Supabase langsung
 
 ### 6.5 — Submission
 - [ ] Video demo 3-5 menit (semua fitur: auth, feed, create, detail, chat, admin moderation)
 - [ ] Commit final + push ke GitHub
-- [ ] APK ready untuk dosen
+- [x] APK kandidat production tersedia dari EAS
+- [x] APK production historis yang valid secara statis tersedia
+- [ ] APK production dari snapshot source terbaru tersedia
 
 ### 6 Definition of Done
-- [ ] Google OAuth login berfungsi
-- [ ] Notifikasi auto-generated (approved/rejected/new_message)
-- [ ] APK standalone bisa di-install
-- [ ] All screens dari UI_AUDIT.md implemented (0 stub/placeholder tersisa)
+- [x] Schema terbaru sudah diterapkan dan dites di Supabase
+- [x] Trigger notifikasi terverifikasi lewat SQL dan client API
+- [ ] APK production sudah direbuild dari source terbaru
+- [ ] APK standalone terbaru sudah diuji install dan smoke test
+- [x] Source tidak memiliki stub/placeholder fitur yang diketahui
+- [ ] Checklist manual lengkap dengan bukti
+- [x] Expo Doctor lulus — 18/18 checks
 - [ ] Video demo complete
 - [ ] GitHub repo public dengan README comprehensive
+- [ ] Liquid-glass language konsisten di auth, chat, navbar, laporan, dan admin area
 
 ---
 
@@ -86,7 +150,7 @@ Saat fase selesai, AI WAJIB:
 
 User ketik:
 ```
-Baca CHECKPOINT.md dan NEXT_STEPS.md, lanjut FASE 6
+Baca AI_HANDOFF.md dan AI_NEXT_PROMPT.md sampai selesai, lanjut FASE 6
 ```
 
 AI baru:
@@ -94,7 +158,7 @@ AI baru:
 2. Read CHECKPOINT.md (status)
 3. Read NEXT_STEPS.md (plan)
 4. Cek `git log --oneline -10` verify state
-5. Kasih rekap plan ke user, tanya scope adjustment
+5. Mulai audit lalu lanjutkan pekerjaan aman tanpa mengulang fase selesai
 
 ---
 
@@ -109,7 +173,11 @@ AI baru:
 
 ⚠️ **Realtime cleanup:** `chatStore.subscribe/unsubscribe` — channel harus di-unsubscribe di cleanup effect `ChatRoomScreen`.
 
-⚠️ **NotifContext polling 15 detik** — badge bell di-refresh otomatis.
+⚠️ **NotifContext polling 15 detik** — hanya aktif saat preferensi notifikasi in-app menyala.
+
+⚠️ **Navbar rule:** `Notifications` harus tetap menampilkan navbar utama; yang fullscreen cuma `ChatRoom` dan `UserProfile`.
+
+⚠️ **MyPosts style:** `src/screens/profile/MyPostsScreen.tsx` sudah dipoles ke glass layout, jangan dibikin balik ke layout polos.
 
 ⚠️ **JANGAN UBAH** `CONTEXT.md` & `UI_AUDIT.md`.
 
