@@ -159,13 +159,7 @@ export default function ChatRoomScreen() {
             pointerEvents="none"
           />
           <Pressable
-            onPress={() => {
-              if (nav.canGoBack()) {
-                nav.goBack();
-              } else {
-                nav.getParent()?.navigate('ChatTab', { screen: 'Inbox' });
-              }
-            }}
+            onPress={() => nav.goBack()}
             accessibilityRole="button"
             accessibilityLabel="Kembali"
             hitSlop={8}
