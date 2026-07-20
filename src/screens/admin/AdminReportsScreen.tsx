@@ -51,8 +51,13 @@ export default function AdminReportsScreen() {
       if (showSpinner) setLoading(true);
       setError(null);
       try {
-        const filter: { status?: ReportStatus; search?: string } = {};
+        const filter: {
+          status?: ReportStatus;
+          search?: string;
+          includeAllStatuses?: boolean;
+        } = {};
         if (statusFilter !== 'all') filter.status = statusFilter as ReportStatus;
+        else filter.includeAllStatuses = true;
         if (search.trim().length > 0) filter.search = search.trim();
         const data = await listReports(filter);
         setReports(data);

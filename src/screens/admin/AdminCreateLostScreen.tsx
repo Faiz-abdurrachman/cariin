@@ -1,4 +1,5 @@
-// AdminCreateLostScreen — form laporan walk-in kehilangan oleh admin.
+// Form laporan walk-in admin. Jenis kehilangan/temuan memakai state lokal agar
+// pergantian mode tidak me-remount screen atau menghapus isian bersama.
 
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -21,15 +22,20 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import type { AdminCreateStackParamList } from '@/navigation/types';
+import { getCurrentUserId } from '@/services/auth.service';
 import { createAdminReport } from '@/services/report.service';
-import { supabase } from '@/services/supabase';
 import {
   pickImageFromLibrary,
   takePhoto,
   uploadReportPhoto,
   type PickImageResult,
 } from '@/services/upload.service';
-import { CATEGORIES, COLORS, type CategoryId } from '@/utils/constants';
+import {
+  CATEGORIES,
+  COLORS,
+  type CategoryId,
+  type ReportType,
+} from '@/utils/constants';
 
 type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreateLost'>;
 
@@ -37,10 +43,12 @@ export default function AdminCreateLostScreen() {
   const nav = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
 
+  const [reportType, setReportType] = useState<ReportType>('lost');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<CategoryId | null>(null);
   const [location, setLocation] = useState('');
+  const [custodyPoint, setCustodyPoint] = useState('');
   const [photo, setPhoto] = useState<PickImageResult | null>(null);
   const [reporterName, setReporterName] = useState('');
   const [reporterNim, setReporterNim] = useState('');
@@ -55,8 +63,6 @@ export default function AdminCreateLostScreen() {
     ]);
   };
 
-  const switchToFound = () => nav.replace('AdminCreateFound');
-
   const goBack = () => {
     if (nav.canGoBack()) nav.goBack();
   };
@@ -65,22 +71,29 @@ export default function AdminCreateLostScreen() {
     if (!title.trim()) return Alert.alert('Validasi', 'Nama barang wajib diisi.');
     if (!category) return Alert.alert('Validasi', 'Pilih kategori barang.');
     if (!location.trim()) return Alert.alert('Validasi', 'Lokasi wajib diisi.');
+    if (reportType === 'found' && !custodyPoint.trim()) {
+      return Alert.alert(
+        'Validasi',
+        'Titik penitipan wajib diisi untuk barang temuan.',
+      );
+    }
 
     setSubmitting(true);
     try {
       let photoUrl: string | null = null;
       if (photo) {
-        const { data: authData } = await supabase.auth.getUser();
-        const userId = authData.user?.id;
-        if (userId) photoUrl = await uploadReportPhoto(photo, userId);
+        const userId = await getCurrentUserId();
+        photoUrl = await uploadReportPhoto(photo, userId);
       }
 
       await createAdminReport({
-        type: 'lost',
+        type: reportType,
         title: title.trim(),
         description: description.trim() || null,
         category,
         location: location.trim(),
+        custody_point:
+          reportType === 'found' ? custodyPoint.trim() : null,
         photo_url: photoUrl,
         reporter_name: reporterName.trim() || null,
         reporter_nim: reporterNim.trim() || null,
@@ -155,7 +168,7 @@ export default function AdminCreateLostScreen() {
               Laporan Walk-In
             </Text>
             <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }} numberOfLines={1}>
-              Kehilangan
+              {reportType === 'lost' ? 'Kehilangan' : 'Penemuan'}
             </Text>
           </View>
           <View style={{ width: 38 }} />
@@ -185,9 +198,14 @@ export default function AdminCreateLostScreen() {
             <LinearGradient colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {(['lost', 'found'] as const).map((t) => {
-                const active = t === 'lost';
+                const active = t === reportType;
                 return (
-                  <Pressable key={t} onPress={t === 'found' ? switchToFound : undefined} style={{ flex: 1 }} accessibilityRole="button">
+                  <Pressable
+                    key={t}
+                    onPress={() => setReportType(t)}
+                    style={{ flex: 1 }}
+                    accessibilityRole="button"
+                  >
                     {({ pressed }) => (
                       <View
                         style={{
@@ -271,6 +289,18 @@ export default function AdminCreateLostScreen() {
 
           <FieldLabel required>Lokasi</FieldLabel>
           <Input value={location} onChangeText={setLocation} placeholder="Tempat terakhir terlihat..." leftIcon="map-pin" />
+
+          {reportType === 'found' ? (
+            <>
+              <FieldLabel required>Titik Penitipan</FieldLabel>
+              <Input
+                value={custodyPoint}
+                onChangeText={setCustodyPoint}
+                placeholder="Cth: Pos satpam, resepsionis, ruang TU"
+                leftIcon="archive"
+              />
+            </>
+          ) : null}
 
           <FieldLabel>Deskripsi Detail</FieldLabel>
           <Input value={description} onChangeText={setDescription} placeholder="Ciri-ciri khusus, isi dompet, warna, dll..." multiline numberOfLines={4} />

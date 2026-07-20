@@ -2,7 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
+import { Alert, FlatList, Image, Pressable, RefreshControl, Text, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -97,20 +97,6 @@ export default function AdminDashboardScreen() {
       <View
         style={{
           position: 'absolute',
-          top: -50,
-          right: -50,
-          width: 350,
-          height: 350,
-          borderRadius: 999,
-          backgroundColor: COLORS.admin,
-          opacity: 0.16,
-          transform: [{ scale: 1.35 }],
-        }}
-        pointerEvents="none"
-      />
-      <View
-        style={{
-          position: 'absolute',
           bottom: -50,
           left: -50,
           width: 300,
@@ -188,61 +174,135 @@ export default function AdminDashboardScreen() {
             <StatCard value={stats?.total ?? '-'} label="Total" color={COLORS.admin} />
           </View>
 
-          <Pressable
-            onPress={() => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const parent: any = nav.getParent();
-              parent?.navigate('CreateTab', { screen: 'AdminCreateLost' });
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Buat laporan admin baru"
-          >
-            {({ pressed }) => (
-              <BlurView
-                intensity={45}
-                tint="light"
-                style={{
-                  borderRadius: 22,
-                  overflow: 'hidden',
-                  backgroundColor: 'rgba(255,255,255,0.42)',
-                  borderWidth: 1.5,
-                  borderColor: 'rgba(255,255,255,0.72)',
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                  opacity: pressed ? 0.86 : 1,
-                }}
-              >
-                <LinearGradient
-                  colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFillObject}
-                  pointerEvents="none"
-                />
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <View
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 12,
-                      backgroundColor: COLORS.admin,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Feather name="plus" size={16} color="#FFFFFF" />
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Pressable
+              onPress={() => {
+                Alert.alert('Buat Laporan Admin', 'Pilih jenis laporan:', [
+                  {
+                    text: 'Laporan Kehilangan',
+                    onPress: () => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const parent: any = nav.getParent();
+                      parent?.navigate('CreateTab', { screen: 'AdminCreateLost' });
+                    },
+                  },
+                  {
+                    text: 'Laporan Penemuan',
+                    onPress: () => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const parent: any = nav.getParent();
+                      parent?.navigate('CreateTab', { screen: 'AdminCreateFound' });
+                    },
+                  },
+                  { text: 'Batal', style: 'cancel' },
+                ]);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Buat laporan admin baru"
+              style={{ flex: 1 }}
+            >
+              {({ pressed }) => (
+                <BlurView
+                  intensity={45}
+                  tint="light"
+                  style={{
+                    borderRadius: 22,
+                    overflow: 'hidden',
+                    backgroundColor: 'rgba(255,255,255,0.42)',
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,255,255,0.72)',
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                    opacity: pressed ? 0.86 : 1,
+                  }}
+                >
+                  <LinearGradient
+                    colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                    pointerEvents="none"
+                  />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 12,
+                        backgroundColor: COLORS.admin,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Feather name="plus" size={16} color="#FFFFFF" />
+                    </View>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: COLORS.adminText }}>
+                      Buat Laporan
+                    </Text>
                   </View>
-                  <Text style={{ fontSize: 13, fontWeight: '900', color: COLORS.adminText }}>
-                    Buat Laporan Admin
-                  </Text>
-                </View>
-              </BlurView>
-            )}
-          </Pressable>
+                </BlurView>
+              )}
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const parent: any = nav.getParent();
+                parent?.navigate('ReportsTab');
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Lihat Semua Laporan"
+              style={{ flex: 1 }}
+            >
+              {({ pressed }) => (
+                <BlurView
+                  intensity={45}
+                  tint="light"
+                  style={{
+                    borderRadius: 22,
+                    overflow: 'hidden',
+                    backgroundColor: 'rgba(255,255,255,0.42)',
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,255,255,0.72)',
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                    opacity: pressed ? 0.86 : 1,
+                  }}
+                >
+                  <LinearGradient
+                    colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.18)', 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFillObject}
+                    pointerEvents="none"
+                  />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 12,
+                        backgroundColor: 'rgba(79,70,229,0.15)', // COLORS.admin transparentish
+                        borderWidth: 1,
+                        borderColor: 'rgba(79,70,229,0.3)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Feather name="list" size={16} color={COLORS.admin} />
+                    </View>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: COLORS.adminText }}>
+                      Semua Laporan
+                    </Text>
+                  </View>
+                </BlurView>
+              )}
+            </Pressable>
+          </View>
         </View>
-      </SafeAreaView>
 
       <FlatList
+        style={{ flex: 1 }}
         data={reports}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <Card report={item} onPress={() => nav.navigate('AdminReview', { reportId: item.id })} />}
@@ -343,6 +403,7 @@ export default function AdminDashboardScreen() {
         }
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.admin} />}
       />
+      </SafeAreaView>
     </View>
   );
 }

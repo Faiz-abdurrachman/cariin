@@ -1,9 +1,14 @@
 // AdminReviewScreen — detail per laporan + tombol Approve/Reject.
 
 import { Feather } from '@expo/vector-icons';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -29,6 +34,8 @@ import {
   approveReport,
   getReportById,
   rejectReport,
+  deleteReport,
+  resolveReportAsAdmin,
   type Report,
 } from '@/services/report.service';
 import { getOrCreateConversation } from '@/services/chat.service';
@@ -64,9 +71,11 @@ export default function AdminReviewScreen() {
     }
   }, [reportId]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   const onApprove = () => {
     Alert.alert('Setujui laporan?', `"${report?.title}" akan dipublikasikan di feed.`, [
@@ -109,6 +118,65 @@ export default function AdminReviewScreen() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const onDelete = () => {
+    if (!report) return;
+    Alert.alert('Hapus Laporan?', `Laporan "${report.title}" akan dihapus permanen.`, [
+      { text: 'Batal', style: 'cancel' },
+      {
+        text: 'Hapus',
+        style: 'destructive',
+        onPress: async () => {
+          setSubmitting(true);
+          try {
+            await deleteReport(report.id);
+            Alert.alert('Terhapus', 'Laporan berhasil dihapus.', [
+              { text: 'OK', onPress: () => nav.goBack() },
+            ]);
+          } catch (e) {
+            Alert.alert('Gagal Hapus', e instanceof Error ? e.message : 'Coba lagi.');
+          } finally {
+            setSubmitting(false);
+          }
+        },
+      },
+    ]);
+  };
+
+  const onResolve = () => {
+    if (!report) return;
+    Alert.alert(
+      'Selesaikan laporan?',
+      `Laporan "${report.title}" akan dipindahkan ke status Selesai.`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Selesaikan',
+          onPress: async () => {
+            setSubmitting(true);
+            try {
+              await resolveReportAsAdmin(report.id);
+              Alert.alert('Berhasil', 'Laporan telah diselesaikan.', [
+                { text: 'OK', onPress: () => nav.goBack() },
+              ]);
+            } catch (e) {
+              Alert.alert(
+                'Gagal menyelesaikan',
+                e instanceof Error ? e.message : 'Coba lagi.',
+              );
+            } finally {
+              setSubmitting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const onEdit = () => {
+    if (!report) return;
+    nav.navigate('AdminEditReport', { reportId: report.id });
   };
 
   if (loading) {
@@ -187,29 +255,83 @@ export default function AdminReviewScreen() {
           )}
 
           <SafeAreaView edges={['top']} style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-            <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+            <View style={{ paddingHorizontal: 16, paddingTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Pressable onPress={() => nav.goBack()} accessibilityRole="button">
                 {({ pressed }) => (
-                  <BlurView
-                    intensity={45}
-                    tint="light"
+                  <View
                     style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 16,
-                      backgroundColor: 'rgba(255,255,255,0.58)',
+                      width: 44,
+                      height: 44,
+                      borderRadius: 22,
+                      backgroundColor: 'rgba(255,255,255,0.88)',
                       borderWidth: 1,
-                      borderColor: 'rgba(255,255,255,0.82)',
+                      borderColor: 'rgba(255,255,255,0.96)',
                       alignItems: 'center',
                       justifyContent: 'center',
                       opacity: pressed ? 0.75 : 1,
+                      shadowColor: '#000000',
+                      shadowOpacity: 0.12,
+                      shadowRadius: 8,
+                      shadowOffset: { width: 0, height: 3 },
+                      elevation: 3,
                     }}
                   >
-                    <LinearGradient colors={['rgba(255,255,255,0.9)', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject} pointerEvents="none" />
                     <Feather name="arrow-left" size={18} color={COLORS.adminText} />
-                  </BlurView>
+                  </View>
                 )}
               </Pressable>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Pressable onPress={onEdit} disabled={submitting} accessibilityRole="button" accessibilityLabel="Edit laporan">
+                  {({ pressed }) => (
+                    <View
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: 'rgba(255,255,255,0.88)',
+                        borderWidth: 1,
+                        borderColor: 'rgba(255,255,255,0.96)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: submitting ? 0.5 : pressed ? 0.75 : 1,
+                        shadowColor: '#000000',
+                        shadowOpacity: 0.12,
+                        shadowRadius: 8,
+                        shadowOffset: { width: 0, height: 3 },
+                        elevation: 3,
+                      }}
+                    >
+                      <Feather name="edit-3" size={18} color={COLORS.admin} />
+                    </View>
+                  )}
+                </Pressable>
+
+                <Pressable onPress={onDelete} disabled={submitting} accessibilityRole="button" accessibilityLabel="Hapus laporan">
+                  {({ pressed }) => (
+                    <View
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: 'rgba(255,255,255,0.88)',
+                        borderWidth: 1,
+                        borderColor: 'rgba(255,255,255,0.96)',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: submitting ? 0.5 : pressed ? 0.75 : 1,
+                        shadowColor: '#000000',
+                        shadowOpacity: 0.12,
+                        shadowRadius: 8,
+                        shadowOffset: { width: 0, height: 3 },
+                        elevation: 3,
+                      }}
+                    >
+                      <Feather name="trash-2" size={18} color={COLORS.lost} />
+                    </View>
+                  )}
+                </Pressable>
+              </View>
             </View>
           </SafeAreaView>
 
@@ -426,6 +548,86 @@ export default function AdminReviewScreen() {
             ) : null}
           </View>
         </SafeAreaView>
+      ) : report.status === 'approved' ? (
+        <SafeAreaView
+          edges={['bottom']}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'rgba(255,255,255,0.64)',
+            borderTopWidth: 1,
+            borderTopColor: 'rgba(255,255,255,0.84)',
+          }}
+        >
+          <View style={{ padding: 16, flexDirection: 'row', gap: 12 }}>
+            <Pressable
+              onPress={onEdit}
+              disabled={submitting}
+              style={{ flex: 1 }}
+              accessibilityRole="button"
+            >
+              {({ pressed }) => (
+                <View
+                  style={{
+                    paddingVertical: 15,
+                    backgroundColor: 'rgba(255,255,255,0.7)',
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(13,148,136,0.28)',
+                    borderRadius: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'row',
+                    gap: 8,
+                    opacity: submitting ? 0.5 : pressed ? 0.82 : 1,
+                  }}
+                >
+                  <Feather name="edit-3" size={17} color={COLORS.admin} />
+                  <Text style={{ color: COLORS.adminText, fontSize: 13, fontWeight: '900' }}>
+                    Edit Data
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+
+            <Pressable
+              onPress={onResolve}
+              disabled={submitting}
+              style={{ flex: 1 }}
+              accessibilityRole="button"
+            >
+              {({ pressed }) => (
+                <View
+                  style={{
+                    paddingVertical: 15,
+                    backgroundColor: COLORS.resolved,
+                    borderRadius: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'row',
+                    gap: 8,
+                    opacity: submitting ? 0.5 : pressed ? 0.84 : 1,
+                    shadowColor: COLORS.resolved,
+                    shadowOpacity: 0.2,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 4,
+                  }}
+                >
+                  {submitting ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Feather name="check-circle" size={17} color="#FFFFFF" />
+                  )}
+                  <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '900' }}>
+                    Selesaikan
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
+        </SafeAreaView>
       ) : (
         <SafeAreaView
           edges={['bottom']}
@@ -461,7 +663,7 @@ export default function AdminReviewScreen() {
                 pointerEvents="none"
               />
               <Text style={{ fontSize: 13, fontWeight: '800', color: COLORS.textMuted }}>
-                Laporan ini sudah {report.status === 'approved' ? 'disetujui' : report.status === 'rejected' ? 'ditolak' : 'selesai'}.
+                Laporan ini sudah {report.status === 'rejected' ? 'ditolak' : 'selesai'}.
               </Text>
             </BlurView>
           </View>
