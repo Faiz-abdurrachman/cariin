@@ -163,7 +163,7 @@ export default function ChatRoomScreen() {
               if (nav.canGoBack()) {
                 nav.goBack();
               } else {
-                nav.navigate('Inbox');
+                nav.replace('Inbox');
               }
             }}
             accessibilityRole="button"
