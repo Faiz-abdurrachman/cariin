@@ -38,13 +38,17 @@ import {
   type ReportType,
 } from '@/utils/constants';
 
-type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreateFound'>;
+type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreate'>;
 
-export default function AdminCreateFoundScreen() {
+interface Props {
+  initialLost?: boolean;
+}
+
+export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
   const nav = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
 
-  const [reportType, setReportType] = useState<ReportType>('found');
+  const [reportType, setReportType] = useState<ReportType>(initialLost ? 'lost' : 'found');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<CategoryId | null>(null);

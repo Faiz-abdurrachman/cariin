@@ -182,13 +182,13 @@ export default function AdminDashboardScreen() {
                   {
                     text: 'Laporan Kehilangan',
                     onPress: () => {
-                      parentNav?.navigate('CreateTab', { screen: 'AdminCreateLost' });
+                      parentNav?.navigate('CreateTab', { screen: 'AdminCreate', params: { initialType: 'lost' } });
                     },
                   },
                   {
                     text: 'Laporan Penemuan',
                     onPress: () => {
-                      parentNav?.navigate('CreateTab', { screen: 'AdminCreateFound' });
+                      parentNav?.navigate('CreateTab', { screen: 'AdminCreate', params: { initialType: 'found' } });
                     },
                   },
                   { text: 'Batal', style: 'cancel' },

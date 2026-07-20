@@ -37,7 +37,7 @@ import {
   type ReportType,
 } from '@/utils/constants';
 
-type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreateLost'>;
+type Nav = StackNavigationProp<AdminCreateStackParamList, 'AdminCreate'>;
 
 export default function AdminCreateLostScreen() {
   const nav = useNavigation<Nav>();

@@ -90,8 +90,7 @@ export type AdminDashboardStackParamList = {
 };
 
 export type AdminCreateStackParamList = {
-  AdminCreateLost: undefined;
-  AdminCreateFound: undefined;
+  AdminCreate: { initialType?: 'lost' | 'found' } | undefined;
 };
 
 export type AdminChatStackParamList = {

@@ -24,8 +24,7 @@ import {
 
 import LiquidTabBar from '@/components/LiquidTabBar';
 import { useAuth } from '@/context/AuthContext';
-import AdminCreateFoundScreen from '@/screens/admin/AdminCreateFoundScreen';
-import AdminCreateLostScreen from '@/screens/admin/AdminCreateLostScreen';
+import AdminCreateReportScreen from '@/screens/admin/AdminCreateReportScreen';
 import AdminChangePasswordScreen from '@/screens/admin/AdminChangePasswordScreen';
 import AdminDashboardScreen from '@/screens/admin/AdminDashboardScreen';
 import AdminEditReportScreen from '@/screens/admin/AdminEditReportScreen';
@@ -60,8 +59,7 @@ const CreateStack = createStackNavigator<AdminCreateStackParamList>();
 function AdminCreateStackNavigator() {
   return (
     <CreateStack.Navigator screenOptions={{ headerShown: false }}>
-      <CreateStack.Screen name="AdminCreateLost" component={AdminCreateLostScreen} />
-      <CreateStack.Screen name="AdminCreateFound" component={AdminCreateFoundScreen} />
+      <CreateStack.Screen name="AdminCreate" component={AdminCreateReportScreen} />
     </CreateStack.Navigator>
   );
 }
@@ -207,7 +205,8 @@ function AdminTabs() {
           variant="admin"
           onCreatePress={() =>
             props.navigation.navigate('CreateTab', {
-              screen: 'AdminCreateLost',
+              screen: 'AdminCreate',
+              params: { initialType: 'lost' },
             })
           }
         />
@@ -241,8 +240,8 @@ function AdminTabs() {
         name="CreateTab"
         component={AdminCreateStackNavigator}
         options={({ route }) => {
-          const routeName = getFocusedRouteNameFromRoute(route) ?? 'AdminCreateLost';
-          const display = ['AdminCreateLost', 'AdminCreateFound'].includes(routeName) ? 'none' : 'flex';
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'AdminCreate';
+          const display = routeName === 'AdminCreate' ? 'none' : 'flex';
           return {
             tabBarStyle: { display },
             title: 'Buat',
