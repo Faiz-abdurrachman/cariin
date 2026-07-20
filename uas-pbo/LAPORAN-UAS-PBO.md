@@ -80,7 +80,7 @@ export abstract class User {
 }
 ```
 
-`new User()` akan **error** — `User` hanya blueprint. Objek nyata dibuat lewat subclass `Mahasiswa` atau `Admin`.
+  `new User()` akan **error** — `User` hanya blueprint. Objek nyata dibuat lewat subclass `Mahasiswa` atau `Admin`.
 
 ### 2.2 Encapsulation (Enkapsulasi)
 

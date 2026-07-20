@@ -15,21 +15,6 @@
 **Faiz Abdurrachman**
 (241111021)
 
-**Irham Zubaidi Alhuda**
-(241111006)
-
-**Galih Witradika**
-(241111013)
-
-**Ibnul Mubarok**
-(241111026)
-
-**Imroatu Zakkiyah**
-(241111032)
-
-**Aldo Yulian Widyadewangga**
-(241111037)
-
 ---
 
 **PROGRAM STUDI INFORMATIKA**
@@ -47,9 +32,9 @@ Berdasarkan survei yang dilakukan terhadap 39 mahasiswa UNU Yogyakarta, ditemuka
 
 Dari sinilah Cari.In lahir. Cari.In adalah aplikasi mobile Lost & Found yang dibangun khusus untuk mahasiswa UNU Yogyakarta. Aplikasi ini menyediakan platform terpusat di mana mahasiswa bisa melaporkan barang hilang atau temuan, mencari barang di feed publik yang sudah terfilter, dan berkomunikasi dengan pelapor atau penemu melalui fitur chat in-app — semuanya tanpa harus bertukar nomor HP pribadi.
 
-Dari sisi teknis, aplikasi dikembangkan menggunakan React Native dengan Expo SDK 54, TypeScript strict mode untuk keamanan tipe data, NativeWind v4 untuk styling yang konsisten, dan React Navigation v7 yang mendukung tiga jenis navigasi sekaligus (Stack, Bottom Tab, dan Drawer). Untuk backend, digunakan Supabase yang menyediakan autentikasi, database PostgreSQL dengan Row Level Security, penyimpanan file, dan fitur realtime untuk chat.
+Dari sisi teknis, aplikasi dikembangkan menggunakan React Native 0.81.5 dengan Expo SDK 54, TypeScript 5.9 strict mode untuk keamanan tipe data, style React Native dengan design tokens serta penggunaan NativeWind secara selektif, dan React Navigation v7 yang mendukung tiga jenis navigasi sekaligus (Stack, Bottom Tab, dan Drawer). Untuk backend, digunakan Supabase yang menyediakan autentikasi, database PostgreSQL dengan Row Level Security, penyimpanan file, dan fitur realtime untuk chat.
 
-Hasil pengujian menunjukkan bahwa aplikasi berjalan dengan baik: TypeScript type checking menghasilkan 0 error, ESLint 0 warning, dan expo-doctor memberikan skor 18/18. Seluruh 26 layar yang dirancang di prototype HTML berhasil diimplementasikan dan berfungsi sesuai spesifikasi. Aplikasi juga berhasil di-build menjadi APK Android berukuran 76 MB melalui EAS Build.
+Pemeriksaan statis terakhir pada 20 Juli 2026 menghasilkan 0 error TypeScript, 0 error maupun warning ESLint, serta 18/18 pemeriksaan Expo Doctor lulus tanpa issue. Source aplikasi mencakup 30 file screen TSX, termasuk screen autentikasi, mahasiswa, admin, dan wrapper untuk fitur bersama. EAS Build production dari konfigurasi final berhasil menghasilkan APK valid berukuran 80.572.407 byte (76,84 MiB); manifest APK tidak memuat permission `RECORD_AUDIO`. APK tersebut belum diinstal di perangkat fisik. Project Supabase berhasil dipulihkan menjadi `ACTIVE_HEALTHY`; migration fungsi, privilege, RLS, trigger, Storage, dan Realtime berhasil. Smoke test SQL serta client API dengan dua session akun nyata membuktikan Auth, RPC, RLS, Storage, Realtime, dan trigger berjalan, termasuk penolakan akses lintas-user. Redirect Auth sudah tersimpan dan request recovery tercatat mengirim email, tetapi penyelesaian reset lewat deep-link belum diuji. Duplikasi NIM juga sudah dinormalisasi dan unique index NIM aktif; pengujian UI dua perangkat masih terbuka.
 
 ---
 
@@ -61,6 +46,20 @@ Hasil pengujian menunjukkan bahwa aplikasi berjalan dengan baik: TypeScript type
 - Daftar Gambar
 - Daftar Lampiran
 - BAB I Pendahuluan
+---
+
+**PROGRAM STUDI INFORMATIKA**
+**FAKULTAS TEKNOLOGI INFORMASI**
+**UNIVERSITAS NAHDLATUL ULAMA YOGYAKARTA**
+**2026**
+
+---
+
+# RINGKASAN EKSEKUTIF
+
+Kehilangan barang di lingkungan kampus adalah masalah yang hampir setiap mahasiswa pernah alami. Mulai dari kunci kendaraan yang tertinggal di parkiran, charger yang ketinggalan di ruang kelas, sampai dompet yang jatuh di selasar kampus. Sayangnya, selama ini penanganan barang hilang dan temuan di UNU Yogyakarta masih dilakukan secara manual. Mahasiswa yang kehilangan barang biasanya bertanya ke satpam atau menyebar informasi di grup WhatsApp angkatan. Cara-cara ini punya banyak kelemahan: informasi cepat terkubur oleh obrolan lain, tidak ada sistem pencarian yang terstruktur, tidak ada verifikasi identitas sehingga rawan klaim palsu, dan nomor HP pribadi jadi terekspos di grup publik.
+
+
 - BAB II Tinjauan Pustaka
 - BAB III Metode Perancangan
 - BAB IV Hasil dan Pembahasan
@@ -75,16 +74,22 @@ Hasil pengujian menunjukkan bahwa aplikasi berjalan dengan baik: TypeScript type
 | No | Nama Tabel | Halaman |
 |----|-----------|---------|
 | 1 | Data Survei Mahasiswa UNU Yogyakarta | — |
-| 2 | Technology Stack | — |
-| 3 | Database Schema | — |
-| 4 | Perbandingan Framework Mobile | — |
-| 5 | Perbandingan Backend: Supabase vs Firebase | — |
-| 6 | Tahapan Pengembangan per Fase | — |
-| 7 | Kebutuhan Fungsional | — |
-| 8 | RLS Policy Matrix | — |
-| 9 | Perbandingan dengan Sistem Sejenis | — |
-| 10 | Hasil Pengujian Fungsional | — |
-| 11 | Hasil Pengujian Statis | — |
+| 2 | Perbandingan Framework Mobile | — |
+| 3 | Perbandingan Backend: Supabase vs Firebase | — |
+| 4 | Tahapan Pengembangan per Fase | — |
+| 5 | Kebutuhan Fungsional | — |
+| 6 | Technology Stack | — |
+| 7 | Fitur Autentikasi | — |
+| 8 | Kategori Barang | — |
+| 9 | Perbedaan Form Lost dan Found | — |
+| 10 | Komponen Teknis Chat | — |
+| 11 | Jenis Notifikasi | — |
+| 12 | Daftar Service | — |
+| 13 | Palet Warna | — |
+| 14 | Hasil Pengujian Statis | — |
+| 15 | Rencana Pengujian Fungsional | — |
+| 16 | Status Pengujian Build | — |
+| 17 | Dokumentasi Kegiatan | — |
 
 ---
 
@@ -121,36 +126,9 @@ Hasil pengujian menunjukkan bahwa aplikasi berjalan dengan baik: TypeScript type
 # DAFTAR LAMPIRAN
 
 | No | Lampiran |
-|----|---------|  Docs: man:bluetoothd(8)
-   Main PID: 36670 (bluetoothd)
-     Status: "Running"
-      Tasks: 1 (limit: 8528)
-     Memory: 1M (peak: 2.3M)
-        CPU: 43ms
-     CGroup: /system.slice/bluetooth.service
-             └─36670 /usr/lib/bluetooth/bluetoothd
-
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…ex_1
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…ex_0
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…ream
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…plex
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…s_05
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…s_05
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…plex
-Jul 16 04:43:10 faiz bluetoothd[36670]: Endpoint registered: sender=:1.72 path=/M…plex
-Jul 16 04:43:36 faiz bluetoothd[36670]: Failed to set mode: Failed (0x03)
-Jul 16 04:43:44 faiz bluetoothd[36670]: Failed to set mode: Failed (0x03)
-Hint: Some lines were ellipsized, use -l to show in full.
-[faiz@faiz ~]$ rfkill list
-0: hci0: Bluetooth
-	Soft blocked: yes
-	Hard blocked: no
-1: phy0: Wireless LAN
-	Soft blocked: no
-	Hard blocked: no
-[faiz@faiz ~]$ lsusb
+|----|----------|
 | 1 | Link Repository GitHub |
-| 2 | APK Production |
+| 2 | Status dan Link APK |
 | 3 | Video Demo Aplikasi (3-5 menit) |
 | 4 | Slide Presentasi |
 | 5 | Dokumentasi Kegiatan per Fase |
@@ -223,7 +201,7 @@ Berdasarkan latar belakang yang telah diuraikan, rumusan masalah dalam proyek in
 Sesuai dengan rumusan masalah yang telah ditetapkan, tujuan dari proyek ini adalah:
 
 1. Merancang dan membangun aplikasi mobile Cari.In sebagai platform Lost & Found terpusat yang dapat diakses oleh seluruh mahasiswa UNU Yogyakarta melalui smartphone Android dan iOS.
-2. Menerapkan sistem autentikasi berbasis domain email kampus (@student.unu-jogja.ac.id) sehingga hanya mahasiswa dan staf UNU Yogyakarta yang terverifikasi yang dapat menggunakan aplikasi.
+2. Menerapkan registrasi mahasiswa berbasis domain email kampus (@student.unu-jogja.ac.id), sedangkan akun admin dibuat melalui jalur server dengan metadata role yang tidak dapat diubah oleh client.
 3. Mengimplementasikan fitur chat realtime berbasis Supabase Realtime yang memungkinkan komunikasi langsung antara pelapor dan penemu tanpa mengekspos data kontak pribadi.
 4. Merancang sistem moderasi admin dengan alur kerja yang jelas: mahasiswa membuat laporan → status "pending" → admin review → approve/reject → notifikasi otomatis ke mahasiswa.
 5. Memastikan kualitas kode melalui TypeScript strict mode dengan target 0 error type checking, ESLint 0 warning, dan pengujian fungsional manual di perangkat fisik.
@@ -244,7 +222,7 @@ Sistem mengelola lima jenis data utama: data profil pengguna (profiles), data la
 Alur utama aplikasi adalah: mahasiswa membuat laporan → laporan masuk dalam status "pending" → admin memeriksa dan memoderasi laporan → laporan di-approve atau di-reject → notifikasi dikirim ke mahasiswa → laporan yang di-approve muncul di feed publik.
 
 **4. Output yang Dihasilkan**
-Output dari proyek ini adalah aplikasi Android dalam bentuk APK (Android Package Kit) dan aplikasi iOS yang bisa diakses melalui Expo Go. Keduanya dibangun dari satu kodebase React Native yang sama.
+Output proyek adalah satu kodebase React Native untuk Android dan iOS. Selama pengembangan aplikasi dijalankan melalui Expo Go; APK Android melalui EAS Build menjadi artefak final yang harus dibuat dan diuji sebelum penyerahan.
 
 **5. Metode Pengembangan**
 Proyek dikembangkan menggunakan metode Agile dengan pendekatan iteratif per fase. Setiap fase memiliki scope, deliverable, dan kriteria verifikasi yang jelas sebelum lanjut ke fase berikutnya.
@@ -253,13 +231,13 @@ Proyek dikembangkan menggunakan metode Agile dengan pendekatan iteratif per fase
 Aplikasi menggunakan arsitektur three-layer (Presentation, Domain/Service, Data) dengan penerapan Object-Oriented Programming pada layer model domain. Detail OOP mencakup 4 pilar: abstraction, encapsulation, inheritance, dan polymorphism.
 
 **7. Perangkat Keras**
-Aplikasi ditargetkan untuk smartphone dengan minimal Android 8 (Oreo) atau iOS 15. Perangkat pengembangan yang digunakan adalah laptop dengan spesifikasi minimal Intel Core i5, RAM 8 GB, dan sistem operasi macOS/Windows/Linux.
+Aplikasi ditargetkan untuk smartphone Android dan iOS yang didukung oleh Expo SDK 54. Batas minimum versi sistem operasi mengikuti konfigurasi native yang dihasilkan Expo dan perlu diverifikasi kembali pada artefak build final.
 
 **8. Perangkat Lunak**
 Proyek dikembangkan menggunakan Node.js 18+, Expo SDK 54, Visual Studio Code sebagai IDE, dan Supabase sebagai Backend-as-a-Service. Tidak menggunakan backend server custom.
 
 **9. Teknik Pengujian**
-Pengujian dilakukan dalam dua kategori: pengujian statis menggunakan TypeScript type checker dan ESLint, serta pengujian fungsional manual yang dilakukan di perangkat fisik iPhone melalui Expo Go.
+Pengujian dibagi menjadi pengujian statis menggunakan TypeScript type checker dan ESLint, serta pengujian fungsional manual melalui Expo Go. Hasil hanya dinyatakan berhasil setelah checklist pengujian diisi dan bukti eksekusinya disimpan.
 
 ---
 
@@ -269,7 +247,7 @@ Pengujian dilakukan dalam dua kategori: pengujian statis menggunakan TypeScript 
 
 React Native adalah framework pengembangan aplikasi mobile yang dikembangkan oleh Meta (sebelumnya Facebook). Framework ini memungkinkan pengembang menulis kode aplikasi mobile menggunakan JavaScript atau TypeScript, yang kemudian akan dirender menggunakan komponen native asli dari masing-masing platform (Android dan iOS). Konsep utamanya adalah "Learn Once, Write Anywhere" — sekali belajar React Native, pengembang bisa membuat aplikasi untuk dua platform sekaligus.
 
-Salah satu keunggulan utama React Native dibandingkan pendekatan hybrid lainnya adalah penggunaan bridge yang menghubungkan kode JavaScript dengan komponen native. Ini berarti aplikasi React Native tidak berjalan di dalam WebView seperti pendekatan Cordova/PhoneGap, melainkan benar-benar menggunakan komponen UI native seperti UIView (iOS) dan View (Android). Hasilnya, performa aplikasi mendekati aplikasi native murni.
+Salah satu keunggulan React Native dibandingkan pendekatan hybrid berbasis WebView adalah kemampuannya merender komponen UI native. Project Cari.In mengaktifkan New Architecture React Native, sehingga komunikasi JavaScript dan native menggunakan mekanisme modern React Native seperti JSI, bukan bergantung pada penjelasan bridge lama sebagai satu-satunya jalur komunikasi.
 
 Expo, di sisi lain, adalah platform pengembangan yang dibangun di atas React Native. Expo menyediakan managed workflow yang sangat memudahkan proses development — pengembang tidak perlu menyentuh kode native sama sekali untuk mengakses fitur-fitur seperti kamera, galeri, notifikasi, atau sensor. Expo juga menyediakan tooling lengkap seperti Expo Go untuk testing di perangkat fisik, EAS Build untuk build otomatis di cloud, dan update over-the-air tanpa harus melalui proses review toko aplikasi.
 
@@ -292,7 +270,7 @@ Supabase adalah platform backend open-source yang sering disebut sebagai alterna
 
 Keputusan untuk memilih Supabase dibandingkan Firebase didasarkan pada beberapa pertimbangan teknis. Yang pertama dan paling penting adalah kebutuhan akan database relasional. Aplikasi Cari.In memiliki entitas-entitas yang saling berhubungan: satu user bisa punya banyak laporan, satu laporan bisa punya banyak percakapan, satu percakapan bisa punya banyak pesan. Relasi one-to-many ini jauh lebih natural direpresentasikan dalam tabel relasional daripada koleksi dokumen NoSQL.
 
-Kedua, Supabase menyediakan Row Level Security (RLS) secara native di level database. RLS memungkinkan kita mendefinisikan kebijakan akses data per baris — misalnya, "user hanya bisa melihat laporan miliknya sendiri" atau "admin bisa melihat semua laporan". Kebijakan ini ditulis langsung dalam SQL dan di-enforce oleh database, bukan di middleware aplikasi. Ini memberikan lapisan keamanan tambahan yang tidak bisa di-bypass bahkan jika ada celah di aplikasi.
+Kedua, Supabase menyediakan Row Level Security (RLS) secara native di level database. RLS memungkinkan kebijakan akses ditentukan per baris, sedangkan privilege kolom dan RPC digunakan untuk operasi sensitif. Pada Cari.In, client mahasiswa tidak memperoleh akses langsung untuk mengubah kolom `role`, `status`, atau data moderasi; perubahan status dilakukan melalui RPC yang memverifikasi pemilik atau role admin.
 
 Ketiga, Supabase memiliki fitur Realtime yang menggunakan WebSocket untuk mendengarkan perubahan database. Ini sangat berguna untuk fitur chat — setiap kali ada pesan baru masuk, database secara otomatis mengirim notifikasi ke klien yang sedang terhubung, tanpa perlu polling atau koneksi WebSocket terpisah.
 
@@ -303,9 +281,9 @@ Ketiga, Supabase memiliki fitur Realtime yang menggunakan WebSocket untuk menden
 | Tipe Database | PostgreSQL (Relasional) | Firestore (NoSQL) |
 | Autentikasi | Email, Google, GitHub, dll | Email, Google, Apple, dll |
 | Realtime | WebSocket (CDC) | WebSocket (Firestore) |
-| Storage | S3-compatible (Backblaze B2) | Google Cloud Storage |
-| Row Level Security | ✅ Native PostgreSQL | ❌ Via Firestore Rules |
-| Harga | Free tier: 2 GB database, 1 GB storage | Free tier: 1 GB transfer, terbatas |
+| Storage | Object Storage terkelola | Google Cloud Storage |
+| Kontrol akses data | PostgreSQL RLS + privilege SQL | Firestore Security Rules |
+| Harga | Memiliki free tier sesuai ketentuan penyedia | Memiliki free tier sesuai ketentuan penyedia |
 | Open Source | ✅ Ya (dapat self-host) | ❌ Tidak |
 
 ---
@@ -362,11 +340,11 @@ Proyek dibagi menjadi 7 fase pengembangan yang berjalan secara berurutan namun d
 |------|------------|--------|--------|
 | FASE 1 | Setup project, konfigurasi TypeScript strict, NativeWind, Supabase client | 3 hari | ✅ Selesai |
 | FASE 2 | Navigasi (Stack + Tab + Drawer), AuthContext, routing berdasarkan role | 4 hari | ✅ Selesai |
-| FASE 3 | Auth screens: Splash, RoleSelection, Login, Register, ForgotPassword | 4 hari | ✅ Selesai |
+| FASE 3 | Auth screens: Splash, RoleSelection, Login, Register, ForgotPassword, ResetPassword | 4 hari | ✅ Implementasi selesai |
 | FASE 4 | Core mahasiswa: Home, Detail, Create, MyPosts, Profile (5 screen utama) | 7 hari | ✅ Selesai |
 | FASE 4.5 | Chat realtime + notifikasi in-app (Inbox, ChatRoom, Notifications) | 5 hari | ✅ Selesai |
 | FASE 5 | Admin: Dashboard, Review, All Reports, Walk-in, Drawer navigator | 5 hari | ✅ Selesai |
-| FASE 6 | Polish: Settings, Help, UserProfile, bug fixes, EAS Build | 3 hari | ✅ Selesai |
+| FASE 6 | Polish: Settings, Help, UserProfile, hardening RLS, bug fixes, EAS Build | 3 hari | 🟡 Berjalan; APK berhasil, testing final belum |
 
 ### B.1 Analisis Kebutuhan (FASE 1)
 
@@ -422,7 +400,9 @@ Database dirancang dengan 5 tabel utama yang saling berelasi:
                                                └──────────────┘
 ```
 
-Setiap tabel dilindungi oleh Row Level Security (RLS) yang memastikan pengguna hanya bisa mengakses data yang menjadi haknya.
+**[Gambar 1: ERD Database Cari.In]**
+
+File `supabase-schema.sql` mendefinisikan Row Level Security (RLS) untuk kelima tabel dan memadukannya dengan pembatasan privilege kolom. Setelah schema terbaru diterapkan ke project Supabase, pengguna biasa tidak dapat mengubah `profiles.role`, `reports.status`, data moderasi, identitas peserta conversation, maupun isi pesan lama. Operasi sensitif seperti approve/reject dan mark resolved menggunakan RPC yang memvalidasi role atau kepemilikan.
 
 **Perancangan Navigasi**
 
@@ -432,20 +412,23 @@ Navigasi aplikasi dirancang dengan struktur bercabang berdasarkan status autenti
 RootNavigator
 ├── [Loading] → LoadingScreen
 ├── [Not Authenticated] → AuthNavigator (Stack)
-│     └── Splash → RoleSelection → Login / Register / ForgotPassword
+│     └── Splash → RoleSelection → Login / Register / ForgotPassword / ResetPassword
 ├── [Role: Mahasiswa] → MainNavigator (Bottom Tab)
 │     ├── HomeTab (HomeFeed, Detail, ChatRoom, UserProfile)
 │     ├── ChatTab (Inbox, ChatRoom, UserProfile, Notifications)
 │     ├── CreateTab (FAB button → CreateModal)
 │     ├── MyPostsTab (MyPosts, EditPost, Detail)
-│     └── ProfileTab (Profile, Settings, Help, UserProfile)
+│     └── ProfileTab (Profile, Settings, Help, UserProfile, ChatRoom, Detail)
 └── [Role: Admin] → AdminNavigator (Drawer → Bottom Tab)
       ├── DashboardTab (Dashboard, Review)
       ├── ReportsTab (Semua Laporan)
       ├── CreateTab (FAB button → CreateLost/CreateFound)
       ├── ChatTab (Inbox, ChatRoom)
-      └── AdminProfileTab (Profile, Logout)
+      └── AdminProfileTab (Profile, ChangePassword, Logout)
 ```
+
+**[Gambar 2: Navigation Tree Mahasiswa]**
+**[Gambar 3: Navigation Tree Admin]**
 
 ### B.3 Implementasi (FASE 3-6)
 
@@ -453,11 +436,11 @@ Implementasi dilakukan secara bertahap per fase. Setiap fase mencakup pembuatan 
 
 ### B.4 Pengujian
 
-Pengujian dilakukan dalam dua tahap. Tahap pertama adalah pengujian statis menggunakan TypeScript type checking (`tsc --noEmit`) dan ESLint untuk memastikan kualitas kode. Tahap kedua adalah pengujian fungsional manual dengan menguji setiap fitur langsung di perangkat melalui Expo Go.
+Strategi pengujian dibagi dalam dua tahap. Tahap pertama, yang sudah dijalankan, adalah pemeriksaan statis menggunakan TypeScript (`tsc --noEmit`) dan ESLint. Tahap kedua adalah pengujian fungsional manual melalui Expo Go menggunakan checklist `TESTING-MANUAL.md`.
 
-Pengujian statis memastikan tidak ada type error, tidak ada variable yang digunakan tanpa dideklarasikan, dan tidak ada import yang salah.
+Pengujian statis memeriksa type error dan pelanggaran lint pada source yang dicakup konfigurasi. Pemeriksaan ini tidak menggantikan pengujian runtime.
 
-Pengujian fungsional mencakup seluruh alur: registrasi, login, melihat feed, membuat laporan, chat, notifikasi, dan moderasi admin. Rincian hasil pengujian disajikan pada Bab IV.
+Checklist fungsional mencakup registrasi, login, feed, pembuatan laporan, chat dua akun, notifikasi, profil, dan moderasi admin. Status bukti setiap skenario disajikan pada Bab IV.
 
 ---
 
@@ -467,26 +450,26 @@ Pengujian fungsional mencakup seluruh alur: registrasi, login, melihat feed, mem
 
 ### A.1 Technology Stack
 
-**Tabel 4. Technology Stack yang Digunakan**
+**Tabel 6. Technology Stack yang Digunakan**
 
 | Layer | Teknologi | Versi | Fungsi |
 |-------|-----------|-------|--------|
-| **Framework** | React Native (Expo Managed) | SDK 54 | Kerangka aplikasi mobile |
+| **Framework** | React Native + Expo | RN 0.81.5 / SDK 54 | Kerangka aplikasi mobile |
 | **Language** | TypeScript | 5.9 (strict) | Type safety & OOP |
-| **UI/Styling** | NativeWind v4 + Custom Design System | — | Styling utilitas |
+| **UI/Styling** | React Native styles, design tokens, NativeWind selektif | NativeWind 4.2 | Styling antarmuka |
 | **Navigation** | React Navigation | v7 | Stack + Tab + Drawer |
 | **State Management** | Context API + Zustand | v5 | Global state |
 | **Backend** | Supabase | — | Auth + DB + Storage + Realtime |
-| **Build** | EAS Build | v20.4.0 | Android APK build |
+| **Build** | EAS Build | Konfigurasi `eas.json` | APK production final-config Android |
 | **Lint** | ESLint v9 (flat config) + Prettier | — | Kualitas kode |
 
 ### A.2 Arsitektur Three-Layer
 
 Aplikasi ini dibangun menggunakan arsitektur three-layer yang memisahkan tanggung jawab menjadi tiga lapisan. Setiap lapisan hanya berkomunikasi dengan lapisan di bawahnya melalui interface yang sudah ditentukan.
 
-**[Gambar 1: Arsitektur Three-Layer Cari.In]**
+**[Gambar 4: Arsitektur Three-Layer Cari.In]**
 
-Lapisan pertama adalah **Presentation Layer**, yang terdiri dari 26 screen dan 14 komponen reusable. Lapisan ini bertanggung jawab menangani interaksi pengguna dan menampilkan data. Yang menarik, presentation layer sama sekali tidak memiliki akses langsung ke database — semua operasi data dilakukan melalui service layer.
+Lapisan pertama adalah **Presentation Layer**, yang pada source terakhir terdiri dari 30 file screen TSX dan 14 file komponen. Angka tersebut mencakup screen bersama, wrapper navigasi, dan komponen yang dipakai oleh lebih dari satu alur. Screen bertanggung jawab menangani interaksi dan rendering, sedangkan akses Supabase ditempatkan pada service layer.
 
 Lapisan kedua adalah **Domain / Service Layer**, yang menjadi jembatan antara UI dan database. Lapisan ini terdiri dari beberapa komponen:
 
@@ -503,14 +486,14 @@ Meskipun ini adalah laporan Mobile Programming, penerapan OOP cukup signifikan d
 - `Mahasiswa extends User` — subclass untuk role mahasiswa
 - `Admin extends User` — subclass untuk role admin, dengan method tambahan `approveReport()` dan `rejectReport()`
 
-**[Gambar 2: Class Diagram User (UML)]**
+**[Gambar 5: Class Diagram User (UML)]**
 
 **Hierarki Report:**
 - `ReportModel` (abstract class) — class induk dengan field `_title`, `_category`, `_location`
 - `LostReport extends ReportModel` — untuk laporan kehilangan
 - `FoundReport extends ReportModel` — untuk laporan temuan, dengan tambahan field `_custodyPoint`
 
-**[Gambar 3: Class Diagram Report (UML)]**
+**[Gambar 6: Class Diagram Report (UML)]**
 
 Factory pattern digunakan untuk memilih subclass yang tepat saat runtime. Di `AuthContext`, fungsi `createUserModel()` membuat objek `Mahasiswa` atau `Admin` tergantung role pengguna yang login. Demikian pula di `CreateReportScreen`, fungsi `createReportModel()` membuat `LostReport` atau `FoundReport` tergantung tipe laporan yang dipilih.
 
@@ -520,34 +503,36 @@ Factory pattern digunakan untuk memilih subclass yang tepat saat runtime. Di `Au
 
 Sistem autentikasi merupakan gerbang utama aplikasi. Dibangun menggunakan **Supabase Auth** dengan metode email/password. Ada beberapa keputusan teknis yang diambil selama pengembangan fitur ini.
 
-**Pertama, validasi domain email.** Tidak semua email bisa mendaftar — hanya yang memiliki domain `@student.unu-jogja.ac.id` yang diterima. Ini adalah Unique Value Proposition (UVP) utama Cari.In. Validasi dilakukan di client-side untuk memberikan feedback cepat, dan akan diverifikasi ulang saat registrasi di Supabase. Pendekatan ini dipilih karena:
+**Pertama, validasi domain email.** Registrasi mahasiswa hanya menerima domain `@student.unu-jogja.ac.id`. Validasi dilakukan di client-side dengan `endsWith()` untuk memberikan feedback cepat, lalu trigger `handle_new_user` pada database memeriksa domain kembali. Akun admin harus dibuat melalui jalur server menggunakan app metadata, sehingga metadata client tidak dapat dipakai untuk menaikkan role. Pendekatan ini dipilih karena:
 
 - Mahasiswa UNU Yogyakarta memang hanya punya email dengan domain tersebut
-- Mencegah akun palsu dari luar kampus
+- Mengurangi pendaftaran akun mahasiswa dari luar domain kampus
 - Memudahkan verifikasi identitas saat klaim barang
 
 **Kedua, role-based routing.** Setelah login, sistem membaca kolom `role` dari tabel `profiles`. Berdasarkan nilai role tersebut, aplikasi mengarahkan user ke navigasi yang berbeda:
 
 - Role `mahasiswa` → `MainNavigator` (Bottom Tab dengan 5 menu)
 - Role `admin` → `AdminNavigator` (Drawer + Bottom Tab)
-- Role belum terdeteksi → `AuthNavigator` (halaman login)
+- Profile masih dimuat → role sementara diinferensikan dari domain session; setelah profile tersedia, nilai `profiles.role` menjadi sumber utama
 
 Proses ini di-handle oleh `AuthContext.tsx` yang menjadi pusat state autentikasi. Context ini menyimpan session, user profile, dan role, serta menyediakan method login, register, logout, dan reset password.
 
-**Ketiga, session persistence.** Token JWT dari Supabase disimpan menggunakan `expo-secure-store` — bukan AsyncStorage biasa. Ini penting karena SecureStore menyimpan data terenkripsi di Keychain (iOS) / Keystore (Android). Jadi meskipun HP hilang, token login orang lain tetap aman.
+**Ketiga, session persistence.** Pada Android dan iOS, token session Supabase disimpan menggunakan `expo-secure-store`, yang memanfaatkan penyimpanan aman platform. Untuk preview web digunakan fallback AsyncStorage. SecureStore mengurangi risiko penyimpanan token plaintext, tetapi keamanan perangkat tetap bergantung pada kunci layar dan keamanan akun pengguna.
 
-**Tabel Fitur Autentikasi**
+**Tabel 7. Fitur Autentikasi**
 
 | Fitur | Implementasi | Status |
 |-------|--------------|--------|
-| Register dengan validasi domain | Validasi regex `@student.unu-jogja.ac.id` | ✅ |
+| Register dengan validasi domain | `endsWith()` di client + trigger database | ✅ Diimplementasikan |
 | Login email/password | Supabase `signInWithPassword` | ✅ |
-| Forgot password | Supabase `resetPasswordForEmail` | ✅ |
+| Forgot password | Email recovery + deep-link `cariin://reset-password` + update password | ✅ Diimplementasikan |
 | Session restore | SecureStore + AuthContext | ✅ |
 | Logout | `supabase.auth.signOut()` + clear state | ✅ |
 | Role-based redirect | Otomatis ke MainNavigator / AdminNavigator | ✅ |
 
-**[Gambar 8: Screenshot Login Screen]**
+**[Gambar 7: Screenshot Splash Screen]**
+**[Gambar 8: Screenshot Role Selection]**
+**[Gambar 9: Screenshot Login Screen]**
 
 ---
 
@@ -555,16 +540,16 @@ Proses ini di-handle oleh `AuthContext.tsx` yang menjadi pusat state autentikasi
 
 ### Feed (HomeScreen)
 
-Halaman utama mahasiswa menampilkan daftar laporan publik yang sudah di-approve oleh admin. Implementasi menggunakan **FlatList** dari React Native dengan beberapa optimasi:
+Halaman utama mahasiswa menampilkan daftar laporan publik berstatus `approved` atau `resolved`. Implementasi menggunakan **FlatList** dari React Native dengan beberapa optimasi:
 
 - **Pull-to-refresh:** User bisa tarik ke bawah untuk reload data
 - **Search debounce 300ms:** Setiap input pencarian ditunda 300ms sebelum query dikirim, mencegah request berlebihan
-- **Filter:** Tiga jenis filter — tipe (Semua/Hilang/Ditemukan), kategori (8 kategori), dan keyword search
+- **Filter:** Tiga jenis filter — tipe (Semua/Hilang/Ditemukan), kategori (8 kategori), dan pencarian pada judul, lokasi, atau deskripsi
 - **Zustand store:** Data feed disimpan di `feedStore` menggunakan Zustand, bukan React state biasa. Ini memungkinkan data tetap ada meskipun user navigasi antar screen
 
 Filter kategori menggunakan komponen `ScrollView` horizontal dengan chip yang bisa dipilih. Setiap kategori memiliki ikon MaterialCommunityIcons yang berbeda:
 
-**Tabel Kategori Barang**
+**Tabel 8. Kategori Barang**
 
 | Kategori | Icon MaterialCommunityIcons |
 |----------|-----------------------------|
@@ -577,21 +562,21 @@ Filter kategori menggunakan komponen `ScrollView` horizontal dengan chip yang bi
 | Buku/ATK | `book-open-page-variant-outline` |
 | Lainnya | `dots-horizontal` |
 
-**[Gambar 9: Screenshot Home Feed]**
+**[Gambar 10: Screenshot Home Feed]**
 
 ### Detail (DetailReportScreen)
 
-Halaman detail laporan menampilkan informasi lengkap: foto ukuran penuh (320px height), badge status dengan warna berbeda sesuai status, badge kategori dengan ikon, lokasi, deskripsi, dan informasi pelapor.
+Halaman detail laporan menampilkan foto utama dengan tinggi 320px, badge status, label kategori, lokasi, deskripsi, dan informasi pelapor.
 
-Salah satu tantangan teknis di sini adalah **Pressable styling**. Di React Native versi yang digunakan (0.81), ada issue dimana `Pressable` dengan `style={({pressed}) => ({...})}` (function-form style) sering broken — tombol jadi invisible, Image collapse. Solusinya: pake **children-as-function pattern**:
+Salah satu pola UI yang digunakan project adalah **children-as-function** pada `Pressable`. Pola ini memisahkan area sentuh dari `View` visual dan memudahkan pengaturan opacity ketika tombol ditekan:
 
 ```typescript
-// ❌ JANGAN — sering broken di RN 0.81
+// Alternatif function-form pada prop style
 <Pressable style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
   <Text>Submit</Text>
 </Pressable>
 
-// ✅ PAKAI INI — children-as-function
+// Pola yang dipilih project: children-as-function
 <Pressable onPress={...}>
   {({ pressed }) => (
     <View style={{ opacity: pressed ? 0.85 : 1 }}>
@@ -601,7 +586,7 @@ Salah satu tantangan teknis di sini adalah **Pressable styling**. Di React Nativ
 </Pressable>
 ```
 
-**[Gambar 10: Screenshot Detail Laporan]**
+**[Gambar 11: Screenshot Detail Laporan]**
 
 ---
 
@@ -609,7 +594,7 @@ Salah satu tantangan teknis di sini adalah **Pressable styling**. Di React Nativ
 
 Form pembuatan laporan menangani dua tipe sekaligus: **Lost** (Hilang) dan **Found** (Temuan) dalam satu komponen `CreateReportScreen.tsx`. Pemilihan tipe dilakukan melalui toggle switch di bagian atas form.
 
-**Perbedaan form Lost vs Found:**
+**Tabel 9. Perbedaan Form Lost dan Found**
 
 | Field | Lost (Hilang) | Found (Temuan) |
 |-------|---------------|----------------|
@@ -629,8 +614,10 @@ Form pembuatan laporan menangani dua tipe sekaligus: **Lost** (Hilang) dan **Fou
 
 Pendekatan `base64 → Uint8Array` dipilih karena di lingkungan React Native (Hermes engine), `fetch(uri) → blob()` sering bermasalah untuk local file URI di Android.
 
-**[Gambar 11: Screenshot Create Report (Lost)]**
-**[Gambar 12: Screenshot Create Report (Found)]**
+Bucket dan policy Storage dibuat oleh `supabase-schema.sql`. Operasi upload, update, dan delete pada bucket foto dibatasi ke folder pertama yang sama dengan UUID user terautentikasi.
+
+**[Gambar 12: Screenshot Create Report (Lost)]**
+**[Gambar 13: Screenshot Create Report (Found)]**
 
 ---
 
@@ -651,6 +638,8 @@ User A kirim pesan
 
 ### Komponen Teknis
 
+**Tabel 10. Komponen Teknis Chat**
+
 | Komponen | File | Fungsi |
 |----------|------|--------|
 | Service | `chat.service.ts` | CRUD conversations & messages, subscribe realtime |
@@ -661,22 +650,24 @@ User A kirim pesan
 
 ### Tantangan Teknis
 
-**Realtime subscription cleanup:** Salah satu bug yang sempat muncul adalah memory leak karena channel tidak di-unsubscribe saat user meninggalkan ChatRoom. Solusinya: menggunakan `useFocusEffect` dari React Navigation untuk subscribe saat screen fokus, dan melakukan unsubscribe di `useEffect` cleanup.
+**Realtime subscription cleanup:** `ChatRoomScreen` memasang subscription pada `useEffect` berdasarkan `conversationId`. Cleanup effect memanggil `unsubscribe()` saat screen dilepas atau conversation berubah, sehingga channel lama tidak tertinggal.
 
 ```typescript
-useFocusEffect(
-  useCallback(() => {
-    const channel = chatStore.subscribe(conversationId, onNewMessage);
-    return () => {
-      chatStore.unsubscribe(conversationId); // ✅ Cleanup!
-    };
-  }, [conversationId])
-);
+useEffect(() => {
+  void fetchMessages(conversationId);
+  subscribe(conversationId);
+  void markMessagesAsRead(conversationId);
+
+  return () => {
+    unsubscribe();
+  };
+}, [conversationId, fetchMessages, subscribe, unsubscribe]);
 ```
 
 **Read indicator:** Setiap pesan punya field `is_read`. Saat user membuka ChatRoom, otomatis memanggil `chatService.markMessagesAsRead(conversationId)` yang mengupdate semua pesan dari sender lain yang belum dibaca.
 
-**[Gambar 13: Screenshot Chat Room]**
+**[Gambar 14: Screenshot Chat Room]**
+**[Gambar 15: Screenshot Inbox Percakapan]**
 
 ---
 
@@ -686,6 +677,8 @@ Sistem notifikasi menggunakan pendekatan **database-driven** — bukan push noti
 
 ### Jenis Notifikasi
 
+**Tabel 11. Jenis Notifikasi**
+
 | Type | Trigger | Icon | Warna |
 |------|---------|------|-------|
 | `report_approved` | Admin approve laporan via RPC | `check-circle` | Hijau |
@@ -694,14 +687,14 @@ Sistem notifikasi menggunakan pendekatan **database-driven** — bukan push noti
 
 ### Auto-polling
 
-`NotifContext` melakukan polling setiap 15 detik menggunakan `setInterval`. Setiap interval, dipanggil `notificationService.unreadCount()`. Hasilnya ditampilkan sebagai badge merah di bell icon pada HomeScreen.
+`NotifContext` melakukan polling setiap 15 detik menggunakan `setInterval`. Setiap interval, dipanggil `notificationService.unreadCount()` untuk user yang sedang login. Hasilnya ditampilkan sebagai badge merah di bell icon pada HomeScreen. Preferensi notifikasi disimpan di AsyncStorage; ketika toggle dimatikan, polling dihentikan dan badge direset.
 
 Pendekatan polling dipilih daripada realtime subscription karena:
 - Notifikasi tidak perlu realtime-real-time amat (15 detik sudah cukup responsif)
 - Mengurangi jumlah koneksi WebSocket yang harus dibuka
 - Lebih sederhana implementasinya
 
-**[Gambar 14: Screenshot Notifikasi]**
+**[Gambar 16: Screenshot Notifikasi]**
 
 ---
 
@@ -732,10 +725,10 @@ RPC ini menggunakan `SECURITY DEFINER` — artinya fungsi berjalan dengan privil
 
 ### Walk-in Report
 
-Fitur untuk admin (satpam) yang menerima laporan langsung dari mahasiswa yang datang ke pos satpam. Admin mengisi form atas nama mahasiswa tersebut, termasuk nama pelapor, NIM, dan fakultas. Laporan langsung berstatus `approved` tanpa perlu review ulang.
+Fitur ini ditujukan untuk admin atau satpam yang menerima laporan langsung di pos. Admin dapat mengisi identitas pelapor walk-in berupa nama, NIM, dan fakultas; field identitas tersebut bersifat opsional pada versi saat ini. Laporan dibuat melalui RPC admin dan langsung berstatus `approved`.
 
-**[Gambar 15: Screenshot Admin Dashboard]**
-**[Gambar 16: Screenshot Admin Review]**
+**[Gambar 17: Screenshot Admin Dashboard]**
+**[Gambar 18: Screenshot Admin Review]**
 
 ---
 
@@ -750,7 +743,7 @@ Halaman profil menampilkan informasi user: foto avatar (lingkaran), nama lengkap
 2. Pilih "Ambil Foto" (buka kamera) atau "Pilih dari Galeri"
 3. Foto di-crop (aspect 4:3) dengan kualitas 70%
 4. Diupload ke Supabase Storage bucket `avatars`
-5. Path: `{userId}/avatar.jpg` — selalu overwrite (upsert)
+5. Path: `{userId}/avatar.{jpg|png|webp}` sesuai MIME gambar dan menggunakan upsert
 6. URL di-append `?t={timestamp}` untuk mencegah cache lama
 
 **Teknik upload:** Sama dengan upload foto laporan — menggunakan `base64 → Uint8Array` karena Hermes engine di React Native.
@@ -760,26 +753,33 @@ Halaman profil menampilkan informasi user: foto avatar (lingkaran), nama lengkap
 Menu pengaturan mencakup:
 - **Edit Nama** — mengubah display name
 - **Ganti Password** — terintegrasi dengan Supabase Auth
-- **Toggle Notifikasi** — mengaktifkan/menonaktifkan polling notifikasi
+- **Toggle Notifikasi In-App** — menyimpan preferensi di AsyncStorage dan mengaktifkan/menonaktifkan polling
 
 ### Help Screen
 
 Halaman bantuan berisi FAQ (Frequently Asked Questions) dalam format accordion. Setiap pertanyaan bisa di-tap untuk melihat jawabannya. Juga terdapat informasi kontak dukungan dan versi aplikasi.
 
-**[Gambar 17: Screenshot Profil]**
-**[Gambar 18: Screenshot My Posts]**
+Public profile juga menyediakan tombol **Kirim Pesan**. Percakapan dikaitkan dengan laporan aktif milik user tersebut karena tabel `conversations` mensyaratkan `report_id`.
+
+**[Gambar 19: Screenshot My Posts]**
+**[Gambar 20: Screenshot Profil]**
+**[Gambar 21: Screenshot Settings]**
+**[Gambar 22: Screenshot Help & FAQ]**
 
 ---
 
 ## A.11 Service Layer
 
-Seluruh operasi database dienkapsulasi dalam service layer. Ini adalah implementasi **Encapsulation** di level arsitektur — screen tidak pernah memanggil Supabase langsung.
+Operasi Supabase dienkapsulasi dalam service layer. Screen memanggil fungsi service untuk autentikasi, profil, laporan, upload, chat, dan notifikasi; pemisahan ini menerapkan **encapsulation** pada level arsitektur.
 
 ### Daftar Service
 
+**Tabel 12. Daftar Service**
+
 | Service | File | Fungsi |
 |---------|------|--------|
-| **auth.service.ts** | `loginWithEmail`, `register`, `logout`, `resetPassword` |
+| **auth.service.ts** | `loginWithEmail`, `register`, `logout`, `resetPassword`, `updatePassword`, `getCurrentUserId` |
+| **profile.service.ts** | `getMyProfile`, `getPublicProfile`, `updateMyProfile` |
 | **report.service.ts** | `listReports`, `getReportById`, `createReport`, `updateReport`, `deleteReport`, `markAsResolved`, `approveReport`, `rejectReport`, `createAdminReport`, `getAdminStats` |
 | **upload.service.ts** | `pickImageFromLibrary`, `takePhoto`, `uploadReportPhoto`, `uploadAvatar` |
 | **chat.service.ts** | `listConversations`, `getOrCreateConversation`, `listMessages`, `sendMessage`, `subscribeToMessages`, `markMessagesAsRead` |
@@ -787,7 +787,7 @@ Seluruh operasi database dienkapsulasi dalam service layer. Ini adalah implement
 
 ### Error Handling Pattern
 
-Salah satu gotcha yang ditemukan selama pengembangan: `PostgrestError` dari Supabase **bukan** instance dari `Error` class JavaScript. Artinya, `err instanceof Error` mengembalikan `false`. Ini bisa menyebabkan error tidak tertangkap di blok `catch`.
+Salah satu gotcha yang ditemukan selama pengembangan adalah bahwa objek error dari operasi PostgREST tidak selalu merupakan instance `Error` JavaScript. Objek tersebut tetap masuk ke blok `catch`, tetapi pengecekan `err instanceof Error` pada UI dapat kehilangan pesan aslinya.
 
 Solusi yang diterapkan di semua service:
 
@@ -801,17 +801,17 @@ if (error) throw new Error(error.message);
 
 ## A.12 Design System: Calm Campus
 
-Salah satu keputusan desain yang cukup signifikan adalah pemilihan warna. Awalnya, Cari.In menggunakan warna **zinc-950** (hampir hitam) sebagai primary color. Tapi setelah riset neuropsikologi, ditemukan bahwa warna biru lebih efektif untuk menenangkan pengguna yang sedang panik (kehilangan barang).
+Salah satu keputusan desain adalah mengganti primary color awal yang hampir hitam menjadi biru. Biru dipilih untuk memberi kesan tenang dan tepercaya, sedangkan orange dan emerald dipakai untuk membedakan laporan hilang dan ditemukan secara cepat.
 
-**Palet Warna Final**
+**Tabel 13. Palet Warna Final**
 
-| Warna | Hex | Penggunaan | Efek Psikologis |
-|-------|-----|------------|-----------------|
-| Primary Blue | `#2563EB` | Tombol, navbar, link | Menurunkan detak jantung, trust |
-| Soft Blue | `#EFF6FF` | Background | Mencegah sensory overload |
-| Teal Sage | `#0D9488` | Admin area | Profesional, authority |
-| Orange Lost | `#F97316` | Badge Hilang | Urgensi tanpa panic |
-| Emerald Found | `#059669` | Badge Ditemukan | Relief, positif |
+| Warna | Hex | Penggunaan | Tujuan Visual |
+|-------|-----|------------|---------------|
+| Primary Blue | `#2563EB` | Tombol, navbar, link | Identitas utama dan kepercayaan |
+| Soft Blue | `#EFF6FF` | Background | Kontras lembut |
+| Teal Sage | `#0D9488` | Admin area | Membedakan area admin |
+| Orange Lost | `#F97316` | Badge Hilang | Menandai kondisi hilang |
+| Emerald Found | `#059669` | Badge Ditemukan | Menandai kondisi ditemukan |
 
 **Design Tokens** disimpan di `src/utils/constants.ts`:
 
@@ -822,56 +822,73 @@ FONT_SIZE: { xs:9, sm:11, base:13, md:15, lg:18, xl:20, '2xl':24 }
 SHADOW: { subtle, card, elevated } — all with blue glow
 ```
 
-Pendekatan design tokens ini memudahkan konsistensi visual antar screen. Cukup import `RADIUS` dari constants, semua komponen pake nilai radius yang sama.
+Design tokens menjadi referensi warna, radius, spacing, tipografi, dan shadow. Implementasi saat ini menggunakannya bersama inline styles; standardisasi penuh seluruh nilai visual masih menjadi ruang refactor berikutnya.
 
 ---
 
 ## B. Pengujian Program
 
-### B.1 Pengujian Statis (Kode)
+### B.1 Pengujian Statis dan Konfigurasi
 
-Pengujian statis dilakukan dengan dua tools:
+Pengujian statis yang sudah diverifikasi menggunakan dua tool:
 
-| Tool | Command | Hasil |
+**Tabel 14. Hasil Pengujian Statis per 20 Juli 2026**
+
+| Tool | Command | Hasil Terverifikasi |
 |------|---------|-------|
 | TypeScript | `npx tsc --noEmit` | **0 errors** |
 | ESLint | `npm run lint` | **0 errors, 0 warnings** |
 | Expo Doctor | `npx expo-doctor` | **18/18 checks passed** |
 
-TypeScript dijalankan dalam **strict mode** — `noImplicitAny` dan `noUncheckedIndexedAccess` diaktifkan. Ini berarti setiap variabel yang tipenya tidak jelas akan dianggap error. Awalnya ada sekitar 20+ error type saat pertama kali strict mode diaktifkan. Sebagian besar disebabkan oleh akses array tanpa pengecekan undefined.
+TypeScript dijalankan dalam **strict mode** dengan `noImplicitAny` dan `noUncheckedIndexedAccess`. Expo Doctor memeriksa kompatibilitas dependency dan konfigurasi project Expo; seluruh 18 pemeriksaan lulus pada eksekusi terakhir.
 
-**[Gambar 19: Hasil TypeScript & ESLint Check]**
+**[Gambar 23: Hasil TypeScript & ESLint Check]**
 
 ### B.2 Pengujian Fungsional (Manual)
 
-Setiap fase diuji manual di perangkat iPhone 15 Pro Max via Expo Go. Skenario pengujian mencakup:
+File `TESTING-MANUAL.md` menyediakan checklist pengujian end-to-end. Verifikasi
+backend yang dapat dijalankan tanpa perangkat sudah dicatat terpisah; seluruh
+skenario UI/perangkat tetap merupakan **rencana/verifikasi yang harus
+dilakukan**, bukan hasil berhasil yang sudah dibuktikan.
 
-| Modul | Skenario | Hasil |
+Eksekusi pada 20 Juli 2026 membuktikan project Supabase `ACTIVE_HEALTHY` dan
+smoke test SQL serta client API lulus untuk login dua akun, RPC, RLS, Storage,
+dua subscription Realtime, dan trigger. Negative test membuktikan password
+salah, domain luar, eskalasi role, RPC admin oleh mahasiswa, dan upload
+lintas-user ditolak; perubahan langsung `reports.status` juga diblokir. Request
+reset diterima dan email recovery tercatat
+terkirim, tetapi link email sampai password baru belum diuji. Pengujian UI
+aplikasi tetap belum dilakukan karena environment tidak memiliki dua perangkat
+atau simulator.
+
+**Tabel 15. Rencana Pengujian Fungsional**
+
+| Modul | Skenario | Status Bukti |
 |-------|----------|-------|
-| **Auth** | Register dengan email valid | ✅ Berhasil |
-| **Auth** | Register dengan email non-kampus | ✅ Ditolak (error domain) |
-| **Auth** | Login dengan password salah | ✅ Error sesuai |
-| **Auth** | Forgot password | ✅ Email reset terkirim |
-| **Feed** | Scroll list + pull-to-refresh | ✅ Smooth |
-| **Feed** | Filter kategori | ✅ Data sesuai filter |
-| **Feed** | Search dengan keyword | ✅ Hasil sesuai |
-| **Create** | Buat laporan Hilang (lengkap) | ✅ Status pending |
-| **Create** | Buat laporan tanpa foto | ✅ Error validasi |
-| **Chat** | Kirim pesan realtime | ✅ Muncul tanpa refresh |
-| **Chat** | Notifikasi pesan baru | ✅ Badge merah muncul |
-| **Admin** | Approve laporan | ✅ Status berubah + notif |
-| **Admin** | Reject dengan alasan | ✅ Notif rejection terkirim |
-| **Profile** | Upload avatar | ✅ Tersimpan di Storage |
+| **Auth** | Login dua akun, password salah, dan penolakan domain luar melalui API | ✅ Terverifikasi backend |
+| **Auth** | Register email kampus, restore session, dan logout melalui UI | ⏳ Perlu diuji perangkat |
+| **Auth** | Request/email reset | ✅ Terverifikasi backend |
+| **Auth** | Link email → deep-link → kata sandi baru | ⏳ Perlu diuji perangkat |
+| **Feed** | Scroll, pull-to-refresh, filter, dan search | ⏳ Perlu diuji |
+| **Create** | Validasi field/foto dan laporan berstatus pending | ⏳ Perlu diuji |
+| **Chat** | Event pesan Realtime dua session dan trigger notifikasi | ✅ Terverifikasi backend |
+| **Chat** | UI dua perangkat, pesan dobel, dan read indicator | ⏳ Perlu diuji perangkat |
+| **Notif** | Badge, mark read, dan toggle polling | ⏳ Perlu diuji |
+| **Admin** | Approve/reject, notifikasi, dan laporan walk-in | ⏳ Perlu diuji |
+| **Profile** | Upload avatar, edit nama, dan FAQ accordion | ⏳ Perlu diuji |
 
 ### B.3 Pengujian Build
 
-Aplikasi berhasil di-build menggunakan EAS Build:
+Build production Android dari snapshot konfigurasi final dijalankan melalui EAS Build pada 20 Juli 2026. EAS menyelesaikan build dengan status `FINISHED`. Artifact yang diunduh berhasil melewati pemeriksaan `unzip -t` dan `zipinfo -t` untuk 1.297 entry. Android build-tools membaca package `id.cariin.app`, version `1.0.0`, versionCode 1, minSdk 24, targetSdk 36, dan scheme `cariin`. Daftar permission APK final tidak memuat `android.permission.RECORD_AUDIO`. Verifikasi ini membuktikan artifact dan konfigurasi native, tetapi tidak membuktikan instalasi, startup, login, atau alur backend pada perangkat.
 
-| Platform | Profile | Ukuran | Status |
+**Tabel 16. Status Pengujian Build**
+
+| Platform | Profile | Ukuran | Status Terverifikasi |
 |----------|---------|--------|--------|
-| Android | Preview | 76 MB | ✅ Berhasil |
-| Android | Production | 76 MB | ✅ Berhasil |
-| iOS | Preview | — | ❌ (butuh Apple Developer $99/thn) |
+| Android | Preview | — | ⏳ Belum dibuild/diverifikasi |
+| Android | Production (kandidat lama) | 80.569.203 byte / 76,83 MiB | ✅ Bukti historis compile; sudah digantikan build final-config |
+| Android | Production (final-config) | 80.572.407 byte / 76,84 MiB | ✅ EAS Build selesai; archive, package, scheme, SDK, permission, dan SHA-256 terverifikasi; belum install/smoke test |
+| iOS | Preview | — | Tidak menjadi target artifact penyerahan |
 
 ---
 
@@ -881,20 +898,20 @@ Aplikasi berhasil di-build menggunakan EAS Build:
 
 Setelah melalui proses pengembangan dan pengujian, beberapa kelebihan Cari.In yang teridentifikasi:
 
-**a. Verifikasi Identitas Otomatis**
-Dengan menggunakan domain email kampus (`@student.unu-jogja.ac.id`), setiap pengguna terverifikasi sebagai mahasiswa UNU Yogyakarta. Ini mengurangi risiko klaim palsu karena pelapor memiliki identitas yang jelas.
+**a. Pembatasan Registrasi Mahasiswa**
+Client dan trigger database membatasi registrasi mahasiswa ke domain `@student.unu-jogja.ac.id`. Pembatasan domain membantu mengurangi akun dari luar kampus, tetapi proses klaim barang tetap memerlukan verifikasi ciri kepemilikan melalui chat atau petugas.
 
 **b. Privasi Terjaga**
-Tidak ada nomor HP yang ditampilkan di publik. Komunikasi antara pencari dan penemu dilakukan melalui chat in-app. Nomor HP hanya diketahui oleh masing-masing pengguna dan admin (jika diperlukan).
+Aplikasi tidak mengumpulkan maupun menampilkan nomor HP. Komunikasi antara pencari dan penemu dilakukan melalui chat in-app.
 
 **c. Moderasi Terpusat**
-Setiap laporan melewati proses review admin sebelum tayang di feed publik. Ini mencegah spam, laporan palsu, atau konten yang tidak pantas.
+Laporan mahasiswa dibuat dengan status `pending`. Privilege kolom mencegah client mahasiswa mengubah `status`; approve/reject hanya tersedia melalui RPC admin, sedangkan mahasiswa menandai selesai melalui RPC khusus laporan approved miliknya.
 
 **d. Satu Kodebase Dua Platform**
 Dengan React Native + Expo, aplikasi berjalan di Android dan iOS dari satu kodebase yang sama. Ini menghemat waktu pengembangan dan memudahkan maintenance.
 
 **e. Code Quality**
-TypeScript strict mode memastikan hampir tidak ada runtime error yang disebabkan oleh type mismatch. 0 error tsc dan 0 warning ESLint menunjukkan kode cukup bersih.
+TypeScript strict mode dan ESLint membantu mendeteksi type mismatch, import salah, dan pelanggaran aturan statis sebelum runtime. Keduanya tidak menggantikan pengujian fungsional atau menjamin aplikasi bebas runtime error.
 
 ### 2. Kekurangan Sistem
 
@@ -912,8 +929,11 @@ Aplikasi hanya memiliki satu tema (light mode). Dark mode belum diimplementasi k
 **d. Belum Ada Multi Bahasa**
 UI hanya tersedia dalam Bahasa Indonesia. Belum ada dukungan Bahasa Inggris atau bahasa daerah.
 
-**e. APK Android Saja**
-APK production hanya tersedia untuk Android. Untuk iOS diperlukan Apple Developer Program berbayar ($99/tahun) yang belum diambil.
+**e. APK Final-Config Belum Diuji di Perangkat**
+Artifact production dari konfigurasi izin Android final sudah tersedia dan lolos pemeriksaan integritas, package, scheme, SDK, permission, ukuran, serta SHA-256. Namun instalasi, startup, login, dan alur utama belum dicatat pada checklist perangkat fisik. Backend remote sudah aktif, smoke test SQL/client API lulus, dan redirect Auth sudah diverifikasi; pengujian UI perangkat masih belum dilakukan.
+
+**f. Belum Ada Pengujian Otomatis**
+Repository belum memiliki unit test, integration test, maupun end-to-end test otomatis. Pengujian saat ini mengandalkan pemeriksaan statis dan checklist manual.
 
 ---
 
@@ -921,25 +941,25 @@ APK production hanya tersedia untuk Android. Untuk iOS diperlukan Apple Develope
 
 ## A. Kesimpulan
 
-Berdasarkan hasil perancangan, implementasi, dan pengujian yang telah dilakukan, dapat ditarik beberapa kesimpulan sebagai berikut:
+Berdasarkan hasil perancangan, implementasi, dan pemeriksaan yang telah memiliki bukti pada repository, dapat ditarik beberapa kesimpulan sebagai berikut:
 
-**Pertama**, aplikasi Cari.In berhasil merancang dan membangun platform Lost & Found terpusat untuk mahasiswa UNU Yogyakarta. Aplikasi mencakup 26 layar yang terbagi dalam 7 fase pengembangan, meliputi fitur autentikasi, feed laporan, pembuatan laporan, chat realtime, notifikasi, moderasi admin, dan manajemen profil. Seluruh layar telah diuji secara fungsional dan berjalan sesuai spesifikasi yang direncanakan.
+**Pertama**, Cari.In telah mengimplementasikan modul autentikasi, feed laporan, pembuatan laporan, chat realtime, notifikasi in-app, moderasi admin, serta manajemen profil dalam 30 file screen TSX. Pemeriksaan statis source telah lulus; pengujian fungsional menyeluruh tetap harus diselesaikan menggunakan checklist manual sebelum klaim siap produksi.
 
-**Kedua**, sistem autentikasi menggunakan email kampus (`@student.unu-jogja.ac.id`) berhasil diterapkan melalui validasi di sisi client sebelum dikirim ke Supabase Auth. Mekanisme role-based routing memisahkan akses mahasiswa dan admin secara otomatis setelah login. Hanya pengguna dengan email kampus yang valid yang dapat mendaftar sebagai mahasiswa.
+**Kedua**, registrasi mahasiswa menggunakan validasi domain `@student.unu-jogja.ac.id` pada client dan trigger database. Akun admin menggunakan app metadata dari jalur server. Role-based routing memisahkan MainNavigator mahasiswa dan AdminNavigator secara otomatis setelah login.
 
-**Ketiga**, fitur chat realtime berhasil diimplementasikan menggunakan Supabase Realtime (postgres_changes). Setiap pesan baru langsung muncul tanpa perlu refresh manual, dan notifikasi otomatis terkirim ke penerima melalui database trigger. Privasi pengguna terjaga karena komunikasi dilakukan sepenuhnya di dalam aplikasi tanpa mengekspos nomor telepon.
+**Ketiga**, fitur chat realtime diimplementasikan menggunakan Supabase Realtime (`postgres_changes`) dengan cleanup subscription saat ChatRoom dilepas. Dua client terautentikasi telah menerima event pesan baru dan trigger membuat notifikasi penerima pada smoke test backend. Perilaku UI realtime dua perangkat, termasuk tampilan dan deduplikasi pesan, tetap harus dibuktikan melalui checklist manual.
 
-**Keempat**, sistem moderasi admin dengan workflow approve/reject berhasil diterapkan menggunakan RPC security definer functions. Setiap laporan yang dibuat mahasiswa masuk status "pending", admin dapat menyetujui atau menolak dengan catatan, dan notifikasi otomatis dikirim ke pemilik laporan. Laporan walk-in dari admin langsung disetujui tanpa review.
+**Keempat**, workflow moderasi menggunakan RLS, privilege kolom, dan RPC `SECURITY DEFINER`. Laporan mahasiswa masuk status `pending`; hanya RPC admin yang dapat approve/reject, sedangkan laporan walk-in admin langsung berstatus `approved`. Perubahan status mengirim notifikasi ke pemilik laporan.
 
-**Kelima**, kualitas kode terjaga dengan baik melalui TypeScript strict mode (0 error), ESLint v9 flat config (0 warning), dan expo-doctor (18/18 checks passed). APK production berhasil di-build melalui EAS Build dengan ukuran 76 MB.
+**Kelima**, pemeriksaan terakhir menghasilkan 0 error TypeScript, 0 error/warning ESLint, dan 18/18 pemeriksaan Expo Doctor lulus. EAS Build production dari konfigurasi final berhasil menghasilkan APK valid berukuran 76,84 MiB, dan manifest final tidak memuat permission `RECORD_AUDIO`. Backend remote serta smoke test API sudah terverifikasi; pengujian manual UI penuh dan smoke test instalasi masih harus dilengkapi.
 
 ---
 
 ## B. Saran
 
-Untuk pengembangan selanjutnya, beberapa saran yang dapat diberikan:
+Untuk finalisasi dan pengembangan selanjutnya, beberapa saran yang dapat diberikan:
 
-1. **Google OAuth**: Integrasi login dengan Google agar pengguna memiliki opsi autentikasi alternatif. Saat ini login hanya melalui email/password.
+1. **Selesaikan bukti rilis**: Jalankan checklist pengujian manual dua akun serta smoke test APK final-config pada perangkat fisik. Lampirkan output Expo Doctor, link EAS Build, dan screenshot alur utama.
 
 2. **Notifikasi Push**: Mengintegrasikan notifikasi push (Expo Push Notification) agar pengguna tetap mendapat notifikasi meskipun aplikasi tertutup. Saat ini notifikasi hanya bersifat in-app.
 
@@ -949,7 +969,7 @@ Untuk pengembangan selanjutnya, beberapa saran yang dapat diberikan:
 
 5. **Rating dan Reputasi**: Menambahkan sistem rating atau reputasi pengguna untuk meningkatkan kepercayaan dalam transaksi lost & found.
 
-6. **iOS Build**: Melakukan build untuk platform iOS menggunakan EAS Build (membutuhkan Apple Developer Account).
+6. **Google OAuth Opsional**: Pertimbangkan login Google hanya apabila kebijakan akun kampus dan validasi domain tetap dapat ditegakkan pada backend.
 
 7. **Pengujian Otomatis**: Menambahkan unit test dan integration test menggunakan framework seperti Jest atau Detox untuk pengujian yang lebih komprehensif.
 
@@ -979,16 +999,30 @@ TypeScript. (2025). *TypeScript Documentation*. https://www.typescriptlang.org/d
 
 Repository: `https://github.com/Faiz-abdurrachman/cariin`
 
-## Lampiran 2: APK Production
+## Lampiran 2: Status dan Link APK
 
-APK dapat di-build melalui EAS Build dengan perintah:
+Build EAS production Android dari konfigurasi final:
+
+- Build ID: `4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b`
+- Build page: `https://expo.dev/accounts/faiz.abdurrachman/projects/cariin/builds/4d5739ec-b37c-4527-b6cf-c1dc48f0bd6b`
+- APK: `https://expo.dev/artifacts/eas/pPr_zko1oVS3ZOM_WV2UJs13jhArovBN9YVSuELaB0M.apk`
+- Ukuran: `80.572.407 byte` (`76,84 MiB`)
+- SHA-256: `6c6d30f0af72d0ba1b29a16a463e1b9bd14176ac74b96fe7c1152d2129479c82`
+- Verifikasi file: 1.297 entry archive valid; package `id.cariin.app`;
+  version `1.0.0`/versionCode 1; minSdk 24; targetSdk 36; scheme `cariin`;
+  permission `RECORD_AUDIO` tidak ada
+
+Perintah build yang digunakan:
+
 ```bash
 eas build --platform android --profile production
 ```
 
+> Artifact berasal dari snapshot konfigurasi final dan salinan lokal disimpan di folder `dist/` yang di-ignore. Artifact belum diinstal atau smoke test pada perangkat fisik. Backend remote sudah aktif, smoke test SQL/client API lulus, dan redirect Auth sudah diverifikasi; pengujian UI dua perangkat masih tertunda.
+
 ## Lampiran 3: Video Demo Aplikasi
 
-> [Link video demo akan diisi setelah perekaman]
+> Status per 20 Juli 2026: belum direkam. Link diisi setelah video demo selesai.
 
 ## Lampiran 4: Slide Presentasi
 
@@ -998,18 +1032,19 @@ Slide presentasi tersedia di:
 
 ## Lampiran 5: Dokumentasi Kegiatan
 
-| No | Kegiatan | Tanggal |
-|----|----------|--------|
-| 1 | Analisis Permasalahan dan Survei Kuesioner | 23 Mei – 3 Juni 2026 |
-| 2 | Perancangan Database (ERD) & Arsitektur Sistem | 5 – 15 Juni 2026 |
-| 3 | Perancangan prototype dan MVP | 16 – 24 Juni 2026 |
-| 4 | Implementasi Aplikasi Mobile & Integrasi Backend | 25 Juni – 5 Juli 2026 |
-| 5 | Implementasi Fitur Chat Realtime & Notifikasi | 6 – 15 Juli 2026 |
-| 6 | Implementasi Dashboard Admin & Finalisasi | 16 – 25 Juli 2026 |
+**Tabel 17. Dokumentasi Kegiatan**
+
+| No | Kegiatan | Tanggal | Status per 20 Juli 2026 |
+|----|----------|---------|--------------------------|
+| 1 | Analisis Permasalahan dan Survei Kuesioner | 23 Mei – 3 Juni 2026 | Selesai; bukti survei perlu dilampirkan |
+| 2 | Perancangan Database (ERD) & Arsitektur Sistem | 5 – 15 Juni 2026 | Selesai |
+| 3 | Perancangan prototype dan MVP | 16 – 24 Juni 2026 | Selesai |
+| 4 | Implementasi Aplikasi Mobile & Integrasi Backend | 25 Juni – 5 Juli 2026 | Selesai |
+| 5 | Implementasi Fitur Chat Realtime & Notifikasi | 6 – 15 Juli 2026 | Implementasi selesai; testing manual perlu bukti |
+| 6 | Implementasi Dashboard Admin & Finalisasi | 16 – 25 Juli 2026 | Berjalan; tanggal 25 Juli adalah target |
 
 ---
 
 *Laporan ini disusun sebagai syarat Ujian Akhir Semester Mata Kuliah Mobile Programming*
 *Program Studi Informatika — Universitas Nahdlatul Ulama Yogyakarta*
 *2026*
-
