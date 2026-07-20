@@ -34,6 +34,9 @@ export default function SuccessScreen() {
 
   const goToMyPosts = () => {
     const root = nav.getParent<StackNavigationProp<RootStackParamList>>();
+    if (root && root.canGoBack()) {
+      root.goBack();
+    }
     root?.navigate('MainTabs', { screen: 'MyPostsTab', params: { screen: 'MyPosts' } });
   };
 

@@ -523,7 +523,7 @@ export default function AdminReviewScreen() {
               </Pressable>
             </View>
 
-            {report.user_id ? (
+            {report.user_id && !report.created_by_admin ? (
               <Pressable onPress={chatOwner} accessibilityRole="button">
                 {({ pressed }) => (
                   <View
