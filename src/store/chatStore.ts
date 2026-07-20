@@ -50,12 +50,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   async sendMessage(conversationId: string, content: string) {
     const msg = await chatService.sendMessage(conversationId, content);
-    set((s) => ({
-      messages: {
-        ...s.messages,
-        [conversationId]: [...(s.messages[conversationId] ?? []), msg],
-      },
-    }));
+    // Realtime INSERT bisa datang sebelum response HTTP selesai. Lewat
+    // appendMessage agar message yang sama tidak masuk dua kali.
+    get().appendMessage(conversationId, msg);
   },
 
   appendMessage(conversationId: string, message: Message) {
