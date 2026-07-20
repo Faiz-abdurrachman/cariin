@@ -10,6 +10,9 @@ export interface Conversation {
   last_message: string | null;
   last_at: string | null;
   created_at: string;
+  report: {
+    title: string;
+  } | null;
   user_a: {
     id: string;
     name: string;
@@ -31,7 +34,7 @@ export interface Message {
   created_at: string;
 }
 
-const CONVERSATION_SELECT = `*, user_a:user_a_id(id, name, avatar_url), user_b:user_b_id(id, name, avatar_url)`;
+const CONVERSATION_SELECT = `*, report:report_id(title), user_a:user_a_id(id, name, avatar_url), user_b:user_b_id(id, name, avatar_url)`;
 
 export async function listConversations(): Promise<Conversation[]> {
   const currentUserId = await getCurrentUserId();

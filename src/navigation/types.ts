@@ -97,6 +97,7 @@ export type AdminCreateStackParamList = {
 export type AdminChatStackParamList = {
   Inbox: undefined;
   ChatRoom: { conversationId: string; reportId: string };
+  UserProfile: { userId: string };
 };
 
 export type AdminProfileStackParamList = {

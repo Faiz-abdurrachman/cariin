@@ -33,6 +33,7 @@ import AdminReportsScreen from '@/screens/admin/AdminReportsScreen';
 import AdminReviewScreen from '@/screens/admin/AdminReviewScreen';
 import ChatRoomScreen from '@/screens/chat/ChatRoomScreen';
 import InboxScreen from '@/screens/chat/InboxScreen';
+import UserProfileScreen from '@/screens/profile/UserProfileScreen';
 import { COLORS } from '@/utils/constants';
 
 import type {
@@ -71,6 +72,7 @@ function AdminChatStackNavigator() {
     <ChatStack.Navigator screenOptions={{ headerShown: false }}>
       <ChatStack.Screen name="Inbox" component={InboxScreen} />
       <ChatStack.Screen name="ChatRoom" component={ChatRoomScreen} />
+      <ChatStack.Screen name="UserProfile" component={UserProfileScreen} />
     </ChatStack.Navigator>
   );
 }

@@ -124,6 +124,11 @@ export default function InboxScreen() {
                 <Text style={{ fontSize: 13, color: COLORS.textMuted }} numberOfLines={1}>
                   {item.last_message ?? 'Belum ada pesan'}
                 </Text>
+                {item.report?.title ? (
+                  <Text style={{ fontSize: 11, color: accent, marginTop: 2 }} numberOfLines={1}>
+                    Re: {item.report.title}
+                  </Text>
+                ) : null}
               </View>
             </BlurView>
           </View>
