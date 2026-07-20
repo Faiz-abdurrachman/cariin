@@ -6,8 +6,8 @@
 --   2. Klik "New query", paste seluruh isi file ini
 --   3. Klik "Run". Pastikan tidak ada error.
 --   4. Buka Table Editor untuk verifikasi 5 tabel sudah dibuat.
---   5. Setup Storage buckets manual: report-photos, chat-media, avatars
---      (lihat bagian "STORAGE BUCKETS" di bawah untuk detail).
+--   5. Verifikasi bucket Storage report-photos, chat-media, dan avatars
+--      beserta policy-nya pada bagian "STORAGE BUCKETS".
 --
 -- Semua perintah idempotent (pakai IF NOT EXISTS / DROP POLICY IF EXISTS),
 -- jadi aman di-run ulang.
@@ -38,6 +38,12 @@ create table if not exists public.profiles (
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
 );
+
+create unique index if not exists idx_profiles_email_unique
+  on public.profiles (lower(email));
+create unique index if not exists idx_profiles_nim_unique
+  on public.profiles (nim)
+  where nim is not null;
 
 -- reports: laporan barang hilang / temuan
 create table if not exists public.reports (
@@ -97,6 +103,7 @@ create table if not exists public.messages (
 );
 
 create index if not exists idx_messages_conversation on public.messages(conversation_id, created_at);
+create index if not exists idx_messages_sender_id on public.messages(sender_id);
 
 -- notifications: in-app notification user
 create table if not exists public.notifications (
@@ -124,7 +131,7 @@ begin
   new.updated_at := now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 drop trigger if exists trg_profiles_updated_at on public.profiles;
 create trigger trg_profiles_updated_at
@@ -139,18 +146,36 @@ create trigger trg_reports_updated_at
 -- Auto-bikin row profiles saat user baru daftar via auth.users.
 -- Field name diambil dari raw_user_meta_data (di-set saat signUp dari client).
 create or replace function public.handle_new_user() returns trigger as $$
+declare
+  v_is_admin_invite boolean;
 begin
-  insert into public.profiles (id, email, name, role)
+  -- App metadata hanya dapat ditetapkan oleh server/service-role. Metadata
+  -- client signUp masuk ke raw_user_meta_data dan tidak dapat menaikkan role.
+  v_is_admin_invite :=
+    coalesce(new.raw_app_meta_data ->> 'role', '') = 'admin';
+
+  if split_part(lower(new.email), '@', 2) <> 'student.unu-jogja.ac.id'
+     and not v_is_admin_invite then
+    raise exception 'Registrasi hanya menerima email kampus @student.unu-jogja.ac.id.';
+  end if;
+
+  insert into public.profiles (
+    id, email, name, nim, faculty, department, role, is_verified
+  )
   values (
     new.id,
-    new.email,
+    lower(new.email),
     coalesce(new.raw_user_meta_data ->> 'name', split_part(new.email, '@', 1)),
-    'mahasiswa'
+    nullif(new.raw_user_meta_data ->> 'nim', ''),
+    nullif(new.raw_user_meta_data ->> 'faculty', ''),
+    nullif(new.raw_user_meta_data ->> 'department', ''),
+    case when v_is_admin_invite then 'admin' else 'mahasiswa' end,
+    new.email_confirmed_at is not null
   )
   on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 drop trigger if exists trg_on_auth_user_created on auth.users;
 create trigger trg_on_auth_user_created
@@ -166,7 +191,7 @@ begin
   where id = new.conversation_id;
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 drop trigger if exists trg_messages_update_conversation on public.messages;
 create trigger trg_messages_update_conversation
@@ -231,6 +256,47 @@ as $$
   );
 $$;
 
+-- Profil lengkap hanya boleh dibaca oleh pemiliknya. SELECT tabel profiles
+-- di bawah hanya membuka kolom direktori yang dibutuhkan UI publik.
+create or replace function public.get_my_profile()
+  returns setof public.profiles
+  language sql
+  stable
+  security definer
+  set search_path = public
+as $$
+  select *
+  from public.profiles
+  where id = auth.uid();
+$$;
+
+-- Status laporan tidak dapat diubah langsung oleh client. Mahasiswa hanya
+-- boleh menutup laporan approved miliknya lewat fungsi terkontrol ini.
+create or replace function public.mark_report_resolved(p_report_id uuid)
+  returns public.reports
+  language plpgsql
+  security definer
+  set search_path = public
+as $$
+declare
+  v_report public.reports;
+begin
+  update public.reports
+  set status = 'resolved',
+      resolved_at = now()
+  where id = p_report_id
+    and user_id = auth.uid()
+    and status = 'approved'
+  returning * into v_report;
+
+  if not found then
+    raise exception 'Laporan tidak ditemukan, bukan milik Anda, atau belum disetujui.';
+  end if;
+
+  return v_report;
+end;
+$$;
+
 -- ============================================================================
 -- 4a. GRANTS — wajib supaya role authenticated/anon bisa "menyentuh" tabel
 -- ============================================================================
@@ -241,14 +307,35 @@ $$;
 
 grant usage on schema public to anon, authenticated;
 
-grant select on all tables in schema public to anon;
+revoke all on all tables in schema public from anon;
 grant select, insert, update, delete on all tables in schema public to authenticated;
+
+-- Cabut kembali akses blanket pada data/kolom sensitif.
+revoke select on public.profiles from anon, authenticated;
+grant select (id, name, nim, faculty, department, avatar_url, created_at, updated_at)
+  on public.profiles to authenticated;
+
+revoke update on public.profiles from authenticated;
+grant update (name, nim, faculty, department, avatar_url, expo_push_token)
+  on public.profiles to authenticated;
+
+revoke update on public.reports from authenticated;
+grant update (type, title, description, category, location, custody_point, photo_url)
+  on public.reports to authenticated;
+
+revoke update on public.conversations from authenticated;
+
+revoke update on public.messages from authenticated;
+grant update (is_read) on public.messages to authenticated;
+
+revoke update on public.notifications from authenticated;
+grant update (is_read) on public.notifications to authenticated;
 
 grant usage, select on all sequences in schema public to authenticated;
 
 -- Default privilege untuk tabel/sequence yang dibuat di masa depan.
 alter default privileges in schema public
-  grant select on tables to anon;
+  revoke select on tables from anon;
 alter default privileges in schema public
   grant select, insert, update, delete on tables to authenticated;
 alter default privileges in schema public
@@ -256,7 +343,17 @@ alter default privileges in schema public
 
 -- Function `is_admin` butuh EXECUTE permission supaya bisa dipanggil dari
 -- RLS policy oleh role authenticated/anon.
-grant execute on function public.is_admin() to anon, authenticated;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.update_conversation_last_message()
+  from public, anon, authenticated;
+revoke execute on function public.notify_new_message()
+  from public, anon, authenticated;
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+revoke execute on function public.get_my_profile() from public, anon;
+revoke execute on function public.mark_report_resolved(uuid) from public, anon;
+grant execute on function public.get_my_profile() to authenticated;
+grant execute on function public.mark_report_resolved(uuid) to authenticated;
 
 -- ============================================================================
 -- 5. ROW LEVEL SECURITY
@@ -270,13 +367,16 @@ alter table public.notifications enable row level security;
 
 -- ----- profiles -----
 drop policy if exists profiles_select_all on public.profiles;
-create policy profiles_select_all on public.profiles
-  for select using (true);
+drop policy if exists profiles_select_authenticated on public.profiles;
+create policy profiles_select_authenticated on public.profiles
+  for select
+  to authenticated
+  using (true);
 
 drop policy if exists profiles_update_self on public.profiles;
 create policy profiles_update_self on public.profiles
-  for update using (id = auth.uid())
-  with check (id = auth.uid());
+  for update using (id = (select auth.uid()))
+  with check (id = (select auth.uid()));
 
 -- profiles_admin_all dihapus untuk menghindari risiko rekursi RLS:
 -- policy `for all using (public.is_admin())` menyebabkan setiap operasi pada
@@ -297,9 +397,11 @@ create policy profiles_update_self on public.profiles
 -- SELECT: publik bisa lihat status approved/resolved. Owner bisa lihat semua row sendiri. Admin bisa lihat semua.
 drop policy if exists reports_select_public on public.reports;
 create policy reports_select_public on public.reports
-  for select using (
+  for select
+  to authenticated
+  using (
     status in ('approved','resolved')
-    or user_id = auth.uid()
+    or user_id = (select auth.uid())
     or public.is_admin()
   );
 
@@ -307,22 +409,29 @@ create policy reports_select_public on public.reports
 drop policy if exists reports_insert_self on public.reports;
 create policy reports_insert_self on public.reports
   for insert with check (
-    user_id = auth.uid()
+    (
+      user_id = (select auth.uid())
+      and status = 'pending'
+      and created_by_admin = false
+      and admin_note is null
+      and reporter_name is null
+      and reporter_nim is null
+      and reporter_faculty is null
+      and resolved_at is null
+    )
     or public.is_admin()
   );
 
--- UPDATE: owner bisa edit row sendiri kalau status belum 'resolved'. Admin bebas.
--- Catatan: USING gate "row mana yang boleh di-update" (cek state SEKARANG belum
--- resolved). WITH CHECK hanya validate NEW row tetap milik user — tidak boleh
--- replicate `status <> 'resolved'` di sini, karena transisi ke 'resolved'
--- (markAsResolved) butuh NEW row punya status='resolved'.
+-- UPDATE konten: owner bisa edit row sendiri kalau status belum resolved.
+-- GRANT kolom di atas tidak memberi client akses ke status/admin_note, sehingga
+-- transisi status hanya dapat dilakukan melalui RPC terkontrol.
 drop policy if exists reports_update_self on public.reports;
 create policy reports_update_self on public.reports
   for update using (
-    (user_id = auth.uid() and status <> 'resolved')
+    (user_id = (select auth.uid()) and status <> 'resolved')
     or public.is_admin()
   ) with check (
-    user_id = auth.uid()
+    user_id = (select auth.uid())
     or public.is_admin()
   );
 
@@ -330,7 +439,7 @@ create policy reports_update_self on public.reports
 drop policy if exists reports_delete_self on public.reports;
 create policy reports_delete_self on public.reports
   for delete using (
-    (user_id = auth.uid() and status <> 'resolved')
+    (user_id = (select auth.uid()) and status <> 'resolved')
     or public.is_admin()
   );
 
@@ -338,20 +447,31 @@ create policy reports_delete_self on public.reports
 drop policy if exists conversations_select_participant on public.conversations;
 create policy conversations_select_participant on public.conversations
   for select using (
-    user_a_id = auth.uid() or user_b_id = auth.uid() or public.is_admin()
+    user_a_id = (select auth.uid())
+    or user_b_id = (select auth.uid())
+    or public.is_admin()
   );
 
 drop policy if exists conversations_insert_participant on public.conversations;
 create policy conversations_insert_participant on public.conversations
   for insert with check (
-    user_a_id = auth.uid() or user_b_id = auth.uid()
+    (
+      (
+        user_a_id = (select auth.uid())
+        or user_b_id = (select auth.uid())
+      )
+      and exists (
+        select 1
+        from public.reports r
+        where r.id = report_id
+          and r.status in ('approved', 'resolved')
+          and r.user_id in (user_a_id, user_b_id)
+      )
+    )
+    or public.is_admin()
   );
 
 drop policy if exists conversations_update_participant on public.conversations;
-create policy conversations_update_participant on public.conversations
-  for update using (
-    user_a_id = auth.uid() or user_b_id = auth.uid()
-  );
 
 -- ----- messages -----
 drop policy if exists messages_select_participant on public.messages;
@@ -360,7 +480,10 @@ create policy messages_select_participant on public.messages
     exists (
       select 1 from public.conversations c
       where c.id = messages.conversation_id
-        and (c.user_a_id = auth.uid() or c.user_b_id = auth.uid())
+        and (
+          c.user_a_id = (select auth.uid())
+          or c.user_b_id = (select auth.uid())
+        )
     )
     or public.is_admin()
   );
@@ -368,11 +491,14 @@ create policy messages_select_participant on public.messages
 drop policy if exists messages_insert_participant on public.messages;
 create policy messages_insert_participant on public.messages
   for insert with check (
-    sender_id = auth.uid()
+    sender_id = (select auth.uid())
     and exists (
       select 1 from public.conversations c
       where c.id = messages.conversation_id
-        and (c.user_a_id = auth.uid() or c.user_b_id = auth.uid())
+        and (
+          c.user_a_id = (select auth.uid())
+          or c.user_b_id = (select auth.uid())
+        )
     )
   );
 
@@ -383,19 +509,25 @@ create policy messages_update_participant on public.messages
     exists (
       select 1 from public.conversations c
       where c.id = messages.conversation_id
-        and (c.user_a_id = auth.uid() or c.user_b_id = auth.uid())
+        and (
+          c.user_a_id = (select auth.uid())
+          or c.user_b_id = (select auth.uid())
+        )
     )
   );
 
 -- ----- notifications -----
 drop policy if exists notifications_select_self on public.notifications;
 create policy notifications_select_self on public.notifications
-  for select using (user_id = auth.uid() or public.is_admin());
+  for select using (
+    user_id = (select auth.uid())
+    or public.is_admin()
+  );
 
 drop policy if exists notifications_update_self on public.notifications;
 create policy notifications_update_self on public.notifications
-  for update using (user_id = auth.uid())
-  with check (user_id = auth.uid());
+  for update using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
 
 -- INSERT notifications: dilakukan oleh service (admin moderate, trigger chat),
 -- bukan dari client biasa. Admin diizinkan; trigger pakai security definer.
@@ -412,28 +544,137 @@ create policy notifications_insert_admin on public.notifications
 
 -- create publication supabase_realtime;
 
-alter publication supabase_realtime add table public.messages;
-alter publication supabase_realtime add table public.conversations;
-alter publication supabase_realtime add table public.notifications;
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'messages'
+    ) then
+      alter publication supabase_realtime add table public.messages;
+    end if;
+
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'conversations'
+    ) then
+      alter publication supabase_realtime add table public.conversations;
+    end if;
+
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime'
+        and schemaname = 'public'
+        and tablename = 'notifications'
+    ) then
+      alter publication supabase_realtime add table public.notifications;
+    end if;
+  end if;
+end;
+$$;
 
 -- ============================================================================
--- 7. STORAGE BUCKETS (jalankan manual via Dashboard, atau pakai SQL berikut)
+-- 7. STORAGE BUCKETS + POLICIES
 -- ============================================================================
--- Kalau ingin via SQL Editor (perlu permission storage):
---
--- insert into storage.buckets (id, name, public)
---   values ('report-photos', 'report-photos', true) on conflict do nothing;
--- insert into storage.buckets (id, name, public)
---   values ('chat-media', 'chat-media', false) on conflict do nothing;
--- insert into storage.buckets (id, name, public)
---   values ('avatars', 'avatars', true) on conflict do nothing;
---
--- Lebih aman & visual: bikin manual via Dashboard → Storage → New bucket:
---   - report-photos: Public = true   (foto barang yg sudah approved boleh diakses publik)
---   - chat-media:    Public = false  (lampiran chat hanya peserta)
---   - avatars:       Public = true   (avatar profil)
---
--- Lalu setup policy storage di tab "Policies" per bucket.
+-- Bucket report dan avatar memakai URL publik karena URL-nya disimpan di tabel
+-- dan dirender langsung oleh React Native. Upload/update/delete tetap dibatasi
+-- ke folder pertama yang sama dengan auth.uid().
+insert into storage.buckets (id, name, public)
+values
+  ('report-photos', 'report-photos', true),
+  ('avatars', 'avatars', true),
+  ('chat-media', 'chat-media', false)
+on conflict (id) do update
+set public = excluded.public;
+
+-- Bersihkan nama policy dari versi schema lama agar rerun tidak menyisakan
+-- akses duplikat yang lebih longgar.
+drop policy if exists "report photos auth upload" on storage.objects;
+drop policy if exists "report photos owner update" on storage.objects;
+drop policy if exists "report photos owner delete" on storage.objects;
+drop policy if exists "avatars auth upload" on storage.objects;
+drop policy if exists "avatars owner update" on storage.objects;
+drop policy if exists "avatars owner delete" on storage.objects;
+
+drop policy if exists report_photos_select_own on storage.objects;
+create policy report_photos_select_own on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'report-photos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists report_photos_insert_own on storage.objects;
+create policy report_photos_insert_own on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'report-photos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists report_photos_update_own on storage.objects;
+create policy report_photos_update_own on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'report-photos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  )
+  with check (
+    bucket_id = 'report-photos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists report_photos_delete_own on storage.objects;
+create policy report_photos_delete_own on storage.objects
+  for delete to authenticated
+  using (
+    bucket_id = 'report-photos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists avatars_select_own on storage.objects;
+create policy avatars_select_own on storage.objects
+  for select to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists avatars_insert_own on storage.objects;
+create policy avatars_insert_own on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists avatars_update_own on storage.objects;
+create policy avatars_update_own on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  )
+  with check (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+drop policy if exists avatars_delete_own on storage.objects;
+create policy avatars_delete_own on storage.objects
+  for delete to authenticated
+  using (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
+  );
+
+-- `chat-media` disiapkan sebagai bucket private, tetapi belum diberi policy
+-- karena versi aplikasi ini belum memiliki fitur lampiran chat. Dengan begitu
+-- client tidak bisa mengunggah atau membaca object chat secara tidak sengaja.
 
 -- ============================================================================
 -- 8. FASE 5 — ADMIN RPC FUNCTIONS + NOTIFICATION TRIGGER
@@ -460,7 +701,7 @@ begin
   end if;
 
   -- Validasi status
-  if p_new_status not in ('approved','rejected','resolved') then
+  if p_new_status not in ('approved','rejected') then
     raise exception 'Status tidak valid: %', p_new_status;
   end if;
 
@@ -469,6 +710,7 @@ begin
   set status     = p_new_status,
       admin_note = p_admin_note
   where id = p_report_id
+    and status <> 'resolved'
   returning user_id into v_user_id;
 
   if not found then
@@ -506,12 +748,16 @@ $$;
 
 -- RPC: Admin membuat laporan walk-in (created_by_admin=true).
 -- Field reporter_name/nim/faculty diisi manual karena pelapor bukan user sistem.
-create or replace function public.create_admin_report(
+drop function if exists public.create_admin_report(
+  text, text, text, text, text, text, text, text, text, text
+);
+
+create function public.create_admin_report(
   p_type            text,
   p_title           text,
-  p_description     text default null,
   p_category        text,
   p_location        text,
+  p_description     text default null,
   p_custody_point   text default null,
   p_photo_url       text default null,
   p_reporter_name   text default null,
@@ -549,9 +795,146 @@ begin
 end;
 $$;
 
+-- RPC: Admin mengubah seluruh data inti laporan. Reporter manual hanya boleh
+-- berubah untuk laporan walk-in; identitas laporan mahasiswa tetap bersumber
+-- dari profiles agar data akun tidak bisa ditimpa lewat form laporan.
+drop function if exists public.update_admin_report(
+  uuid, text, text, text, text, text, text, text, text, text, text
+);
+
+create function public.update_admin_report(
+  p_report_id        uuid,
+  p_type             text,
+  p_title            text,
+  p_category         text,
+  p_location         text,
+  p_description      text default null,
+  p_custody_point    text default null,
+  p_photo_url        text default null,
+  p_reporter_name    text default null,
+  p_reporter_nim     text default null,
+  p_reporter_faculty text default null
+)
+returns public.reports
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_report public.reports;
+begin
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh mengubah laporan.';
+  end if;
+
+  if p_type not in ('lost', 'found') then
+    raise exception 'Jenis laporan tidak valid.';
+  end if;
+
+  if nullif(btrim(p_title), '') is null then
+    raise exception 'Nama barang wajib diisi.';
+  end if;
+
+  if p_category not in (
+    'elektronik', 'dokumen', 'dompet_tas', 'kunci',
+    'aksesoris', 'pakaian', 'buku_atk', 'lainnya'
+  ) then
+    raise exception 'Kategori laporan tidak valid.';
+  end if;
+
+  if nullif(btrim(p_location), '') is null then
+    raise exception 'Lokasi wajib diisi.';
+  end if;
+
+  if p_type = 'found' and nullif(btrim(coalesce(p_custody_point, '')), '') is null then
+    raise exception 'Titik penitipan wajib diisi untuk barang temuan.';
+  end if;
+
+  update public.reports
+  set type = p_type,
+      title = btrim(p_title),
+      description = nullif(btrim(coalesce(p_description, '')), ''),
+      category = p_category,
+      location = btrim(p_location),
+      custody_point = case
+        when p_type = 'found'
+          then nullif(btrim(coalesce(p_custody_point, '')), '')
+        else null
+      end,
+      photo_url = nullif(btrim(coalesce(p_photo_url, '')), ''),
+      reporter_name = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_name, '')), '')
+        else reporter_name
+      end,
+      reporter_nim = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_nim, '')), '')
+        else reporter_nim
+      end,
+      reporter_faculty = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_faculty, '')), '')
+        else reporter_faculty
+      end
+  where id = p_report_id
+  returning * into v_report;
+
+  if not found then
+    raise exception 'Laporan tidak ditemukan.';
+  end if;
+
+  return v_report;
+end;
+$$;
+
+-- RPC: Admin boleh menyelesaikan laporan aktif mana pun, termasuk laporan
+-- walk-in dan laporan mahasiswa. Transisi lain tetap melalui RPC moderasi.
+drop function if exists public.admin_mark_report_resolved(uuid);
+
+create function public.admin_mark_report_resolved(p_report_id uuid)
+returns public.reports
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_report public.reports;
+begin
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh menyelesaikan laporan.';
+  end if;
+
+  update public.reports
+  set status = 'resolved',
+      resolved_at = now()
+  where id = p_report_id
+    and status = 'approved'
+  returning * into v_report;
+
+  if not found then
+    raise exception 'Laporan tidak ditemukan atau statusnya bukan aktif.';
+  end if;
+
+  return v_report;
+end;
+$$;
+
 -- GRANT execute untuk RPC functions
+revoke execute on function public.update_report_status(uuid, text, text)
+  from public, anon;
+revoke execute on function public.create_admin_report(
+  text, text, text, text, text, text, text, text, text, text
+) from public, anon;
+revoke execute on function public.update_admin_report(
+  uuid, text, text, text, text, text, text, text, text, text, text
+) from public, anon;
+revoke execute on function public.admin_mark_report_resolved(uuid)
+  from public, anon;
 grant execute on function public.update_report_status(uuid, text, text) to authenticated;
 grant execute on function public.create_admin_report(text, text, text, text, text, text, text, text, text, text) to authenticated;
+grant execute on function public.update_admin_report(uuid, text, text, text, text, text, text, text, text, text, text) to authenticated;
+grant execute on function public.admin_mark_report_resolved(uuid) to authenticated;
 
 -- ============================================================================
 -- DONE
