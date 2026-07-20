@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { StackActions, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -163,7 +163,7 @@ export default function ChatRoomScreen() {
               if (nav.canGoBack()) {
                 nav.goBack();
               } else {
-                nav.dispatch(StackActions.replace('Inbox'));
+                nav.getParent()?.navigate('ChatTab', { screen: 'Inbox' });
               }
             }}
             accessibilityRole="button"
