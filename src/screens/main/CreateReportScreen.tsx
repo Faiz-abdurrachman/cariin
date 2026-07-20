@@ -52,6 +52,7 @@ export default function CreateReportScreen() {
   const [category, setCategory] = useState<CategoryId | null>(null);
   const [location, setLocation] = useState('');
   const [custodyPoint, setCustodyPoint] = useState('');
+  const [eventTime, setEventTime] = useState('');
   const [photo, setPhoto] = useState<PickImageResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -124,6 +125,11 @@ export default function CreateReportScreen() {
         location: location.trim(),
         custody_point: type === 'found' ? custodyPoint.trim() : null,
         photo_url: photoUrl,
+        event_time: eventTime.trim()
+          ? new Date(
+              new Date().toDateString() + ' ' + eventTime.trim()
+            ).toISOString()
+          : null,
       });
       void refreshFeed();
       nav.replace('Success', { reportId: report.id, type });
@@ -450,6 +456,15 @@ export default function CreateReportScreen() {
                 />
               </>
             ) : null}
+
+            <FieldLabel>Jam Kejadian (Opsional)</FieldLabel>
+            <Input
+              value={eventTime}
+              onChangeText={setEventTime}
+              placeholder="Cth: 14:30"
+              keyboardType="numbers-and-punctuation"
+              maxLength={5}
+            />
 
             <FieldLabel>Deskripsi Detail</FieldLabel>
             <Input

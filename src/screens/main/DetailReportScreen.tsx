@@ -25,7 +25,7 @@ import type { HomeStackParamList, MainTabParamList } from '@/navigation/types';
 import { getOrCreateConversation } from '@/services/chat.service';
 import { getReportById, type Report } from '@/services/report.service';
 import { COLORS } from '@/utils/constants';
-import { categoryLabel, formatFullDate } from '@/utils/formatters';
+import { categoryLabel, formatDateTime, formatFullDate } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<HomeStackParamList, 'DetailLost' | 'DetailFound'>;
 type RouteP = RouteProp<HomeStackParamList, 'DetailLost' | 'DetailFound'>;
@@ -304,6 +304,16 @@ export default function DetailReportScreen() {
               label="Waktu Lapor"
               value={formatFullDate(report.created_at)}
             />
+            {report.event_time ? (
+              <>
+                <Divider />
+                <InfoRow
+                  icon="clock"
+                  label="Jam Kejadian"
+                  value={formatDateTime(report.event_time)}
+                />
+              </>
+            ) : null}
             {report.custody_point ? (
               <>
                 <Divider />

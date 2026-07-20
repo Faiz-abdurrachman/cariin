@@ -40,7 +40,7 @@ import {
 } from '@/services/report.service';
 import { getOrCreateConversation } from '@/services/chat.service';
 import { COLORS } from '@/utils/constants';
-import { formatFullDate, categoryLabel } from '@/utils/formatters';
+import { formatDateTime, formatFullDate, categoryLabel } from '@/utils/formatters';
 
 type Nav = StackNavigationProp<AdminDashboardStackParamList, 'AdminReview'>;
 type RouteP = RouteProp<AdminDashboardStackParamList, 'AdminReview'>;
@@ -430,6 +430,9 @@ export default function AdminReviewScreen() {
               <InfoRow icon="map-pin" label="Lokasi" value={report.location} />
               {report.custody_point ? <InfoRow icon="archive" label="Titik Penitipan" value={report.custody_point} /> : null}
               <InfoRow icon="calendar" label="Waktu Lapor" value={formatFullDate(report.created_at)} />
+              {report.event_time ? (
+                <InfoRow icon="clock" label="Jam Kejadian" value={formatDateTime(report.event_time)} />
+              ) : null}
             </View>
 
             {report.description ? (

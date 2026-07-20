@@ -54,6 +54,7 @@ export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
   const [category, setCategory] = useState<CategoryId | null>(null);
   const [location, setLocation] = useState('');
   const [custodyPoint, setCustodyPoint] = useState('');
+  const [eventTime, setEventTime] = useState('');
   const [photo, setPhoto] = useState<PickImageResult | null>(null);
   const [reporterName, setReporterName] = useState('');
   const [reporterNim, setReporterNim] = useState('');
@@ -122,6 +123,11 @@ export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
         custody_point:
           reportType === 'found' ? custodyPoint.trim() : null,
         photo_url: photoUrl,
+        event_time: eventTime.trim()
+          ? new Date(
+              new Date().toDateString() + ' ' + eventTime.trim()
+            ).toISOString()
+          : null,
         reporter_name: reporterName.trim() || null,
         reporter_nim: reporterNim.trim() || null,
         reporter_faculty: reporterFaculty.trim() || null,
@@ -417,6 +423,9 @@ export default function AdminCreateFoundScreen({ initialLost = false }: Props) {
               />
             </>
           ) : null}
+
+          <FieldLabel>Jam Kejadian (Opsional)</FieldLabel>
+          <Input value={eventTime} onChangeText={setEventTime} placeholder="Cth: 14:30" keyboardType="numbers-and-punctuation" maxLength={5} />
 
           <FieldLabel>Deskripsi Detail</FieldLabel>
           <Input value={description} onChangeText={setDescription} placeholder="Kondisi barang, ciri khas, kapan ditemukan..." multiline numberOfLines={4} />

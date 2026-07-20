@@ -937,5 +937,165 @@ grant execute on function public.update_admin_report(uuid, text, text, text, tex
 grant execute on function public.admin_mark_report_resolved(uuid) to authenticated;
 
 -- ============================================================================
+-- 9. MIGRATION — event_time (jam kejadian)
+-- ============================================================================
+-- Tambah kolom event_time untuk mencatat jam kejadian hilang/temuan.
+-- Format: timestamptz (ISO 8601). Client mengirim HH:MM, service layer
+-- menggabungkan dengan tanggal hari ini.
+alter table public.reports
+  add column if not exists event_time timestamptz;
+
+-- Update RPC create_admin_report: tambah param p_event_time
+drop function if exists public.create_admin_report(
+  text, text, text, text, text, text, text, text, text, text
+);
+
+create function public.create_admin_report(
+  p_type             text,
+  p_title            text,
+  p_category         text,
+  p_location         text,
+  p_description      text default null,
+  p_custody_point    text default null,
+  p_photo_url        text default null,
+  p_event_time       timestamptz default null,
+  p_reporter_name    text default null,
+  p_reporter_nim     text default null,
+  p_reporter_faculty text default null
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+begin
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh membuat laporan walk-in.';
+  end if;
+
+  insert into public.reports (
+    user_id, type, title, description, category,
+    location, custody_point, photo_url, event_time,
+    status, created_by_admin,
+    reporter_name, reporter_nim, reporter_faculty
+  ) values (
+    auth.uid(),
+    p_type, p_title, p_description, p_category,
+    p_location, p_custody_point, p_photo_url, p_event_time,
+    'approved',
+    true,
+    p_reporter_name, p_reporter_nim, p_reporter_faculty
+  ) returning id into v_id;
+
+  return v_id;
+end;
+$$;
+
+-- Update RPC update_admin_report: tambah param p_event_time
+drop function if exists public.update_admin_report(
+  uuid, text, text, text, text, text, text, text, text, text, text
+);
+
+create function public.update_admin_report(
+  p_report_id        uuid,
+  p_type             text,
+  p_title            text,
+  p_category         text,
+  p_location         text,
+  p_description      text default null,
+  p_custody_point    text default null,
+  p_photo_url        text default null,
+  p_event_time       timestamptz default null,
+  p_reporter_name    text default null,
+  p_reporter_nim     text default null,
+  p_reporter_faculty text default null
+)
+returns public.reports
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_report public.reports;
+begin
+  if not public.is_admin() then
+    raise exception 'Hanya admin yang boleh mengubah laporan.';
+  end if;
+
+  if p_type not in ('lost', 'found') then
+    raise exception 'Jenis laporan tidak valid.';
+  end if;
+
+  if nullif(btrim(p_title), '') is null then
+    raise exception 'Nama barang wajib diisi.';
+  end if;
+
+  if p_category not in (
+    'elektronik', 'dokumen', 'dompet_tas', 'kunci',
+    'aksesoris', 'pakaian', 'buku_atk', 'lainnya'
+  ) then
+    raise exception 'Kategori laporan tidak valid.';
+  end if;
+
+  if nullif(btrim(p_location), '') is null then
+    raise exception 'Lokasi wajib diisi.';
+  end if;
+
+  if p_type = 'found' and nullif(btrim(coalesce(p_custody_point, '')), '') is null then
+    raise exception 'Titik penitipan wajib diisi untuk barang temuan.';
+  end if;
+
+  update public.reports
+  set type = p_type,
+      title = btrim(p_title),
+      description = nullif(btrim(coalesce(p_description, '')), ''),
+      category = p_category,
+      location = btrim(p_location),
+      custody_point = case
+        when p_type = 'found'
+          then nullif(btrim(coalesce(p_custody_point, '')), '')
+        else null
+      end,
+      photo_url = nullif(btrim(coalesce(p_photo_url, '')), ''),
+      event_time = p_event_time,
+      reporter_name = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_name, '')), '')
+        else reporter_name
+      end,
+      reporter_nim = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_nim, '')), '')
+        else reporter_nim
+      end,
+      reporter_faculty = case
+        when created_by_admin
+          then nullif(btrim(coalesce(p_reporter_faculty, '')), '')
+        else reporter_faculty
+      end
+  where id = p_report_id
+  returning * into v_report;
+
+  if not found then
+    raise exception 'Laporan tidak ditemukan.';
+  end if;
+
+  return v_report;
+end;
+$$;
+
+-- Re-grant execute setelah recreate functions
+revoke execute on function public.create_admin_report(
+  text, text, text, text, text, text, text, text, text, text, timestamptz
+) from public, anon;
+revoke execute on function public.update_admin_report(
+  uuid, text, text, text, text, text, text, text, text, text, text, timestamptz
+) from public, anon;
+grant execute on function public.create_admin_report(text, text, text, text, text, text, text, text, text, text, timestamptz) to authenticated;
+grant execute on function public.update_admin_report(uuid, text, text, text, text, text, text, text, text, text, text, timestamptz) to authenticated;
+
+-- ============================================================================
 -- DONE
 -- ============================================================================

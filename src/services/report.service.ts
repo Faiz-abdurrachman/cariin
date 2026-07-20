@@ -28,9 +28,7 @@ export interface Report {
   status: ReportStatus;
   admin_note: string | null;
   created_by_admin: boolean;
-  // Saat created_by_admin=true, kolom-kolom ini diisi oleh admin (laporan walk-in
-  // dari user yg gak punya akun). Saat false, biarkan null & ambil dari relasi
-  // `reporter` (foreign embed dari profiles).
+  event_time: string | null;
   reporter_name: string | null;
   reporter_nim: string | null;
   reporter_faculty: string | null;
@@ -48,6 +46,7 @@ export interface ReportInput {
   location: string;
   custody_point?: string | null;
   photo_url?: string | null;
+  event_time?: string | null;
 }
 
 export interface ReportFilter {
@@ -130,6 +129,7 @@ export async function createReport(input: ReportInput): Promise<Report> {
       location: input.location,
       custody_point: input.custody_point ?? null,
       photo_url: input.photo_url ?? null,
+      event_time: input.event_time ?? null,
       status: 'pending', // default schema, di-set eksplisit biar jelas
     })
     .select(REPORT_SELECT)
@@ -155,6 +155,7 @@ export async function updateReport(
       ...(patch.location !== undefined && { location: patch.location }),
       ...(patch.custody_point !== undefined && { custody_point: patch.custody_point }),
       ...(patch.photo_url !== undefined && { photo_url: patch.photo_url }),
+      ...(patch.event_time !== undefined && { event_time: patch.event_time }),
     })
     .eq('id', id)
     .select(REPORT_SELECT)
@@ -208,6 +209,7 @@ export interface AdminReportInput {
   location: string;
   custody_point?: string | null;
   photo_url?: string | null;
+  event_time?: string | null;
   reporter_name?: string | null;
   reporter_nim?: string | null;
   reporter_faculty?: string | null;
@@ -222,6 +224,7 @@ export async function createAdminReport(input: AdminReportInput): Promise<string
     p_location: input.location,
     p_custody_point: input.custody_point ?? null,
     p_photo_url: input.photo_url ?? null,
+    p_event_time: input.event_time ?? null,
     p_reporter_name: input.reporter_name ?? null,
     p_reporter_nim: input.reporter_nim ?? null,
     p_reporter_faculty: input.reporter_faculty ?? null,
@@ -243,6 +246,7 @@ export async function updateAdminReport(
     p_location: input.location,
     p_custody_point: input.custody_point ?? null,
     p_photo_url: input.photo_url ?? null,
+    p_event_time: input.event_time ?? null,
     p_reporter_name: input.reporter_name ?? null,
     p_reporter_nim: input.reporter_nim ?? null,
     p_reporter_faculty: input.reporter_faculty ?? null,
