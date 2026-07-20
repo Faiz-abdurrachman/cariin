@@ -20,8 +20,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/context/AuthContext';
 import type { ProfileStackParamList } from '@/navigation/types';
-import { supabase } from '@/services/supabase';
-import { pickImageFromLibrary, takePhoto, uploadAvatar } from '@/services/upload.service';
+import { updateMyProfile } from '@/services/profile.service';
+import {
+  pickImageFromLibrary,
+  takePhoto,
+  uploadAvatar,
+  type PickImageResult,
+} from '@/services/upload.service';
 import { COLORS } from '@/utils/constants';
 
 export default function ProfileScreen() {
@@ -29,40 +34,37 @@ export default function ProfileScreen() {
   const nav = useNavigation<StackNavigationProp<ProfileStackParamList, 'Profile'>>();
   const [avatarUploading, setAvatarUploading] = useState(false);
 
+  const updateAvatar = async (
+    picker: () => Promise<PickImageResult | null>,
+  ) => {
+    if (!userProfile) return;
+    setAvatarUploading(true);
+    try {
+      const picked = await picker();
+      if (!picked) return;
+      const url = await uploadAvatar(picked, userProfile.id);
+      await updateMyProfile(userProfile.id, { avatar_url: url });
+      await refreshProfile();
+    } catch (error) {
+      Alert.alert(
+        'Gagal memperbarui foto',
+        error instanceof Error ? error.message : 'Coba lagi.',
+      );
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
   const onAvatarPress = () => {
     if (avatarUploading || !userProfile) return;
     Alert.alert('Foto Profil', 'Pilih sumber gambar.', [
       {
         text: 'Ambil Foto',
-        onPress: async () => {
-          setAvatarUploading(true);
-          const picked = await takePhoto();
-          if (picked && userProfile) {
-            const url = await uploadAvatar(picked, userProfile.id);
-            await supabase
-              .from('profiles')
-              .update({ avatar_url: url })
-              .eq('id', userProfile.id);
-            await refreshProfile();
-          }
-          setAvatarUploading(false);
-        },
+        onPress: () => void updateAvatar(takePhoto),
       },
       {
         text: 'Pilih dari Galeri',
-        onPress: async () => {
-          setAvatarUploading(true);
-          const picked = await pickImageFromLibrary();
-          if (picked && userProfile) {
-            const url = await uploadAvatar(picked, userProfile.id);
-            await supabase
-              .from('profiles')
-              .update({ avatar_url: url })
-              .eq('id', userProfile.id);
-            await refreshProfile();
-          }
-          setAvatarUploading(false);
-        },
+        onPress: () => void updateAvatar(pickImageFromLibrary),
       },
       { text: 'Batal', style: 'cancel' },
     ]);
@@ -126,21 +128,26 @@ export default function ProfileScreen() {
           style={{
             marginHorizontal: 16,
             marginTop: 2,
-            marginBottom: 12,
+            marginBottom: 14,
             paddingHorizontal: 16,
-            paddingVertical: 14,
+            paddingVertical: 16,
+            borderRadius: 28,
+            backgroundColor: 'rgba(255,255,255,0.48)',
+            borderWidth: 1.5,
+            borderColor: 'rgba(255,255,255,0.82)',
+            overflow: 'hidden',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: 'rgba(255,255,255,0.42)',
-            borderRadius: 24,
-            borderWidth: 1.5,
-            borderColor: 'rgba(255,255,255,0.76)',
-            overflow: 'hidden',
+            shadowColor: '#000',
+            shadowOpacity: 0.1,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 8 },
+            elevation: 4,
           }}
         >
           <LinearGradient
-            colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+            colors={['rgba(255,255,255,0.94)', 'rgba(255,255,255,0.24)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={StyleSheet.absoluteFillObject}
@@ -159,15 +166,20 @@ export default function ProfileScreen() {
             style={{
               borderRadius: 30,
               overflow: 'hidden',
-              backgroundColor: 'rgba(255,255,255,0.42)',
+              backgroundColor: 'rgba(255,255,255,0.5)',
               borderWidth: 1.5,
-              borderColor: 'rgba(255,255,255,0.76)',
+              borderColor: 'rgba(255,255,255,0.82)',
               padding: 20,
               marginBottom: 16,
+              shadowColor: '#000',
+              shadowOpacity: 0.1,
+              shadowRadius: 20,
+              shadowOffset: { width: 0, height: 10 },
+              elevation: 5,
             }}
           >
             <LinearGradient
-              colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.18)', 'transparent']}
+              colors={['rgba(255,255,255,0.94)', 'rgba(255,255,255,0.22)', 'transparent']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFillObject}

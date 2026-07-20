@@ -22,17 +22,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import AuthInput from '@/components/AuthInput';
 import { useAuth } from '@/context/AuthContext';
+import { useNotif } from '@/context/NotifContext';
 import type { ProfileStackParamList } from '@/navigation/types';
-import { supabase } from '@/services/supabase';
+import { updatePassword } from '@/services/auth.service';
+import { updateMyProfile } from '@/services/profile.service';
 import { COLORS } from '@/utils/constants';
 
 export default function SettingsScreen() {
   const { userProfile, refreshProfile } = useAuth();
+  const { notificationsEnabled, setNotificationsEnabled } = useNotif();
   const nav = useNavigation<StackNavigationProp<ProfileStackParamList, 'Settings'>>();
 
   const [name, setName] = useState(userProfile?.name ?? '');
   const [password, setPassword] = useState('');
-  const [notifEnabled, setNotifEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const onSave = async () => {
@@ -41,23 +43,21 @@ export default function SettingsScreen() {
       Alert.alert('Nama tidak boleh kosong');
       return;
     }
+    if (!userProfile) {
+      Alert.alert('Sesi tidak valid', 'Silakan login ulang.');
+      return;
+    }
+    if (password.length > 0 && password.length < 6) {
+      Alert.alert('Kata sandi minimal 6 karakter');
+      return;
+    }
 
     setSaving(true);
     try {
-      const { error: profileErr } = await supabase
-        .from('profiles')
-        .update({ name: trimmed, updated_at: new Date().toISOString() })
-        .eq('id', userProfile!.id);
-      if (profileErr) throw new Error(profileErr.message);
+      await updateMyProfile(userProfile.id, { name: trimmed });
 
       if (password.length > 0) {
-        if (password.length < 6) {
-          Alert.alert('Kata sandi minimal 6 karakter');
-          return;
-        }
-
-        const { error: pwErr } = await supabase.auth.updateUser({ password });
-        if (pwErr) throw new Error(pwErr.message);
+        await updatePassword(password);
       }
 
       await refreshProfile();
@@ -258,15 +258,15 @@ export default function SettingsScreen() {
               />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: COLORS.primary }}>
-                  Push Notifications
+                  Notifikasi In-App
                 </Text>
                 <Text style={{ fontSize: 12, color: COLORS.textMuted }}>
                   Pemberitahuan pesan dan status laporan.
                 </Text>
               </View>
               <Switch
-                value={notifEnabled}
-                onValueChange={setNotifEnabled}
+                value={notificationsEnabled}
+                onValueChange={(enabled) => void setNotificationsEnabled(enabled)}
                 trackColor={{ false: '#D4D4D8', true: '#22C55E' }}
                 thumbColor={COLORS.surface}
               />

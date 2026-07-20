@@ -4,6 +4,7 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -46,6 +47,8 @@ const FAQ: FaqItem[] = [
 ];
 
 function FaqCard({ item }: { item: FaqItem }) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <View
       style={{
@@ -57,8 +60,10 @@ function FaqCard({ item }: { item: FaqItem }) {
       }}
     >
       <Pressable
-        onPress={() => {}}
+        onPress={() => setExpanded((current) => !current)}
         accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        accessibilityLabel={`${item.question}. ${expanded ? 'Tutup jawaban' : 'Buka jawaban'}`}
         style={{
           padding: 16,
           flexDirection: 'row',
@@ -77,13 +82,26 @@ function FaqCard({ item }: { item: FaqItem }) {
         >
           {item.question}
         </Text>
-        <Feather name="chevron-down" size={18} color={COLORS.textMuted} />
+        <Feather
+          name={expanded ? 'chevron-up' : 'chevron-down'}
+          size={18}
+          color={COLORS.textMuted}
+        />
       </Pressable>
-      <View style={{ borderTopWidth: 1, borderTopColor: '#F4F4F5', paddingHorizontal: 16, paddingVertical: 14 }}>
-        <Text style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 20 }}>
-          {item.answer}
-        </Text>
-      </View>
+      {expanded ? (
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: '#F4F4F5',
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+          }}
+        >
+          <Text style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 20 }}>
+            {item.answer}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 }

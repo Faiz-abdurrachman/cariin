@@ -4,6 +4,7 @@
 
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,30 +19,38 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import EmptyState from '@/components/EmptyState';
 import StatusBadge from '@/components/StatusBadge';
-import type { HomeStackParamList } from '@/navigation/types';
+import { useAuth } from '@/context/AuthContext';
+import type {
+  ChatStackParamList,
+  HomeStackParamList,
+  ProfileStackParamList,
+} from '@/navigation/types';
+import { getOrCreateConversation } from '@/services/chat.service';
+import {
+  getPublicProfile,
+  type PublicProfile,
+} from '@/services/profile.service';
 import { listReports, type Report } from '@/services/report.service';
-import { supabase } from '@/services/supabase';
 import { COLORS } from '@/utils/constants';
 import { formatRelativeTime, categoryLabel } from '@/utils/formatters';
 
-type Nav = RouteProp<HomeStackParamList, 'UserProfile'>;
-
-interface PublicProfile {
-  name: string;
-  nim: string | null;
-  faculty: string | null;
-  avatar_url: string | null;
-  created_at: string;
-}
+type CommonProfileStackParamList =
+  & HomeStackParamList
+  & ChatStackParamList
+  & ProfileStackParamList;
+type Nav = StackNavigationProp<CommonProfileStackParamList, 'UserProfile'>;
+type Route = RouteProp<CommonProfileStackParamList, 'UserProfile'>;
 
 export default function UserProfileScreen() {
-  const nav = useNavigation();
-  const route = useRoute<Nav>();
+  const nav = useNavigation<Nav>();
+  const route = useRoute<Route>();
+  const { user } = useAuth();
   const userId = route.params.userId;
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [startingChat, setStartingChat] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -49,7 +58,7 @@ export default function UserProfileScreen() {
     setError(null);
     try {
       const [profileData, reportsData] = await Promise.all([
-        fetchPublicProfile(userId),
+        getPublicProfile(userId),
         listReports({ userId, status: 'approved' }),
       ]);
       setProfile(profileData);
@@ -125,6 +134,26 @@ export default function UserProfileScreen() {
 
   const joinYear = new Date(profile.created_at).getFullYear();
   const isFound = (type: string) => type === 'found';
+  const activeReport = reports[0];
+
+  const startChat = async () => {
+    if (!activeReport || startingChat) return;
+    setStartingChat(true);
+    try {
+      const conversation = await getOrCreateConversation(activeReport.id, userId);
+      nav.navigate('ChatRoom', {
+        conversationId: conversation.id,
+        reportId: activeReport.id,
+      });
+    } catch (chatError) {
+      Alert.alert(
+        'Gagal membuka percakapan',
+        chatError instanceof Error ? chatError.message : 'Coba lagi.',
+      );
+    } finally {
+      setStartingChat(false);
+    }
+  };
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: COLORS.background }}>
@@ -237,41 +266,38 @@ export default function UserProfileScreen() {
             Bergabung sejak {joinYear}
           </Text>
 
-          {/* Chat button — placeholder sampai FASE 4.5 */}
-          <Pressable
-            onPress={() =>
-              Alert.alert(
-                'Segera hadir',
-                'Fitur chat akan tersedia di update berikutnya.',
-              )
-            }
-            style={{ marginTop: 16 }}
-            accessibilityRole="button"
-            accessibilityLabel="Kirim pesan"
-          >
-            {({ pressed }) => (
-              <View
-                style={{
-                  paddingHorizontal: 24,
-                  paddingVertical: 10,
-                  backgroundColor: COLORS.primary,
-                  borderRadius: 999,
-                  opacity: pressed ? 0.85 : 1,
-                  shadowColor: '#000',
-                  shadowOpacity: 0.12,
-                  shadowRadius: 8,
-                  shadowOffset: { width: 0, height: 4 },
-                  elevation: 4,
-                }}
-              >
-                <Text
-                  style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}
+          {user?.id !== userId && activeReport ? (
+            <Pressable
+              onPress={() => void startChat()}
+              disabled={startingChat}
+              style={{ marginTop: 16 }}
+              accessibilityRole="button"
+              accessibilityLabel={`Kirim pesan tentang ${activeReport.title}`}
+            >
+              {({ pressed }) => (
+                <View
+                  style={{
+                    paddingHorizontal: 24,
+                    paddingVertical: 10,
+                    backgroundColor: COLORS.primary,
+                    borderRadius: 999,
+                    opacity: pressed || startingChat ? 0.72 : 1,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.12,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 4 },
+                    elevation: 4,
+                  }}
                 >
-                  Kirim Pesan
-                </Text>
-              </View>
-            )}
-          </Pressable>
+                  <Text
+                    style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}
+                  >
+                    {startingChat ? 'Membuka Pesan...' : 'Kirim Pesan'}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          ) : null}
         </View>
       </View>
 
@@ -296,13 +322,7 @@ export default function UserProfileScreen() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => {
-                // Navigate ke Detail — karena UserProfile ada di multiple stacks,
-                // kita cast navigation agar bisa navigate ke screen yang ada di
-                // stack yang sama.
                 const target = item.type === 'lost' ? 'DetailLost' : 'DetailFound';
-                // @ts-expect-error — cross-stack navigation: navigasi ke screen
-                // yang mungkin tidak ada di current stack, tapi navigator root
-                // bakal resolve via deep link.
                 nav.navigate(target, { reportId: item.id });
               }}
               accessibilityRole="button"
@@ -382,15 +402,4 @@ export default function UserProfileScreen() {
       </View>
     </SafeAreaView>
   );
-}
-
-async function fetchPublicProfile(userId: string): Promise<PublicProfile> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('name, nim, faculty, avatar_url, created_at')
-    .eq('id', userId)
-    .single();
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error('Profil tidak ditemukan.');
-  return data as PublicProfile;
 }
