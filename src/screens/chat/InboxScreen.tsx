@@ -20,9 +20,12 @@ type Nav = StackNavigationProp<ChatStackParamList, 'Inbox'>;
 
 export default function InboxScreen() {
   const nav = useNavigation<Nav>();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { conversations, loadingConversations, fetchConversations } = useChatStore();
   const [refreshing, setRefreshing] = useState(false);
+  const isAdmin = role === 'admin';
+  const accent = isAdmin ? COLORS.admin : COLORS.primary;
+  const background = isAdmin ? COLORS.adminLight : COLORS.background;
 
   useFocusEffect(
     useCallback(() => {
@@ -107,7 +110,7 @@ export default function InboxScreen() {
                   }}
                 >
                   <Text
-                    style={{ fontSize: 15, fontWeight: '800', color: COLORS.primary }}
+                    style={{ fontSize: 15, fontWeight: '800', color: accent }}
                     numberOfLines={1}
                   >
                     {otherName}
@@ -130,7 +133,7 @@ export default function InboxScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <View style={{ flex: 1, backgroundColor: background }}>
       <View
         style={{
           position: 'absolute',
@@ -139,7 +142,7 @@ export default function InboxScreen() {
           width: 350,
           height: 350,
           borderRadius: 999,
-          backgroundColor: COLORS.primary,
+          backgroundColor: accent,
           opacity: 0.15,
           transform: [{ scale: 1.35 }],
         }}
@@ -186,7 +189,7 @@ export default function InboxScreen() {
             style={StyleSheet.absoluteFillObject}
             pointerEvents="none"
           />
-          <Text style={{ fontSize: 20, fontWeight: '900', color: COLORS.primary }}>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: accent }}>
             Pesan
           </Text>
           <Text style={{ fontSize: 12, color: COLORS.textMuted, marginLeft: 10 }}>
@@ -202,7 +205,7 @@ export default function InboxScreen() {
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />
             }
             ListEmptyComponent={
               <EmptyState

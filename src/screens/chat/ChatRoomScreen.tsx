@@ -3,6 +3,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -18,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import ChatBubble from '@/components/ChatBubble';
 import { useAuth } from '@/context/AuthContext';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 import type { ChatStackParamList } from '@/navigation/types';
 import { markMessagesAsRead } from '@/services/chat.service';
 import { useChatStore } from '@/store/chatStore';
@@ -30,8 +32,9 @@ export default function ChatRoomScreen() {
   const nav = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { conversationId } = route.params;
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
   const {
     messages,
     loadingMessages,
@@ -46,6 +49,10 @@ export default function ChatRoomScreen() {
   const [text, setText] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const otherNameRef = useRef('...');
+  const isAdmin = role === 'admin';
+  const keyboardVisible = keyboardHeight > 0;
+  const accent = isAdmin ? COLORS.admin : COLORS.primary;
+  const background = isAdmin ? COLORS.adminLight : COLORS.background;
 
   const conversation = conversations.find((c) => c.id === conversationId);
   const otherUser = conversation
@@ -59,7 +66,9 @@ export default function ChatRoomScreen() {
   useEffect(() => {
     void fetchMessages(conversationId);
     subscribe(conversationId);
-    void markMessagesAsRead(conversationId);
+    void markMessagesAsRead(conversationId).catch(() => {
+      // Read receipt bukan critical path; pesan tetap dapat dibaca/dikirim.
+    });
     void fetchConversations();
 
     return () => {
@@ -77,15 +86,23 @@ export default function ChatRoomScreen() {
     const trimmed = text.trim();
     if (!trimmed) return;
     setText('');
-    await sendMessage(conversationId, trimmed);
-    void fetchConversations();
-    setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+    try {
+      await sendMessage(conversationId, trimmed);
+      void fetchConversations();
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    } catch (error) {
+      setText(trimmed);
+      Alert.alert(
+        'Pesan gagal dikirim',
+        error instanceof Error ? error.message : 'Coba lagi.',
+      );
+    }
   }, [text, conversationId, sendMessage, fetchConversations]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <View style={{ flex: 1, backgroundColor: background }}>
       <View
         style={{
           position: 'absolute',
@@ -94,7 +111,7 @@ export default function ChatRoomScreen() {
           width: 360,
           height: 360,
           borderRadius: 999,
-          backgroundColor: COLORS.primary,
+          backgroundColor: accent,
           opacity: 0.12,
           transform: [{ scale: 1.25 }],
         }}
@@ -161,7 +178,7 @@ export default function ChatRoomScreen() {
                   opacity: pressed ? 0.7 : 1,
                 }}
               >
-                <Feather name="arrow-left" size={20} color={COLORS.primary} />
+                <Feather name="arrow-left" size={20} color={accent} />
               </View>
             )}
           </Pressable>
@@ -193,7 +210,7 @@ export default function ChatRoomScreen() {
                       style={{
                         fontSize: 16,
                         fontWeight: '900',
-                        color: COLORS.primary,
+                        color: accent,
                         opacity: pressed ? 0.78 : 1,
                       }}
                       numberOfLines={1}
@@ -209,7 +226,7 @@ export default function ChatRoomScreen() {
             </Pressable>
           ) : (
             <View style={{ flex: 1, marginLeft: 14 }}>
-              <Text style={{ fontSize: 16, fontWeight: '900', color: COLORS.primary }} numberOfLines={1}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: accent }} numberOfLines={1}>
                 Chat
               </Text>
               <Text style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }} numberOfLines={1}>
@@ -222,7 +239,7 @@ export default function ChatRoomScreen() {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 8 : 0}
+          keyboardVerticalOffset={0}
         >
           <FlatList
             ref={flatListRef}
@@ -231,7 +248,14 @@ export default function ChatRoomScreen() {
               const isMine = item.sender_id === user?.id;
               const prev = index > 0 ? msgs[index - 1] : null;
               const showTime = !prev || prev.sender_id !== item.sender_id;
-              return <ChatBubble message={item} isMine={isMine} showTime={showTime} />;
+              return (
+                <ChatBubble
+                  message={item}
+                  isMine={isMine}
+                  showTime={showTime}
+                  variant={isAdmin ? 'admin' : 'default'}
+                />
+              );
             }}
             keyExtractor={(item) => item.id}
             keyboardShouldPersistTaps="handled"
@@ -269,7 +293,13 @@ export default function ChatRoomScreen() {
             }
           />
 
-          <View style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 8) }}>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              paddingTop: 8,
+              paddingBottom: keyboardVisible ? 8 : Math.max(insets.bottom, 8),
+            }}
+          >
             <BlurView
               intensity={60}
               tint="light"
@@ -306,7 +336,7 @@ export default function ChatRoomScreen() {
                     paddingHorizontal: 12,
                     paddingTop: 10,
                     paddingBottom: 10,
-                    color: COLORS.primary,
+                    color: accent,
                     fontWeight: '600',
                     textAlignVertical: 'top',
                     backgroundColor: 'rgba(255,255,255,0.58)',
@@ -328,7 +358,7 @@ export default function ChatRoomScreen() {
                       width: 44,
                       height: 44,
                       borderRadius: 16,
-                      backgroundColor: text.trim() ? COLORS.primary : '#D4D4D8',
+                      backgroundColor: text.trim() ? accent : '#D4D4D8',
                       alignItems: 'center',
                       justifyContent: 'center',
                       opacity: pressed ? 0.82 : 1,
