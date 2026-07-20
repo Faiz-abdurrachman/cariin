@@ -80,9 +80,21 @@ export async function logout(): Promise<void> {
   if (error) throw error;
 }
 
+export async function getCurrentUserId(): Promise<string> {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) throw new Error(error.message);
+  if (!data.user) throw new Error('Sesi tidak valid. Silakan login ulang.');
+  return data.user.id;
+}
+
 export async function resetPassword(email: string): Promise<void> {
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
     redirectTo: RESET_REDIRECT,
   });
   if (error) throw error;
+}
+
+export async function updatePassword(password: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw new Error(error.message);
 }

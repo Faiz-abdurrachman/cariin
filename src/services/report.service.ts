@@ -56,6 +56,7 @@ export interface ReportFilter {
   status?: ReportStatus;
   search?: string;
   userId?: string; // dipakai MyPosts: filter laporan milik user tertentu
+  includeAllStatuses?: boolean; // khusus admin: jangan pasang filter status default
 }
 
 // PostgREST foreign embed: `reporter:user_id (...)`. Pakai alias `reporter`
@@ -78,18 +79,23 @@ export async function listReports(filter: ReportFilter = {}): Promise<Report[]> 
   // Default: hanya tampilkan approved+resolved untuk feed publik (RLS juga
   // memfilter, tapi explicit di query menghemat round trip & jelas intent).
   // Untuk MyPosts (userId di-set), tampilkan semua status milik user.
-  if (filter.userId) {
-    q = q.eq('user_id', filter.userId);
-  } else if (filter.status) {
+  if (filter.userId) q = q.eq('user_id', filter.userId);
+
+  if (filter.status) {
     q = q.eq('status', filter.status);
-  } else {
+  } else if (!filter.userId && !filter.includeAllStatuses) {
     q = q.in('status', ['approved', 'resolved']);
   }
 
   if (filter.type) q = q.eq('type', filter.type);
   if (filter.category) q = q.eq('category', filter.category);
   if (filter.search && filter.search.trim().length > 0) {
-    q = q.ilike('title', `%${escapeLike(filter.search.trim())}%`);
+    const term = escapeLike(filter.search.trim()).replace(/[(),"]/g, ' ').trim();
+    if (term) {
+      q = q.or(
+        `title.ilike.%${term}%,location.ilike.%${term}%,description.ilike.%${term}%`,
+      );
+    }
   }
 
   const { data, error } = await q.order('created_at', { ascending: false });
@@ -164,15 +170,9 @@ export async function deleteReport(id: string): Promise<void> {
 }
 
 export async function markAsResolved(id: string): Promise<Report> {
-  // Set status='resolved' + resolved_at=now. RLS update_self mengizinkan owner
-  // update selama status saat ini bukan 'resolved' (sudah resolved tidak bisa
-  // di-set ulang). Setelah resolve, RLS memblokir edit/delete row tsb.
-  const { data, error } = await supabase
-    .from('reports')
-    .update({ status: 'resolved', resolved_at: new Date().toISOString() })
-    .eq('id', id)
-    .select(REPORT_SELECT)
-    .single();
+  const { data, error } = await supabase.rpc('mark_report_resolved', {
+    p_report_id: id,
+  });
   if (error) throw new Error(error.message);
   if (!data) throw new Error('Gagal menandai laporan selesai.');
   return data as Report;
@@ -228,6 +228,37 @@ export async function createAdminReport(input: AdminReportInput): Promise<string
   });
   if (error) throw new Error(error.message);
   return data as string;
+}
+
+export async function updateAdminReport(
+  id: string,
+  input: AdminReportInput,
+): Promise<Report> {
+  const { data, error } = await supabase.rpc('update_admin_report', {
+    p_report_id: id,
+    p_type: input.type,
+    p_title: input.title,
+    p_description: input.description ?? null,
+    p_category: input.category,
+    p_location: input.location,
+    p_custody_point: input.custody_point ?? null,
+    p_photo_url: input.photo_url ?? null,
+    p_reporter_name: input.reporter_name ?? null,
+    p_reporter_nim: input.reporter_nim ?? null,
+    p_reporter_faculty: input.reporter_faculty ?? null,
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Gagal memperbarui laporan.');
+  return data as Report;
+}
+
+export async function resolveReportAsAdmin(id: string): Promise<Report> {
+  const { data, error } = await supabase.rpc('admin_mark_report_resolved', {
+    p_report_id: id,
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Gagal menyelesaikan laporan.');
+  return data as Report;
 }
 
 export async function getAdminStats(): Promise<{

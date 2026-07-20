@@ -1,5 +1,6 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/services/supabase';
+import { getCurrentUserId } from '@/services/auth.service';
 
 export interface Conversation {
   id: string;
@@ -33,10 +34,13 @@ export interface Message {
 const CONVERSATION_SELECT = `*, user_a:user_a_id(id, name, avatar_url), user_b:user_b_id(id, name, avatar_url)`;
 
 export async function listConversations(): Promise<Conversation[]> {
+  const currentUserId = await getCurrentUserId();
   const { data, error } = await supabase
     .from('conversations')
     .select(CONVERSATION_SELECT)
-    .or(`user_a_id.eq.${(await supabase.auth.getSession()).data.session?.user.id},user_b_id.eq.${(await supabase.auth.getSession()).data.session?.user.id}`)
+    .or(
+      `user_a_id.eq.${currentUserId},user_b_id.eq.${currentUserId}`,
+    )
     .order('last_at', { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -47,21 +51,23 @@ export async function getOrCreateConversation(
   reportId: string,
   otherUserId: string,
 ): Promise<Conversation> {
-  const session = await supabase.auth.getSession();
-  const currentUserId = session.data.session?.user.id;
-  if (!currentUserId) throw new Error('Anda harus login terlebih dahulu.');
+  const currentUserId = await getCurrentUserId();
+  if (currentUserId === otherUserId) {
+    throw new Error('Percakapan tidak dapat dibuat dengan akun sendiri.');
+  }
 
   const userAId = currentUserId < otherUserId ? currentUserId : otherUserId;
   const userBId = currentUserId < otherUserId ? otherUserId : currentUserId;
 
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from('conversations')
     .select(CONVERSATION_SELECT)
     .eq('report_id', reportId)
     .eq('user_a_id', userAId)
     .eq('user_b_id', userBId)
-    .single();
+    .maybeSingle();
 
+  if (existingError) throw new Error(existingError.message);
   if (existing) return existing as Conversation;
 
   const { data: created, error: insertError } = await supabase
@@ -74,6 +80,19 @@ export async function getOrCreateConversation(
     .select(CONVERSATION_SELECT)
     .single();
 
+  if (insertError?.code === '23505') {
+    // Dua perangkat dapat membuat conversation yang sama hampir bersamaan.
+    // Ambil row pemenang unique constraint agar flow tetap idempotent.
+    const { data: concurrent, error: concurrentError } = await supabase
+      .from('conversations')
+      .select(CONVERSATION_SELECT)
+      .eq('report_id', reportId)
+      .eq('user_a_id', userAId)
+      .eq('user_b_id', userBId)
+      .single();
+    if (concurrentError) throw new Error(concurrentError.message);
+    return concurrent as Conversation;
+  }
   if (insertError) throw new Error(insertError.message);
   if (!created) throw new Error('Gagal membuat percakapan.');
   return created as Conversation;
@@ -94,16 +113,16 @@ export async function sendMessage(
   conversationId: string,
   content: string,
 ): Promise<Message> {
-  const session = await supabase.auth.getSession();
-  const senderId = session.data.session?.user.id;
-  if (!senderId) throw new Error('Anda harus login terlebih dahulu.');
+  const trimmed = content.trim();
+  if (!trimmed) throw new Error('Pesan tidak boleh kosong.');
+  const senderId = await getCurrentUserId();
 
   const { data, error } = await supabase
     .from('messages')
     .insert({
       conversation_id: conversationId,
       sender_id: senderId,
-      content: content.trim(),
+      content: trimmed,
     })
     .select('*')
     .single();
@@ -135,9 +154,7 @@ export function subscribeToMessages(
 }
 
 export async function markMessagesAsRead(conversationId: string): Promise<void> {
-  const session = await supabase.auth.getSession();
-  const currentUserId = session.data.session?.user.id;
-  if (!currentUserId) return;
+  const currentUserId = await getCurrentUserId();
 
   const { error } = await supabase
     .from('messages')
