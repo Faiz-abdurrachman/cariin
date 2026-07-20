@@ -11,7 +11,8 @@ import EmptyState from '@/components/EmptyState';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import { useAuth } from '@/context/AuthContext';
 import { useNotif } from '@/context/NotifContext';
-import type { AdminDashboardStackParamList } from '@/navigation/types';
+import type { AdminDashboardStackParamList, AdminTabParamList } from '@/navigation/types';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { getAdminStats, listReports, type Report } from '@/services/report.service';
 import { COLORS, type ReportStatus } from '@/utils/constants';
 import { categoryLabel, formatRelativeTime } from '@/utils/formatters';
@@ -37,6 +38,8 @@ export default function AdminDashboardScreen() {
   const nav = useNavigation<Nav>();
   const { userProfile } = useAuth();
   const { unread } = useNotif();
+
+  const parentNav = nav.getParent<BottomTabNavigationProp<AdminTabParamList>>();
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
@@ -155,9 +158,7 @@ export default function AdminDashboardScreen() {
               <IconButton
                 icon="bell"
                 onPress={() => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const parent: any = nav.getParent();
-                  parent?.navigate('ChatTab', { screen: 'Inbox' });
+                  parentNav?.navigate('ChatTab', { screen: 'Inbox' });
                 }}
                 label={`Notifikasi, ${unread} belum dibaca`}
                 badge={unread}
@@ -181,17 +182,13 @@ export default function AdminDashboardScreen() {
                   {
                     text: 'Laporan Kehilangan',
                     onPress: () => {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const parent: any = nav.getParent();
-                      parent?.navigate('CreateTab', { screen: 'AdminCreateLost' });
+                      parentNav?.navigate('CreateTab', { screen: 'AdminCreateLost' });
                     },
                   },
                   {
                     text: 'Laporan Penemuan',
                     onPress: () => {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const parent: any = nav.getParent();
-                      parent?.navigate('CreateTab', { screen: 'AdminCreateFound' });
+                      parentNav?.navigate('CreateTab', { screen: 'AdminCreateFound' });
                     },
                   },
                   { text: 'Batal', style: 'cancel' },
@@ -246,9 +243,7 @@ export default function AdminDashboardScreen() {
 
             <Pressable
               onPress={() => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const parent: any = nav.getParent();
-                parent?.navigate('ReportsTab');
+                parentNav?.navigate('ReportsTab');
               }}
               accessibilityRole="button"
               accessibilityLabel="Lihat Semua Laporan"
@@ -305,6 +300,10 @@ export default function AdminDashboardScreen() {
         style={{ flex: 1 }}
         data={reports}
         keyExtractor={(item) => item.id}
+        windowSize={5}
+        maxToRenderPerBatch={5}
+        initialNumToRender={4}
+        removeClippedSubviews
         renderItem={({ item }) => <Card report={item} onPress={() => nav.navigate('AdminReview', { reportId: item.id })} />}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 132, flexGrow: 1 }}

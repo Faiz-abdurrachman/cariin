@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/context/AuthContext';
 import { NotifProvider } from '@/context/NotifContext';
 import RootNavigator from '@/navigation';
@@ -14,14 +15,16 @@ import RootNavigator from '@/navigation';
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <AuthProvider>
-          <NotifProvider>
-            <RootNavigator />
-            <StatusBar style="dark" />
-          </NotifProvider>
-        </AuthProvider>
-      </SafeAreaProvider>
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <AuthProvider>
+            <NotifProvider>
+              <RootNavigator />
+              <StatusBar style="dark" />
+            </NotifProvider>
+          </AuthProvider>
+        </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

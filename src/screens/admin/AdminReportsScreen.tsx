@@ -199,6 +199,10 @@ export default function AdminReportsScreen() {
         <FlatList
           data={reports}
           keyExtractor={(item) => item.id}
+          windowSize={5}
+          maxToRenderPerBatch={5}
+          initialNumToRender={4}
+          removeClippedSubviews
           renderItem={({ item }) => <ReportRow report={item} onPress={() => goToReview(item.id)} />}
           ListHeaderComponent={
             <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>

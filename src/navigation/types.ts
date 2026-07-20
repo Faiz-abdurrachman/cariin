@@ -107,7 +107,7 @@ export type AdminProfileStackParamList = {
 export type AdminTabParamList = {
   DashboardTab: NavigatorScreenParams<AdminDashboardStackParamList>;
   ReportsTab: undefined;
-  CreateTab: undefined;
+  CreateTab: NavigatorScreenParams<AdminCreateStackParamList>;
   ChatTab: NavigatorScreenParams<AdminChatStackParamList>;
   AdminProfileTab: NavigatorScreenParams<AdminProfileStackParamList>;
 };

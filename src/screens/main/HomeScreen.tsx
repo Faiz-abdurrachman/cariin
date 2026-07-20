@@ -91,6 +91,10 @@ export default function HomeScreen() {
         <FlatList
           data={reports}
           keyExtractor={(item) => item.id}
+          windowSize={5}
+          maxToRenderPerBatch={5}
+          initialNumToRender={4}
+          removeClippedSubviews
           renderItem={({ item }) => (
             <View style={{ paddingHorizontal: 20 }}>
               <ReportCard
