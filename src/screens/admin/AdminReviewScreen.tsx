@@ -233,10 +233,12 @@ export default function AdminReviewScreen() {
       const conv = await getOrCreateConversation(report.id, report.user_id);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const parent: any = nav.getParent();
-      parent?.navigate('ChatTab', { screen: 'Inbox' });
       parent?.navigate('ChatTab', {
-        screen: 'ChatRoom',
-        params: { conversationId: conv.id, reportId: report.id },
+        screen: 'Inbox',
+        params: {
+          openConversationId: conv.id,
+          openReportId: report.id,
+        },
       });
     } catch (e) {
       Alert.alert('Gagal membuka chat', e instanceof Error ? e.message : 'Coba lagi nanti.');

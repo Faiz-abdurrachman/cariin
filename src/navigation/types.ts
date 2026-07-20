@@ -36,7 +36,7 @@ export type HomeStackParamList = {
 };
 
 export type ChatStackParamList = {
-  Inbox: undefined;
+  Inbox: { openConversationId?: string; openReportId?: string } | undefined;
   ChatRoom: { conversationId: string; reportId: string };
   UserProfile: { userId: string };
   DetailLost: { reportId: string };
@@ -94,7 +94,7 @@ export type AdminCreateStackParamList = {
 };
 
 export type AdminChatStackParamList = {
-  Inbox: undefined;
+  Inbox: { openConversationId?: string; openReportId?: string } | undefined;
   ChatRoom: { conversationId: string; reportId: string };
   UserProfile: { userId: string };
 };
